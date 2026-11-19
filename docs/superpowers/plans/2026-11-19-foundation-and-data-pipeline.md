@@ -94,7 +94,7 @@ test('amber lang', () => expect(LOCALES.map(toAmberLang)).toEqual(['en','ru','ch
 **Interfaces:**
 - Consumes: `Locale`, `Element`, `WeaponType` from `@gi/shared` (pg enums built from `ELEMENTS`, `WEAPON_TYPES`, `LOCALES`).
 - Produces (`@gi/db`):
-  - Tables (Drizzle names): `characters` (id text pk, rarity smallint, element nullable, weaponType, region text null, birthdayMonth/birthdayDay smallint null, releaseAt timestamptz null, sourceHash text, updatedAt), `characterI18n` (characterId fk cascade, locale, name, title null, description null, details jsonb; pk `(characterId, locale)`), `weapons` (id, rarity, weaponType, sourceHash, updatedAt), `weaponI18n` (weaponId, locale, name, description null, details jsonb), `materials` (id, rarity, category text, sourceHash, updatedAt), `materialI18n` (materialId, locale, name, description null), `mediaAssets` (id serial, ownerType enum `character|weapon|material`, ownerId text, kind enum `icon|gacha_splash|gacha_icon|model_glb`, sourceUrl text, r2Key, width int, height int, contentHash, updatedAt; unique `(ownerType, ownerId, kind)`), `syncRuns` (id serial, startedAt, finishedAt null, status enum `running|succeeded|partial|failed`, counts jsonb, error text null)
+  - Tables (Drizzle names): `characters` (id text pk, rarity smallint, element nullable, weaponType, region text null, birthdayMonth/birthdayDay smallint null, releaseAt timestamptz null, sourceHash text, updatedAt), `characterI18n` (characterId fk cascade, locale, name, title null, description null, details jsonb; pk `(characterId, locale)`), `weapons` (id, rarity, weaponType, sourceHash, updatedAt), `weaponI18n` (weaponId, locale, name, description null, details jsonb), `materials` (id, rarity, category text, sourceHash, updatedAt), `materialI18n` (materialId, locale, name, description null), `mediaAssets` (id serial, ownerType enum `character|weapon|material`, ownerId text, kind enum `icon|gacha_splash|gacha_icon|model_glb`, sourceUrl text, r2Key, width int, height int, contentHash, updatedAt; unique `(ownerType, ownerId, kind)`), `syncRuns` (id serial, startedAt, finishedAt null, status enum `running|succeeded|partial|failed`, counts jsonb, error text null), `siteAssets` (id serial, group text — e.g. `home-background`, r2Key, width int, height int, contentHash unique, sortOrder int, createdAt) for hand-curated site media that does not come from upstream
   - `createDb(url: string): { db: Db; close(): Promise<void> }`, `type Db`
   - `resetDb(db: Db): Promise<void>` (truncate all tables, restart identities). Test-only export from `@gi/db/test-utils`.
   - Scripts: `db:generate` (drizzle-kit generate), `db:migrate` (programmatic `migrate()` runner, `src/migrate.ts`)
@@ -141,13 +141,18 @@ test('amber lang', () => expect(LOCALES.map(toAmberLang)).toEqual(['en','ru','ch
 - Produces:
   - `api = hc<AppType>(import.meta.env.VITE_API_URL)` in `src/api.ts`
   - `queryClient` and file-based TanStack Router (plugin `@tanstack/router-plugin/vite`)
-  - Tailwind v4 via `@tailwindcss/vite`; `theme.css` declares `@theme` tokens: `--color-pyro … --color-geo` and `--color-rarity-1 … --color-rarity-5`, values copied from the `legacy` branch `src/assets/Styles/_vision_colors.scss` and `_rarity_colors.scss`; `--font-genshin` from the legacy `HYWenHei-HEW` font (copy the font file from `legacy:public/fonts/genshin-text/`)
+  - Tailwind v4 via `@tailwindcss/vite`; `theme.css` declares `@theme` tokens: `--color-pyro … --color-geo` and `--color-rarity-1 … --color-rarity-5`, values copied from the `legacy` branch `src/assets/Styles/_vision_colors.scss` and `_rarity_colors.scss`; `--font-genshin` and `--font-genshin-icon` (see fonts below)
+  - **Fonts** (from `legacy:public/fonts/`; woff2 only, drop eot/svg/ttf/woff):
+    - `HYWenHei-HEW` text font (3.6 MB woff2, full CJK) is split into `unicode-range` subsets by a committed script `apps/web/scripts/subset-fonts.py` (fontTools `pyftsubset`, run with `uvx --from fonttools[woff]`): one `latin-cyrillic` file (U+0000-024F, U+0400-04FF, U+2000-206F, U+20AC) and CJK chunks of about 300 code points ordered by frequency (common zh-CN/zh-TW characters first, then the rest of U+4E00-9FFF, U+3000-303F, U+FF00-FFEF). The script writes `src/assets/fonts/hywenhei/*.woff2` and `src/styles/fonts.css` (one `@font-face` per subset, family `Genshin`, `font-display: swap`). The source font stays out of the repo; the script reads it from a path argument (e.g. `git show legacy:public/fonts/genshin-text/HYWenHei-HEW.woff2 > /tmp/...`).
+    - `genshinicon` icon font (61 glyphs, 14 KB woff2) is copied whole to `src/assets/fonts/genshinicon.woff2`. Codepoints from `legacy:public/css/genshinIcons.css` go into a typed map `genshinIcons: Record<GenshinIconName, string>`, with a `<GenshinIcon name="…" />` component (`aria-hidden` unless it has a `label`).
+    - `index.html` preloads only the `latin-cyrillic` subset.
+  - Site UI icons bundled from the legacy API's `assets/images/genshin-site/` (`git -C ../api show` or the local clone): `home-icons/*` → `src/assets/icons/home/`, `nav-icons/*` → `src/assets/icons/nav/`, `stats-icons/*` → `src/assets/icons/stats/`, `placeholder-icons/*` → `src/assets/icons/placeholder/`. Add the missing `.webp` extension to extensionless files and rename to kebab-case (`Icon_Wish` → `wish.webp`). `src/assets/icons/index.ts` exports typed maps (`homeIcons: Record<HomeIconName, string>` etc.) built with `import.meta.glob(..., { eager: true, query: '?url', import: 'default' })`
   - Index route renders a placeholder home with the API status (`useQuery` → `api.health.$get()`), showing "API online" or "API offline"
 
-- [ ] **Step 1: Write failing test**: render the index route with a mocked `api.health.$get` resolving `{ ok: true }` → text "API online"; mocked rejection → "API offline".
+- [ ] **Step 1: Write failing tests**: `homeIcons.wish`, `navIcons.character`, `statsIcons.pyro` are defined strings (so a missing or misnamed icon fails the build/test); `genshinIcons` has 61 entries and `<GenshinIcon name=… />` renders its codepoint with `aria-hidden="true"`; `fonts.css` contains a `latin-cyrillic` face whose `unicode-range` includes `U+0400-04FF`; render the index route with a mocked `api.health.$get` resolving `{ ok: true }` → text "API online"; mocked rejection → "API offline".
 - [ ] **Step 2: Run** `pnpm test apps/web`. Expected: FAIL.
 - [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run** `pnpm test apps/web && pnpm --filter @gi/web build`. Expected: PASS; build emits `apps/web/dist/index.html`. With the API running locally, `pnpm --filter @gi/web dev` shows "API online".
+- [ ] **Step 4: Run** `pnpm test apps/web && pnpm --filter @gi/web build`. Expected: PASS; build emits `apps/web/dist/index.html`; the `latin-cyrillic` subset is under 150 KB and no single CJK chunk is over 200 KB (`du -k apps/web/dist/assets/*.woff2`); in the dev server, English and Russian text renders in HYWenHei and the Network tab shows no CJK chunk loaded on an `en` page. With the API running locally, `pnpm --filter @gi/web dev` shows "API online".
 - [ ] **Step 5: Commit** `feat(web): vite react shell with typed api client and theme tokens`
 
 ---
@@ -321,7 +326,30 @@ Behaviour:
 
 ---
 
-### Task 10: Deploy skeletons
+### Task 10: Home backgrounds (site assets in R2)
+
+The 40 hand-picked home screenshots (1918×1059 webp, 5.2 MB) are curated content, not game data: the sync job never touches them, and they are not committed to the repo.
+
+**Files:**
+- Create: `apps/api/src/site/seed-site-assets.ts` (CLI `pnpm --filter @gi/api seed:site <group> <dir>`), `apps/api/src/routes/site.ts`
+- Modify: `apps/api/src/app.ts` (mount `/v1/site`)
+- Test: `apps/api/src/site/seed-site-assets.test.ts`, `apps/api/src/routes/site.test.ts`
+
+**Interfaces:**
+- Consumes: `processImage`, `MediaStore` (Task 7); `siteAssets` (Task 2).
+- Produces:
+  - `seedSiteAssets(deps: { db: Db; store: MediaStore }, group: string, files: { name: string; bytes: Uint8Array }[]): Promise<{ uploaded: number; skipped: number }>`: processes each file (webp q85), key `site/${group}/${contentHash.slice(0,12)}.webp`, skips files whose `contentHash` already exists, and sets `sortOrder` from the numeric file name (`0`, `1`, … `39`), falling back to alphabetical order. Never deletes.
+  - `GET /v1/site/home-backgrounds` → `{ items: { url, width, height }[] }` ordered by `sortOrder`; `Cache-Control: public, max-age=3600`
+
+- [ ] **Step 1: Write failing tests**: seeding 3 generated images → 3 rows, 3 keys under `site/home-background/`; re-seeding the same files → `skipped 3`; files named `10`, `2`, `1` get sortOrder 1, 2, 10 (numeric, not lexical); the endpoint returns absolute `MEDIA_PUBLIC_URL` URLs in that order, and an empty table returns `{ items: [] }`.
+- [ ] **Step 2: Run.** Expected: FAIL.
+- [ ] **Step 3: Implement.**
+- [ ] **Step 4: Run tests, then seed locally** from the legacy clone: `pnpm --filter @gi/api seed:site home-background ../../../api/assets/images/genshin-site/home-backgrounds` (path relative to `apps/api`). Expected: `uploaded 40`; `curl localhost:$PORT/v1/site/home-backgrounds` lists 40 URLs that load from MinIO.
+- [ ] **Step 5: Commit** `feat(site): curated home backgrounds in r2 with manifest endpoint`
+
+---
+
+### Task 11: Deploy skeletons
 
 Every step here creates external resources; confirm each with the user before running it.
 
@@ -334,5 +362,5 @@ Every step here creates external resources; confirm each with the user before ru
 - [ ] **Step 1: Cloudflare R2**: user creates bucket `gi-media`, an API token (object read/write on that bucket), and public access (custom domain if they have one, else `r2.dev`). Expected: `MEDIA_PUBLIC_URL/<test-object>` serves over HTTPS.
 - [ ] **Step 2: Railway** (via the Railway MCP/CLI): project `genshin-impact` with Postgres, service `api` (repo branch `remake`, config `apps/api/railway.json`), service `sync` (config `apps/api/railway.sync.json`), shared variables from Global Constraints; `CORS_ORIGIN` = the Vercel URL from Step 3. Generate a domain for `api`. Expected: `curl https://<api-domain>/health` → `{"ok":true}`.
 - [ ] **Step 3: Vercel**: a **new** project `genshin-impact-remake` from branch `remake`, root `apps/web`, env `VITE_API_URL=https://<api-domain>`. The existing project keeps serving `master` (legacy) until cutover. Expected: the deployed page shows "API online".
-- [ ] **Step 4: First production sync**: `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://<api-domain>/admin/sync?full=1`, then follow the `sync` logs. Expected: run ends `succeeded`/`partial`; `GET /v1/characters?locale=zh-TW` returns ~138 items whose media URLs load from R2.
+- [ ] **Step 4: First production sync**: `curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" https://<api-domain>/admin/sync?full=1`, then follow the `sync` logs. Expected: run ends `succeeded`/`partial`; `GET /v1/characters?locale=zh-TW` returns ~138 items whose media URLs load from R2. Then run the Task 10 seed against production (`DATABASE_URL`/R2 env from Railway via `railway run`), and `GET /v1/site/home-backgrounds` returns 40 R2 URLs.
 - [ ] **Step 5: Commit** `chore: railway and vercel deploy config` and push (with go-ahead).
