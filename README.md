@@ -53,6 +53,16 @@ curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" "https://<api-domain>/admin
 curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" "https://<api-domain>/admin/sync?details=1"
 ```
 
+After a deploy that adds a media kind (for example `skill_icon` or `namecard`), run the `?details=1` sync once so existing characters pick it up. The migration runs pre-deploy; nothing else is needed.
+
+### UI strings
+
+The web UI strings live in `apps/web/src/i18n/`. Edit `strings.zh-CN.ts`, `strings.en.ts` and `strings.ru.ts` by hand, then regenerate Traditional Chinese with OpenCC:
+
+```sh
+pnpm --filter @gi/web i18n:zh-tw
+```
+
 ### Running against production from your machine
 
 `railway run` injects the service variables, including the private `*.railway.internal` `DATABASE_URL`, which is not reachable from outside Railway. Override it with the Postgres public proxy URL (`DATABASE_PUBLIC_URL` on the Postgres service) and build locally first (Node 24, corepack/pnpm):
