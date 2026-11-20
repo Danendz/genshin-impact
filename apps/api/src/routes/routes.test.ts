@@ -126,6 +126,20 @@ describe('characters', () => {
     expect(diluc?.media.namecard).toMatch(/namecard\.webp$/)
   })
 
+  it('lists each character region for the filter', async () => {
+    await db
+      .update(characters)
+      .set({ region: 'MONDSTADT' })
+      .where(eq(characters.id, '10000005-pyro'))
+    const { items } = (await (await app.request('/v1/characters')).json()) as {
+      items: { id: string; region: string | null }[]
+    }
+    expect(items.find((i) => i.id === '10000005-pyro')?.region).toBe(
+      'MONDSTADT',
+    )
+    expect(items.find((i) => i.id === '10000002-dendro')?.region).toBeNull()
+  })
+
   it('falls back to en per entity', async () => {
     const res = await app.request('/v1/characters/10000002-dendro?locale=ru')
     expect(res.status).toBe(200)

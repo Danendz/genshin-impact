@@ -606,12 +606,50 @@
 .confirm:hover .confirmIcon::after {
   opacity: 0.7;
 }
+/* legacy CharacterSelectedFilters: a grey strip over the grid, above the bar */
+.chosen {
+  margin: 0;
+  border: 0;
+  min-width: 0;
+  position: absolute;
+  right: 10px;
+  bottom: 52px;
+  left: var(--side);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 20px;
+  background: rgb(202 202 202 / 0.82);
+  animation: fadeDown 0.3s ease-out;
+}
+.chosenList {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
 .chip {
-  border-radius: 999px;
-  padding: 3px 10px;
-  border: 1px solid rgb(255 255 255 / 0.35);
-  font-size: 14px;
+  flex-shrink: 0;
+  padding: 0 5px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.97);
+  color: black;
+  font-size: 17px;
+  white-space: nowrap;
   transition: 0.2s;
+}
+.chosenClear {
+  flex-shrink: 0;
+  margin-left: 10px;
+  padding: 1px 9px;
+  border-radius: 12px;
+  background: #4b4a48;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 /* Right column: legacy ContentRight + AttributesContent. */
@@ -905,6 +943,13 @@
   .filterOption {
     height: 40px;
     font-size: 14px;
+  }
+  .chosen {
+    bottom: 40px;
+  }
+  .chip,
+  .chosenClear {
+    font-size: 13px;
   }
   .confirm {
     height: 35px;

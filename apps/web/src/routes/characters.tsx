@@ -9,7 +9,11 @@ import { useCallback, useState } from 'react'
 import { BottomButtons, ShowButton } from '../characters/BottomButtons'
 import { CloseButton } from '../characters/CloseButton'
 import styles from '../characters/characters.module.css'
-import { characterSearch, filterCharacters } from '../characters/details'
+import {
+  characterSearch,
+  filterCharacters,
+  regionsOf,
+} from '../characters/details'
 import { LegacyBackground } from '../characters/LegacyBackground'
 import { charactersListQuery } from '../characters/queries'
 import { SectionMenu } from '../characters/SectionMenu'
@@ -61,6 +65,7 @@ function CharactersLayout() {
             <>
               <SelectionPanel
                 items={items}
+                regions={regionsOf(data)}
                 activeId={id}
                 search={search}
                 locale={locale}

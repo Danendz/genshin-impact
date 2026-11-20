@@ -18,41 +18,94 @@ export const SECTIONS = [
 ] as const
 export type Section = (typeof SECTIONS)[number]
 
+/** regions in game order; the filter lists the ones the roster has */
+export const REGIONS = [
+  'MONDSTADT',
+  'LIYUE',
+  'INAZUMA',
+  'SUMERU',
+  'FONTAINE',
+  'NATLAN',
+  'SNEZHNAYA',
+] as const
+
+/** filters hold several values each (legacy multi-select); the URL joins them with commas */
 export type CharacterSearch = {
-  element?: Element
-  weaponType?: WeaponType
-  rarity?: 4 | 5
+  element?: Element[]
+  weaponType?: WeaponType[]
+  rarity?: (4 | 5)[]
+  region?: string[]
   section?: Section
   locale?: Locale
 }
+export type FilterKey = 'element' | 'weaponType' | 'rarity' | 'region'
+export const FILTER_KEYS = [
+  'element',
+  'weaponType',
+  'rarity',
+  'region',
+] as const satisfies readonly FilterKey[]
 
 const oneOf = <T extends string>(list: readonly T[], v: unknown) =>
   list.includes(v as T) ? (v as T) : undefined
 
+/** a URL value: 'a,b', a lone number the router already parsed, or an array */
+const values = (raw: unknown): string[] =>
+  (Array.isArray(raw) ? raw : String(raw ?? '').split(','))
+    .map((v) => String(v).trim())
+    .filter(Boolean)
+
+const many = <T>(raw: unknown, keep: (v: string) => T | undefined) => {
+  const out = [...new Set(values(raw).map(keep))].filter(
+    (v): v is T => v !== undefined,
+  )
+  return out.length ? out : undefined
+}
+
 /** route search validator: invalid values are dropped, never thrown */
 export function characterSearch(raw: Record<string, unknown>): CharacterSearch {
-  const rarity = Number(raw.rarity)
   const out: CharacterSearch = {}
-  const element = oneOf(ELEMENTS, raw.element)
-  const weaponType = oneOf(WEAPON_TYPES, raw.weaponType)
+  const element = many(raw.element, (v) => oneOf(ELEMENTS, v))
+  const weaponType = many(raw.weaponType, (v) => oneOf(WEAPON_TYPES, v))
+  const rarity = many(raw.rarity, (v) =>
+    v === '4' || v === '5' ? (Number(v) as 4 | 5) : undefined,
+  )
+  const region = many(raw.region, (v) => (/^[A-Z_]+$/.test(v) ? v : undefined))
   if (element) out.element = element
   if (weaponType) out.weaponType = weaponType
-  if (rarity === 4 || rarity === 5) out.rarity = rarity
+  if (rarity) out.rarity = rarity
+  if (region) out.region = region
   const section = oneOf(SECTIONS, raw.section)
   if (section) out.section = section
   if (isLocale(raw.locale)) out.locale = raw.locale
   return out
 }
 
-export function filterCharacters<
-  T extends { element: string | null; weaponType: string; rarity: number },
->(items: T[], s: CharacterSearch): T[] {
-  return items.filter(
-    (c) =>
-      (!s.element || c.element === s.element) &&
-      (!s.weaponType || c.weaponType === s.weaponType) &&
-      (!s.rarity || c.rarity === s.rarity),
+type Filterable = {
+  element: string | null
+  weaponType: string
+  rarity: number
+  region: string | null
+}
+
+/** any chosen value within a filter, every filter that has values */
+export function filterCharacters<T extends Filterable>(
+  items: T[],
+  s: CharacterSearch,
+): T[] {
+  return items.filter((c) =>
+    FILTER_KEYS.every((k) => {
+      const chosen = s[k] as readonly (string | number)[] | undefined
+      return !chosen || chosen.includes(c[k] as string | number)
+    }),
   )
+}
+
+/** regions the roster has, game order first, unknown ones after */
+export function regionsOf(items: { region: string | null }[]): string[] {
+  const have = new Set(items.map((c) => c.region).filter((r) => r !== null))
+  const known: string[] = REGIONS.filter((r) => have.has(r))
+  return [...known, ...[...have].filter((r) => !known.includes(r)).sort()]
 }
 
 export type TalentLevel = {

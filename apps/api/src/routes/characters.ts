@@ -88,6 +88,7 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
           rarity: r.c.rarity,
           element: r.c.element,
           weaponType: r.c.weaponType,
+          region: r.c.region,
           media: media.get(r.c.id) ?? {},
         })),
       })

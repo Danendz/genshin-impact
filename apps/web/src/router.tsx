@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { createRouter } from '@tanstack/react-router'
+import { createRouter, stringifySearchWith } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 
 export const queryClient = new QueryClient()
@@ -11,6 +11,11 @@ export function makeRouter(client: QueryClient) {
     defaultPreload: 'intent',
     // loaders read through TanStack Query, which owns caching
     defaultPreloadStaleTime: 0,
+    // lists read as ?element=pyro,hydro rather than JSON
+    stringifySearch: stringifySearchWith(
+      (v) => (Array.isArray(v) ? v.join(',') : JSON.stringify(v)),
+      JSON.parse,
+    ),
   })
 }
 

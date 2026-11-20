@@ -11,7 +11,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../api'
 import { makeRouter } from '../router'
-import { parseCharacterDetails, talentKind } from './details'
+import { characterSearch, parseCharacterDetails, talentKind } from './details'
 
 vi.mock('../api', () => {
   const detail = { $get: vi.fn() }
@@ -29,21 +29,23 @@ const item = (
   element: string,
   weaponType: string,
   rarity: number,
+  region: string | null,
 ) => ({
   id,
   name,
   rarity,
   element,
   weaponType,
+  region,
   media: {
     icon: `https://m/${id}/icon.webp`,
     gacha_splash: `https://m/${id}/s.webp`,
   },
 })
 const items = [
-  item('10000038', 'Albedo', 'geo', 'sword', 5),
-  item('10000073', 'Nahida', 'dendro', 'catalyst', 5),
-  item('10000067', 'Collei', 'dendro', 'bow', 4),
+  item('10000038', 'Albedo', 'geo', 'sword', 5, 'MONDSTADT'),
+  item('10000073', 'Nahida', 'dendro', 'catalyst', 5, 'SUMERU'),
+  item('10000067', 'Collei', 'dendro', 'bow', 4, 'SUMERU'),
 ]
 const respond = (status: number, body: unknown) =>
   ({ ok: status === 200, status, json: async () => body }) as never
@@ -107,7 +109,9 @@ describe('characters routes', () => {
     await waitFor(() =>
       expect(router.state.location.pathname).toBe('/characters/10000073'),
     )
-    expect(router.state.location.search).toMatchObject({ element: 'dendro' })
+    expect(characterSearch(router.state.location.search)).toMatchObject({
+      element: ['dendro'],
+    })
   })
 
   it('shows the empty message and stays put when nothing matches', async () => {
@@ -135,10 +139,12 @@ describe('characters routes', () => {
       await screen.findByRole('heading', { name: 'Collei' }),
     ).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/characters/10000067')
-    expect(router.state.location.search).toMatchObject({ element: 'dendro' })
+    expect(characterSearch(router.state.location.search)).toMatchObject({
+      element: ['dendro'],
+    })
   })
 
-  it('filters from the selection panel and closes it on Escape', async () => {
+  it('applies the chosen filters on Confirm and closes on Escape', async () => {
     const router = await renderAt('/characters/10000038?locale=en')
     fireEvent.click(
       await screen.findByRole('button', { name: 'Toggle characters' }),
@@ -148,20 +154,68 @@ describe('characters routes', () => {
     const filter = within(panel).getByRole('group', { name: 'Filter' })
     const bow = within(filter).getByRole('button', { name: 'Bow' })
     expect(bow).toHaveAttribute('aria-pressed', 'false')
+    // legacy: several options per group, nothing applies until Confirm
     fireEvent.click(bow)
-    await waitFor(() =>
-      expect(router.state.location.search).toMatchObject({ weaponType: 'bow' }),
-    )
-    expect(within(filter).getByRole('button', { name: 'Bow' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    )
-    expect(screen.queryByRole('link', { name: 'Albedo' })).toBeNull()
+    fireEvent.click(within(filter).getByRole('button', { name: 'Catalyst' }))
+    expect(bow).toHaveAttribute('aria-pressed', 'true')
+    expect(router.state.location.search).not.toHaveProperty('weaponType')
+    expect(within(panel).getByRole('link', { name: 'Albedo' })).toBeTruthy()
     fireEvent.click(within(filter).getByRole('button', { name: 'Confirm' }))
+    await waitFor(() =>
+      expect(characterSearch(router.state.location.search)).toMatchObject({
+        weaponType: ['bow', 'catalyst'],
+      }),
+    )
+    expect(router.state.location.href).toContain('weaponType=bow%2Ccatalyst')
+    expect(within(panel).queryByRole('link', { name: 'Albedo' })).toBeNull()
+    expect(within(panel).getAllByRole('link')).toHaveLength(2)
     expect(within(panel).queryByRole('group', { name: 'Filter' })).toBeNull()
-    expect(panel).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('filters by region and lists the chosen filters over the grid', async () => {
+    const router = await renderAt(
+      '/characters/10000067?weaponType=sword,bow&region=SUMERU&locale=en',
+    )
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Toggle characters' }),
+    )
+    const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+    expect(
+      within(panel)
+        .getAllByRole('link')
+        .map((a) => a.getAttribute('aria-label')),
+    ).toEqual(['Collei'])
+    const chosen = within(panel).getByRole('group', {
+      name: 'Selected filters',
+    })
+    for (const name of ['Sword', 'Bow', 'Sumeru'])
+      expect(within(chosen).getByText(name)).toBeInTheDocument()
+    // the drawer offers only regions some character comes from
+    fireEvent.click(within(panel).getByRole('button', { name: 'Filter' }))
+    const filter = within(panel).getByRole('group', { name: 'Filter' })
+    const region = within(filter).getByRole('group', { name: 'Region' })
+    expect(
+      within(region)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Mondstadt', 'Sumeru'])
+    expect(
+      within(region).getByRole('button', { name: 'Sumeru' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(within(chosen).getByRole('button', { name: 'Clear' }))
+    await waitFor(() =>
+      expect(router.state.location.search).not.toHaveProperty('region'),
+    )
+    expect(router.state.location.search).not.toHaveProperty('weaponType')
+    expect(
+      within(panel).queryByRole('group', { name: 'Selected filters' }),
+    ).toBeNull()
+    // the open drawer follows the cleared filters
+    expect(
+      within(region).getByRole('button', { name: 'Sumeru' }),
+    ).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('hides the top bar while selecting and closes with the legacy back button', async () => {
@@ -343,6 +397,27 @@ describe('characters routes', () => {
 })
 
 describe('details helpers', () => {
+  it('reads several values per filter and drops unknown ones', () => {
+    expect(
+      characterSearch({
+        element: 'pyro,lava,hydro',
+        weaponType: ['bow'],
+        rarity: '4,5,9',
+        region: 'SUMERU,bad value',
+      }),
+    ).toEqual({
+      element: ['pyro', 'hydro'],
+      weaponType: ['bow'],
+      rarity: [4, 5],
+      region: ['SUMERU'],
+    })
+    // a single value arrives from the URL as a plain string or number
+    expect(characterSearch({ element: 'geo', rarity: 5 })).toEqual({
+      element: ['geo'],
+      rarity: [5],
+    })
+  })
+
   it.each([
     [{ icon: 'Skill_A_01', type: 0 }, 'normal'],
     [{ icon: 'Skill_S_Albedo_01', type: 0 }, 'skill'],
