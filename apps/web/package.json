@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "i18n:zh-tw": "node scripts/gen-zh-tw.ts && biome format --write src/i18n/strings.zh-TW.ts"
   },
   "dependencies": {
     "@gi/shared": "workspace:*",
@@ -25,10 +26,12 @@
     "@testing-library/jest-dom": "^8.0.0",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^26.6.6",
+    "@types/opencc-js": "^1.0.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
     "jsdom": "^31.0.1",
+    "opencc-js": "^1.4.2",
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.8"
   }
