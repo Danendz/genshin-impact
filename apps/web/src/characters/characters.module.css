@@ -107,3 +107,50 @@
   color: #3b4255;
   border-color: #ece5d8;
 }
+
+/*
+ * Detail sheet. Phones: a native scroll container with two snap points:
+ * collapsed (spacer in view, panel peeking) and expanded (panel at the top).
+ * Desktop: a fixed right-hand column, no snapping.
+ */
+.sheet {
+  position: absolute;
+  inset: 0 0 88px 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  pointer-events: none;
+}
+.sheet::-webkit-scrollbar {
+  display: none;
+}
+.sheetSpacer {
+  height: 62%;
+  scroll-snap-align: start;
+}
+.sheetBody {
+  display: flex;
+  height: calc(100% - 4rem);
+  padding: 0 12px;
+  scroll-snap-align: start;
+  pointer-events: auto;
+}
+.sheetBody > * {
+  flex: 1;
+}
+@media (min-width: 768px) {
+  .sheet {
+    inset: 5rem 1.5rem 1.5rem auto;
+    width: min(440px, 42vw);
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .sheetSpacer {
+    display: none;
+  }
+  .sheetBody {
+    height: 100%;
+    padding: 0;
+  }
+}

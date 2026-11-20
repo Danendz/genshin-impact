@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { CharacterHeader } from '../characters/CharacterHeader'
+import styles from '../characters/characters.module.css'
+import { DetailPanel } from '../characters/DetailPanel'
 import { characterDetailQuery } from '../characters/queries'
 import { browserLocale, useLocale } from '../i18n/locale'
 import { t } from '../i18n/strings'
@@ -22,8 +24,8 @@ function CharacterPage() {
   const q = useQuery(characterDetailQuery(id, locale))
 
   return (
-    <section className="pointer-events-none absolute inset-0 z-10 flex flex-col gap-6 px-4 pt-16 pb-28 md:pt-20 md:pr-6 md:pb-6 md:pl-32">
-      <div className="pointer-events-auto">
+    <section className="pointer-events-none absolute inset-0 z-10">
+      <div className="pointer-events-auto absolute top-16 left-4 md:top-20 md:left-32">
         {q.isPending ? (
           <div className="h-24 w-64 animate-pulse rounded-xl bg-white/10" />
         ) : q.isError ? (
@@ -50,6 +52,22 @@ function CharacterPage() {
           />
         )}
       </div>
+      {q.isPending && (
+        <div className={styles.sheet}>
+          <div className={styles.sheetSpacer} />
+          <div className={styles.sheetBody}>
+            <div className="animate-pulse rounded-2xl bg-white/10" />
+          </div>
+        </div>
+      )}
+      {q.data && (
+        <div className={styles.sheet}>
+          <div className={styles.sheetSpacer} />
+          <div className={styles.sheetBody}>
+            <DetailPanel detail={q.data} locale={locale} />
+          </div>
+        </div>
+      )}
     </section>
   )
 }
