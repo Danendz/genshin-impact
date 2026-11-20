@@ -172,6 +172,56 @@ describe('runSync', () => {
     ])
   })
 
+  it('a failing skill icon keeps the character and its other icons, and retries next run', async () => {
+    const { source, state } = fakeSource()
+    const [a] = state.chars
+    if (!a) throw new Error('fixture')
+    a.skillIcons = [
+      { name: 'Skill_500', url: 'https://cdn.test/Skill_500.png' },
+      { name: 'Skill_ok', url: 'https://cdn.test/Skill_ok.png' },
+    ]
+    const f = (async (url: string) =>
+      url.includes('Skill_500')
+        ? new Response('x', { status: 500 })
+        : new Response(png, { status: 200 })) as typeof fetch
+    const res = await runSync(deps(source, f))
+    if (res === 'busy') throw new Error('busy')
+    expect(res.status).toBe('partial')
+    expect(res.counts.characters).toEqual({
+      upserted: 2,
+      skipped: 0,
+      failed: 0,
+    })
+    expect(res.failures).toEqual([
+      expect.objectContaining({ entity: 'skill_icon', id: 'Skill_500' }),
+    ])
+    const icons = await db
+      .select()
+      .from(mediaAssets)
+      .where(eq(mediaAssets.ownerType, 'skill_icon'))
+    expect(icons.map((r) => r.ownerId)).toEqual(['Skill_ok'])
+    const [c] = await db
+      .select()
+      .from(characters)
+      .where(eq(characters.id, a.id))
+    // blank, so the next plain run fetches it again
+    expect(c?.sourceHash).toBe('')
+  })
+
+  it('a full run downloads a shared skill icon once', async () => {
+    const { source, state } = fakeSource()
+    const shared = { name: 'Skill_S', url: 'https://cdn.test/Skill_S.png' }
+    for (const c of state.chars) c.skillIcons = [shared]
+    const f = vi.fn(ok)
+    await runSync(deps(source, f as typeof fetch))
+    f.mockClear()
+    await runSync(deps(source, f as typeof fetch), { full: true })
+    const iconCalls = f.mock.calls.filter(([u]) =>
+      String(u).includes('Skill_S'),
+    )
+    expect(iconCalls).toHaveLength(1)
+  })
+
   it('syncs an empty db', async () => {
     const { source } = fakeSource()
     const res = await runSync(deps(source))

@@ -154,6 +154,36 @@ export async function runSync(
       log(`${entity} ${id} failed: ${reason}`)
     }
 
+    /**
+     * Skill icons are shared by name across characters: each one is synced at
+     * most once per run, and its failure is its own, not the character's.
+     */
+    const iconRuns = new Map<string, Promise<boolean>>()
+    const syncIcon = (icon: SkillIcon) => {
+      let run = iconRuns.get(icon.name)
+      if (!run) {
+        run = syncMedia(
+          mediaDeps,
+          { type: 'skill_icon', id: icon.name },
+          [{ kind: 'icon', url: icon.url }],
+          { force: full },
+        ).then(
+          () => true,
+          (e) => {
+            failures.push({
+              entity: 'skill_icon',
+              id: icon.name,
+              reason: msg(e),
+            })
+            log(`skill_icon ${icon.name} failed: ${msg(e)}`)
+            return false
+          },
+        )
+        iconRuns.set(icon.name, run)
+      }
+      return run
+    }
+
     /** Fetch + upsert + media for one entity; any error counts as entity failure. */
     async function syncEntity<
       R extends { id: string; media: MediaRef[]; skillIcons?: SkillIcon[] },
@@ -182,14 +212,12 @@ export async function runSync(
         await syncMedia(mediaDeps, { type: kind, id: entry.id }, record.media, {
           force: full,
         })
+        let iconsOk = true
         for (const icon of record.skillIcons ?? [])
-          await syncMedia(
-            mediaDeps,
-            { type: 'skill_icon', id: icon.name },
-            [{ kind: 'icon', url: icon.url }],
-            { force: full },
-          )
-        await setSourceHash(db, kind, entry.id, entry.listHash, detailHash)
+          if (!(await syncIcon(icon))) iconsOk = false
+        // a failed icon keeps the hash blank, so the next run retries it
+        if (iconsOk)
+          await setSourceHash(db, kind, entry.id, entry.listHash, detailHash)
         c.upserted++
       } catch (e) {
         fail(c, kind, entry.id, msg(e))
