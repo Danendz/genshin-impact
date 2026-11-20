@@ -28,6 +28,7 @@ export async function upsertCharacter(
     birthdayDay: r.birthday?.[1] ?? null,
     releaseAt: r.releaseAt,
     sourceHash,
+    detailHash: null,
     updatedAt: new Date(),
   }
   await db.transaction(async (tx) => {
@@ -59,6 +60,7 @@ export async function upsertWeapon(
     rarity: r.rarity,
     weaponType: r.weaponType,
     sourceHash,
+    detailHash: null,
     updatedAt: new Date(),
   }
   await db.transaction(async (tx) => {
@@ -110,6 +112,7 @@ export async function setSourceHash(
   table: 'character' | 'weapon' | 'material',
   id: string,
   hash: string,
+  detailHash?: string,
 ): Promise<void> {
   const t =
     table === 'character'
@@ -117,5 +120,12 @@ export async function setSourceHash(
       : table === 'weapon'
         ? weapons
         : materials
-  await db.update(t).set({ sourceHash: hash }).where(eq(t.id, id))
+  if (t === materials || detailHash === undefined) {
+    await db.update(t).set({ sourceHash: hash }).where(eq(t.id, id))
+    return
+  }
+  await db
+    .update(t as typeof characters)
+    .set({ sourceHash: hash, detailHash })
+    .where(eq(t.id, id))
 }

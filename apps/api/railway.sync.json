@@ -4,7 +4,8 @@
     "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter @gi/api... build"
   },
   "deploy": {
-    "startCommand": "node apps/api/dist/cli.js",
+    "preDeployCommand": ["pnpm --filter @gi/db db:migrate"],
+    "startCommand": "node apps/api/dist/cli.js --details",
     "cronSchedule": "0 4 * * *",
     "restartPolicyType": "NEVER"
   }

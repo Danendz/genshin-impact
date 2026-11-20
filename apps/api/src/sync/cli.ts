@@ -6,6 +6,7 @@ import { runSync } from './run-sync'
 
 async function main(): Promise<number> {
   const full = process.argv.includes('--full')
+  const details = process.argv.includes('--details')
   const env = parseCliEnv(process.env)
   const { db, sql, close } = createDb(env.DATABASE_URL)
   const started = Date.now()
@@ -19,7 +20,7 @@ async function main(): Promise<number> {
         fetch,
         log: (m) => console.log(`[sync] ${m}`),
       },
-      { full },
+      { full, details },
     )
     if (result === 'busy') {
       console.error('another sync is already running')

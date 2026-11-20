@@ -89,11 +89,12 @@ async function pool<T>(items: T[], fn: (item: T) => Promise<void>) {
 
 export async function runSync(
   deps: RunSyncDeps,
-  opts: { full?: boolean } = {},
+  opts: { full?: boolean; details?: boolean } = {},
 ): Promise<SyncResult | 'busy'> {
   const { db, sql, source, store } = deps
   const log = deps.log ?? (() => {})
   const full = opts.full ?? false
+  const details = opts.details ?? false
   const timeoutMs = deps.imageTimeoutMs ?? 30_000
 
   const conn = await sql.reserve()
@@ -160,15 +161,26 @@ export async function runSync(
       entry: ListEntry,
       get: (id: string) => Promise<R>,
       upsert: (rec: R, hash: string) => Promise<void>,
+      prev?: { sourceHash: string; detailHash: string | null },
     ) {
       try {
         const record = await get(entry.id)
+        const detailHash = sha256(stableStringify(record))
+        if (
+          details &&
+          !full &&
+          prev?.detailHash === detailHash &&
+          prev.sourceHash === entry.listHash
+        ) {
+          c.skipped++
+          return
+        }
         // '' until media succeeds, so a crash anywhere in between retries next run
         await upsert(record, '')
         await syncMedia(mediaDeps, { type: kind, id: entry.id }, record.media, {
           force: full,
         })
-        await setSourceHash(db, kind, entry.id, entry.listHash)
+        await setSourceHash(db, kind, entry.id, entry.listHash, detailHash)
         c.upserted++
       } catch (e) {
         fail(c, kind, entry.id, msg(e))
@@ -196,9 +208,13 @@ export async function runSync(
       const stored = new Map(
         (
           await db
-            .select({ id: table.id, sourceHash: table.sourceHash })
+            .select({
+              id: table.id,
+              sourceHash: table.sourceHash,
+              detailHash: table.detailHash,
+            })
             .from(table)
-        ).map((r) => [r.id, r.sourceHash]),
+        ).map((r) => [r.id, r] as const),
       )
       const listed = new Set(entries.map((e) => e.id))
       const gone = [...stored.keys()].filter((id) => !listed.has(id))
@@ -211,12 +227,18 @@ export async function runSync(
         if (ignored.includes(entry.id)) {
           c.skipped++
           ignoredCount++
-        } else if (!full && stored.get(entry.id) === entry.listHash) {
+        } else if (
+          !full &&
+          !details &&
+          stored.get(entry.id)?.sourceHash === entry.listHash
+        ) {
           c.skipped++
         } else todo.push(entry)
       }
       if (ignoredCount) log(`${kind}: ignored ${ignoredCount} non-playable`)
-      await pool(todo, (entry) => syncEntity(kind, c, entry, get, upsert))
+      await pool(todo, (entry) =>
+        syncEntity(kind, c, entry, get, upsert, stored.get(entry.id)),
+      )
     }
 
     async function syncMaterials() {

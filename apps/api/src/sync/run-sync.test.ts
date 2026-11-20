@@ -206,6 +206,65 @@ describe('runSync', () => {
     expect(res.counts.characters.upserted).toBe(2)
   })
 
+  it('details run picks up detail-only changes; a plain run does not', async () => {
+    const { source, state } = fakeSource()
+    const d = deps(source)
+    await runSync(d)
+    const c = state.chars[1] as CharacterRecord
+    ;(c.i18n.en as { description: string | null }).description = 'new text'
+    const plain = await runSync(d)
+    if (plain === 'busy') throw new Error('busy')
+    expect(plain.counts.characters.upserted).toBe(0)
+    const stored = () =>
+      db
+        .select()
+        .from(characterI18n)
+        .where(eq(characterI18n.characterId, '10000002'))
+    expect((await stored()).find((r) => r.locale === 'en')?.description).toBe(
+      'd',
+    )
+    const res = await runSync(d, { details: true })
+    if (res === 'busy') throw new Error('busy')
+    expect(res.counts.characters).toEqual({
+      upserted: 1,
+      skipped: 1,
+      failed: 0,
+    })
+    expect((await stored()).find((r) => r.locale === 'en')?.description).toBe(
+      'new text',
+    )
+  })
+
+  it('details run does not force media; unchanged details run writes and uploads nothing', async () => {
+    const { source } = fakeSource()
+    const store = createMemoryStore()
+    const fetchSpy = vi.fn(ok)
+    const d = { ...deps(source, fetchSpy as unknown as typeof fetch), store }
+    await runSync(d)
+    fetchSpy.mockClear()
+    const putSpy = vi.spyOn(store, 'put')
+    const before = await db.select().from(characters)
+    const res = await runSync(d, { details: true })
+    if (res === 'busy') throw new Error('busy')
+    expect(res.status).toBe('succeeded')
+    expect(res.counts.characters.upserted).toBe(0)
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(putSpy).not.toHaveBeenCalled()
+    const mid = await db.select().from(characters)
+    const again = await runSync(d, { details: true })
+    if (again === 'busy') throw new Error('busy')
+    expect(again.counts.characters).toEqual({
+      upserted: 0,
+      skipped: 2,
+      failed: 0,
+    })
+    expect(again.counts.weapons.upserted).toBe(0)
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(putSpy).not.toHaveBeenCalled()
+    expect(await db.select().from(characters)).toEqual(mid)
+    expect(before).toHaveLength(2)
+  })
+
   it('removes i18n locales no longer present', async () => {
     const { source, state } = fakeSource()
     await runSync(deps(source))

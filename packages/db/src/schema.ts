@@ -46,6 +46,8 @@ export const characters = pgTable('characters', {
   birthdayDay: smallint(),
   releaseAt: timestamp({ withTimezone: true }),
   sourceHash: text().notNull(),
+  /** sha256 of the normalized detail record; null until a sync computed it */
+  detailHash: text(),
   updatedAt: updatedAt(),
 })
 
@@ -69,6 +71,7 @@ export const weapons = pgTable('weapons', {
   rarity: smallint().notNull(),
   weaponType: weaponTypeEnum().notNull(),
   sourceHash: text().notNull(),
+  detailHash: text(),
   updatedAt: updatedAt(),
 })
 
