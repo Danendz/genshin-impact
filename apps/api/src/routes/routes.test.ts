@@ -91,7 +91,7 @@ describe('characters', () => {
   it('serves detail', async () => {
     const res = await app.request('/v1/characters/10000005-pyro?locale=en')
     expect(res.status).toBe(200)
-    const body = await res.json()
+    const body = (await res.json()) as { details: unknown }
     expect(body).toMatchObject({
       element: 'pyro',
       locale: 'en',
