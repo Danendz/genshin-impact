@@ -16,6 +16,12 @@ const WEAPON_MAP: Record<string, WeaponType> = {
   WEAPON_POLE: 'polearm',
   WEAPON_BOW: 'bow',
   WEAPON_CATALYST: 'catalyst',
+  // detail responses use display labels instead of WEAPON_* codes
+  Sword: 'sword',
+  Claymore: 'claymore',
+  Polearm: 'polearm',
+  Bow: 'bow',
+  Catalyst: 'catalyst',
 }
 
 export function normalizeElement(

@@ -1,0 +1,52 @@
+{
+  "response": 200,
+  "data": {
+    "items": {
+      "11101": {
+        "id": 11101,
+        "rank": 1,
+        "type": "WEAPON_SWORD_ONE_HAND",
+        "name": "无锋剑",
+        "specialProp": "NONE",
+        "icon": "UI_EquipIcon_Sword_Blunt",
+        "route": "Dull Blade"
+      },
+      "11509": {
+        "id": 11509,
+        "rank": 5,
+        "type": "WEAPON_SWORD_ONE_HAND",
+        "name": "雾切之回光",
+        "specialProp": "FIGHT_PROP_CRITICAL_HURT",
+        "icon": "UI_EquipIcon_Sword_Narukami",
+        "route": "Mistsplitter Reforged"
+      },
+      "12501": {
+        "id": 12501,
+        "rank": 5,
+        "type": "WEAPON_CLAYMORE",
+        "name": "天空之傲",
+        "specialProp": "FIGHT_PROP_CHARGE_EFFICIENCY",
+        "icon": "UI_EquipIcon_Claymore_Dvalin",
+        "route": "Skyward Pride"
+      },
+      "13501": {
+        "id": 13501,
+        "rank": 5,
+        "type": "WEAPON_POLE",
+        "name": "护摩之杖",
+        "specialProp": "FIGHT_PROP_CRITICAL_HURT",
+        "icon": "UI_EquipIcon_Pole_Homa",
+        "route": "Staff of Homa"
+      },
+      "14501": {
+        "id": 14501,
+        "rank": 5,
+        "type": "WEAPON_CATALYST",
+        "name": "天空之卷",
+        "specialProp": "FIGHT_PROP_ATTACK_PERCENT",
+        "icon": "UI_EquipIcon_Catalyst_Dvalin",
+        "route": "Skyward Atlas"
+      }
+    }
+  }
+}

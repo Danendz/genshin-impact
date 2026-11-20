@@ -34,6 +34,11 @@ describe('normalizeWeaponType', () => {
     ['WEAPON_POLE', 'polearm'],
     ['WEAPON_BOW', 'bow'],
     ['WEAPON_CATALYST', 'catalyst'],
+    ['Sword', 'sword'],
+    ['Claymore', 'claymore'],
+    ['Polearm', 'polearm'],
+    ['Bow', 'bow'],
+    ['Catalyst', 'catalyst'],
   ])('%s -> %s', (raw, expected) => {
     expect(normalizeWeaponType(raw)).toBe(expected)
   })
