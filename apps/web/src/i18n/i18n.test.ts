@@ -1,6 +1,6 @@
 import * as OpenCC from 'opencc-js'
-import { describe, expect, it } from 'vitest'
-import { resolveLocale } from './locale'
+import { afterEach, describe, expect, it } from 'vitest'
+import { resolveLocale, saveLocale, savedLocale } from './locale'
 import { dictionaries, regionLabel, t } from './strings'
 import { zhCN } from './strings.zh-CN'
 import { zhTW } from './strings.zh-TW'
@@ -13,7 +13,28 @@ describe('resolveLocale', () => {
     [undefined, ['ru-RU', 'en'], 'ru'],
     ['xx', ['de'], 'en'],
   ] as const)('%s %j -> %s', (search, langs, expected) => {
-    expect(resolveLocale(search, langs)).toBe(expected)
+    expect(resolveLocale(search, undefined, langs)).toBe(expected)
+  })
+
+  it('puts the saved locale between ?locale= and the browser', () => {
+    expect(resolveLocale('ru', 'en', ['zh-CN'])).toBe('ru')
+    expect(resolveLocale(undefined, 'zh-TW', ['ru'])).toBe('zh-TW')
+    expect(resolveLocale(undefined, undefined, ['ru-RU'])).toBe('ru')
+    expect(resolveLocale(undefined, undefined, [])).toBe('en')
+  })
+})
+
+describe('saved locale', () => {
+  afterEach(() => localStorage.clear())
+
+  it('ignores a stored value that is not a locale', () => {
+    localStorage.setItem('gi.locale', '"de"')
+    expect(savedLocale()).toBeUndefined()
+  })
+
+  it('saves and reads back a locale', () => {
+    saveLocale('ru')
+    expect(savedLocale()).toBe('ru')
   })
 })
 
