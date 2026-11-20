@@ -73,5 +73,7 @@ export const en: Dictionary = {
   'region.SUMERU': 'Sumeru',
   'region.FONTAINE': 'Fontaine',
   'region.NATLAN': 'Natlan',
+  'region.NODKRAI': 'Nod-Krai',
   'region.SNEZHNAYA': 'Snezhnaya',
+  'region.TEYVAT': 'Teyvat',
 }

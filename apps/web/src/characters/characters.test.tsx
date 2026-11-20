@@ -11,7 +11,12 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../api'
 import { makeRouter } from '../router'
-import { characterSearch, parseCharacterDetails, talentKind } from './details'
+import {
+  characterSearch,
+  parseCharacterDetails,
+  regionGroup,
+  talentKind,
+} from './details'
 
 vi.mock('../api', () => {
   const detail = { $get: vi.fn() }
@@ -218,6 +223,45 @@ describe('characters routes', () => {
     ).toHaveAttribute('aria-pressed', 'false')
   })
 
+  it('groups upstream region codes into nations and Teyvat', async () => {
+    listGet.mockResolvedValue(
+      respond(200, {
+        items: [
+          ...items,
+          item('10000033', 'Tartaglia', 'hydro', 'bow', 5, 'FATUI'),
+          item('10000005', 'Traveler', 'anemo', 'sword', 5, 'MAINACTOR'),
+          item('10000119', 'Lauma', 'dendro', 'catalyst', 5, 'NODKRAI'),
+          item('10000062', 'Aloy', 'cryo', 'bow', 5, null),
+        ],
+      }),
+    )
+    const router = await renderAt('/characters/10000067?locale=en')
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Toggle characters' }),
+    )
+    const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+    fireEvent.click(within(panel).getByRole('button', { name: 'Filter' }))
+    const filter = within(panel).getByRole('group', { name: 'Filter' })
+    const region = within(filter).getByRole('group', { name: 'Region' })
+    expect(
+      within(region)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['Mondstadt', 'Sumeru', 'Nod-Krai', 'Snezhnaya', 'Teyvat'])
+    fireEvent.click(within(region).getByRole('button', { name: 'Teyvat' }))
+    fireEvent.click(within(filter).getByRole('button', { name: 'Confirm' }))
+    await waitFor(() =>
+      expect(characterSearch(router.state.location.search)).toMatchObject({
+        region: ['TEYVAT'],
+      }),
+    )
+    expect(
+      within(panel)
+        .getAllByRole('link')
+        .map((a) => a.getAttribute('aria-label')),
+    ).toEqual(['Traveler', 'Aloy'])
+  })
+
   it('hides the top bar while selecting and closes with the legacy back button', async () => {
     await renderAt('/characters/10000038?locale=en')
     fireEvent.click(
@@ -416,6 +460,18 @@ describe('details helpers', () => {
       element: ['geo'],
       rarity: [5],
     })
+  })
+
+  it.each([
+    ['MONDSTADT', 'MONDSTADT'],
+    ['FATUI', 'SNEZHNAYA'],
+    ['SNEZHNAYA_STAR', 'SNEZHNAYA'],
+    ['NODKRAI_ZIBAI', 'NODKRAI'],
+    ['MAINACTOR', 'TEYVAT'],
+    ['OMNI_SCOURGE', 'TEYVAT'],
+    [null, 'TEYVAT'],
+  ])('regionGroup %s -> %s', (raw, group) => {
+    expect(regionGroup(raw)).toBe(group)
   })
 
   it.each([

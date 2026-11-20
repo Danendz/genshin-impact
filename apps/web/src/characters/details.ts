@@ -26,8 +26,28 @@ export const REGIONS = [
   'SUMERU',
   'FONTAINE',
   'NATLAN',
+  'NODKRAI',
   'SNEZHNAYA',
+  'TEYVAT',
 ] as const
+export type Region = (typeof REGIONS)[number]
+
+/** upstream codes that belong to a nation under another name */
+const REGION_ALIASES: Record<string, Region> = {
+  FATUI: 'SNEZHNAYA',
+  SNEZHNAYA_STAR: 'SNEZHNAYA',
+  NODKRAI_ZIBAI: 'NODKRAI',
+}
+
+/** folds an upstream region code into a nation; the rest is legacy's Teyvat */
+export function regionGroup(raw: string | null): Region {
+  if (!raw) return 'TEYVAT'
+  const alias = REGION_ALIASES[raw]
+  if (alias) return alias
+  return (REGIONS as readonly string[]).includes(raw)
+    ? (raw as Region)
+    : 'TEYVAT'
+}
 
 /** filters hold several values each (legacy multi-select); the URL joins them with commas */
 export type CharacterSearch = {
@@ -101,11 +121,10 @@ export function filterCharacters<T extends Filterable>(
   )
 }
 
-/** regions the roster has, game order first, unknown ones after */
+/** regions the roster has, in game order */
 export function regionsOf(items: { region: string | null }[]): string[] {
-  const have = new Set(items.map((c) => c.region).filter((r) => r !== null))
-  const known: string[] = REGIONS.filter((r) => have.has(r))
-  return [...known, ...[...have].filter((r) => !known.includes(r)).sort()]
+  const have = new Set(items.map((c) => regionGroup(c.region)))
+  return REGIONS.filter((r) => have.has(r))
 }
 
 export type TalentLevel = {

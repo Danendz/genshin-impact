@@ -72,7 +72,9 @@ export const zhCN = {
   'region.SUMERU': '须弥',
   'region.FONTAINE': '枫丹',
   'region.NATLAN': '纳塔',
+  'region.NODKRAI': '挪德卡莱',
   'region.SNEZHNAYA': '至冬',
+  'region.TEYVAT': '提瓦特',
 }
 
 export type StringKey = keyof typeof zhCN

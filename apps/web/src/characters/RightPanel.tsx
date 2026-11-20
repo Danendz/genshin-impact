@@ -6,6 +6,7 @@ import styles from './characters.module.css'
 import {
   type Constellation,
   parseCharacterDetails,
+  regionGroup,
   type Section,
   type Talent,
   talentKind,
@@ -249,7 +250,7 @@ function Profile({
       )
     : null
   const rows = [
-    ['profile.region', regionLabel(locale, detail.region)],
+    ['profile.region', regionLabel(locale, regionGroup(detail.region))],
     ['profile.birthday', birthday],
     ['profile.release', release],
   ] as const

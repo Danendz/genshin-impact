@@ -2,6 +2,7 @@ import type { Locale } from '@gi/shared'
 import { queryOptions } from '@tanstack/react-query'
 import type { InferResponseType } from 'hono/client'
 import { api } from '../api'
+import { regionGroup } from './details'
 
 const STALE = 5 * 60_000
 
@@ -21,7 +22,11 @@ export const charactersListQuery = (locale: Locale) =>
     queryFn: async (): Promise<CharacterListItem[]> => {
       const res = await api.v1.characters.$get({ query: { locale } })
       if (!res.ok) throw new Error(`characters list: HTTP ${res.status}`)
-      return (await res.json()).items
+      // filters and sorting work on nations, not upstream codes
+      return (await res.json()).items.map((c) => ({
+        ...c,
+        region: regionGroup(c.region),
+      }))
     },
   })
 

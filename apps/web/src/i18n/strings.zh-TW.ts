@@ -74,5 +74,7 @@ export const zhTW: Dictionary = {
   'region.SUMERU': '須彌',
   'region.FONTAINE': '楓丹',
   'region.NATLAN': '納塔',
+  'region.NODKRAI': '挪德卡萊',
   'region.SNEZHNAYA': '至冬',
+  'region.TEYVAT': '提瓦特',
 }
