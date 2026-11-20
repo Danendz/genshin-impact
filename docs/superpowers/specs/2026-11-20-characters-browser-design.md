@@ -9,13 +9,13 @@ The characters browser is the first real page of the remake and the one the port
 ## Goals
 
 - `/characters` and `/characters/$id` in `apps/web`, backed by the deployed `/v1/characters` API.
-- A game-style single screen: an icon strip, full-bleed gacha art, a tabbed info panel.
+- The legacy 2022 character screen, rebuilt: top bar with avatar strip, namecard + gacha art, rhombus menu, right info panel.
 - Talents and constellations are readable: game markup is rendered, not shown raw.
 - Works on phone widths.
 
 ## Non-goals
 
-- Real attributes (base stats, ascension, materials). The Attributes tab shows placeholders. Real data comes in a later step.
+- Real attributes, weapons, artifacts, friendship, outfits, demo videos. Their legacy slots render with placeholders; data comes later.
 - Language switcher UI (home/profile step). Weapons, inventory, wish, 3D.
 - The Vercel cutover itself. It happens when this merges to `master` and is a separate, user-approved action.
 
@@ -38,58 +38,71 @@ For the talent and constellation icons:
 
 ## Design
 
-### Screen
+### Screen (revised: legacy layout)
+
+The first build used a side strip, a bottom sheet and a tab bar. The user rejected it: the screen must reproduce the legacy 2022 layout (`master:src/components/CharacterUI`), rebuilt cleanly in React. It should look the same in structure, fonts, colours and fade animations, but it's not a pixel-for-pixel copy.
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│ [≡ filter]          Albedo · Kreideprinz   ★★★★★  Geo ⚔  │
-│ ┌──┐                                    ┌──────────────┐ │
-│ │ic│    gacha_splash, full-bleed,       │ Attributes   │ │
-│ ├──┤    faded toward the edges          │ Talents      │ │
-│ │ic│                                    │ Constellation│ │
-│ ├──┤                                    │ Profile      │ │
-│ │..│                                    │ (tab content)│ │
-│ └──┘                                    └──────────────┘ │
-└──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│ ❄ Cryo/Ayaka   (○)(○)(○)(○)(○)(○)(○)(○) avatar strip →      (✕) │  top bar, 75px, rgba(0,0,0,.21)
+│ ◆ Attributes                                     Kamisato Ayaka   │
+│ ◆ Weapon                                         ✦✦✦✦✦           │
+│ ◆ Artifacts           gacha splash, 100vh tall,  Level 90 / 90    │
+│ ◆ Constellation       centred over the namecard  ── stats ──      │
+│ ◆ Talents             art (cover, dimmed)        [ Details ]      │
+│ ◆ Profile                                        Friendship  10   │
+│                                                  description      │
+│ [▦][◐]                                           [ Wardrobe ]     │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
+- **Background:**
+  - The character's namecard (`namecard` media, cover, with a `rgba(0,0,0,.12)` dim) fills the screen.
+  - The `gacha_splash` sits centred on top at `100vh` tall.
+  - Both cross-fade when the character changes.
+  - Without a namecard, the element-coloured gradient shows.
+- **Top bar:**
+  - Element glyph and "Element/Name" on the left.
+  - The horizontal avatar strip in the middle: legacy 55px circles with a `#6c9992` border, active/hover `#5bb8d9` fill with a `#7ec8b9` border. It uses native overflow scroll with mouse drag-scroll; each avatar is a `<Link>`.
+  - On the right, a legacy round close button (`#e0ddd4`, 32px) that links to `/`.
+- **Left menu:**
+  - The legacy rhombus list (`ListItemRhombus`): Attributes, Weapon, Artifacts, Constellation, Talents, Profile.
+  - The active item has the white glowing rhombus and its nudge animation.
+  - The selected section is the `section` search param, so it survives switching characters and reloads. The default is Attributes.
+- **Right panel** (300px; translucent rounded card):
+  - **Attributes** (legacy `AttributesContent`):
+    - name (28px), rarity stars (four-point stars in the rarity colour);
+    - "Level 90 / 90" with the blue glowing progress bar;
+    - HP, ATK, DEF, Elemental Mastery and Stamina, each showing "—";
+    - a **Details** pill that opens a modal reading "No data yet";
+    - Friendship, fixed at 10 with the pink bar, as decoration;
+    - the description (scrolls past 90px);
+    - a disabled **Wardrobe** pill.
+  - **Weapon / Artifacts:** "No data yet".
+  - **Talents / Constellation:** a game-style list (icon in a circle plus name, and the kind label for talents). Clicking an entry opens a detail modal with the rendered game text. Combat talents also get the level selector and scaling table.
+  - **Profile:** title, region, birthday and release date, in the same card style.
+- **Bottom-left buttons** (legacy white 30px squares on a dark pill):
+  - **Grid** toggles the left **Character Selection** panel: a "Character Selection" heading, a grid of avatars, and the element, weapon and rarity filters with removable chips. The left menu hides while it is open.
+  - **Hide** toggles every UI layer off except the background and a restore button.
+  - There's no demo-video button, since there are no videos.
+- **Phone (portrait, < 768px):**
+  - The top bar stays, with a smaller strip (45px).
+  - The splash stays centred.
+  - The menu becomes a horizontal scrolling pill bar.
+  - The right panel becomes a bottom sheet, scrollable, at most 45dvh.
+  - The bottom buttons sit above the sheet.
 - **Routes:**
-  - `/characters` redirects to the first character of the current (filtered) list.
-  - `/characters/$id` shows that character.
-  - An unknown id shows a not-found state inside the layout, with the strip still usable.
-- **URL search params:** `element`, `weaponType`, `rarity` hold the filters, validated by the route. Switching characters keeps the filters.
-- **Icon strip:**
-  - The list comes from `GET /v1/characters` (all characters, fetched once and cached by TanStack Query). Filtering happens client-side.
-  - Uses native overflow scroll with `scroll-snap`.
-  - Mouse drag-to-scroll uses Pointer Events. Edge bounce uses CSS (`overscroll-behavior` plus a small transform on drag past the ends). There's no momentum code.
-  - The selected icon is highlighted and scrolled into view.
-  - Each icon is a `<Link>`, so the strip is keyboard- and middle-click friendly.
-- **Filter overlay:**
-  - Opened by the filter button.
-  - Element, weapon type and rarity chips.
-  - Selected filters show as removable chips.
-  - Closes with Escape or by clicking outside.
-- **Header:** name and title, rarity stars, element icon (GenshinIcon font) and weapon type.
-- **Background:** the `gacha_splash` image is cross-faded when the character changes. While it loads, the element-coloured gradient shows.
-- **Panel tabs:**
-  - **Attributes:** placeholder rows, visibly marked as such (e.g. "—").
-  - **Talents:**
-    - Each talent shows its icon, name and type label. Order follows the API order.
-    - Amber's `type` doesn't separate Normal Attack from Elemental Skill (both are `0`), so the label comes from the icon prefix:
-      - `Skill_A_` → Normal Attack
-      - `Skill_S_` → Elemental Skill
-      - `Skill_E_` → Elemental Burst
-      - `type 2` → Passive
-      - anything else → no label
-    - Description is rendered from game markup.
-    - Combat talents (those with `promote` levels) show a scaling table at a chosen level (1–15, default 1).
-  - **Constellations:** C1–C6 with icon, name and rendered description.
-  - **Profile:** description, region (display-cased), birthday (localized month/day) and release date.
-- **Phone (< 768px):**
-  - The strip becomes a horizontal row along the bottom, with snap.
-  - The panel becomes a bottom sheet with a collapsed and an expanded state. It's a native scroll container with CSS snap points, not a drag engine.
-  - The background art stays behind.
-- **3D slot:** an empty, reserved container in the layout where the R3F viewer will mount later. It renders nothing in v1.
+  - `/characters` redirects to the first filtered character; `/characters/$id` shows one.
+  - An unknown id shows not-found in the right panel, with the strip usable.
+  - Search params are `element`, `weaponType`, `rarity`, `section` and `locale`.
+- **3D slot:** an empty `data-slot="viewer3d"` container stays reserved.
+
+### Backend: namecard
+
+- Add a `namecard` media kind.
+- In the Amber character, `other.nameCard.icon` = `UI_NameCardIcon_<X>`. The art is at `https://gi.yatta.moe/assets/UI/namecard/UI_NameCardPic_<X>_P.png`, synced to R2 like the other media. When `nameCard` is missing, no namecard is synced.
+- The list and detail `media` maps expose it as `namecard`.
+- The strip keeps the front `icon`. Amber doesn't serve the legacy side-facing avatar icons (403).
 
 ### Game text rendering (`packages/shared` or `apps/web/src/lib/game-text.ts`)
 

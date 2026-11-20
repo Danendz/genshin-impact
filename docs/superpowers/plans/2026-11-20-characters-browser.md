@@ -243,3 +243,74 @@
   - Verify the Albedo detail has a non-empty `skillIcons` and that one icon URL returns 200 `image/webp`.
   - Vercel preview/prod for `remake` builds. Verify `/characters/10000038` loads.
 - [ ] **Step 4:** Commit `docs: characters browser notes`.
+
+---
+
+## Revision: legacy layout (Tasks 9–12)
+
+The user rejected the T6/T7 presentation (side strip, sheet, tab bar). The spec's "Screen (revised: legacy layout)" section now governs. Task 8 (manual check and README) moves to Task 12. The routes, queries, details helpers, game-text, i18n and skill-icon sync are kept. `CharacterStrip`, `FilterOverlay`, `DetailPanel`, `CharacterHeader`, `CharacterBackdrop` and the sheet CSS are replaced.
+
+Legacy reference: `git show master:src/components/CharacterUI/...`. Port the values from the spec section; don't copy the SCSS wholesale.
+
+### Task 9: namecard media
+
+**Files:**
+- `packages/db/src/schema.ts` and a new migration: `media_kind` gains `'namecard'`.
+- `apps/api/src/sync/amber/amber-source.ts`: when `other.nameCard.icon` matches `UI_NameCardIcon_<X>`, add `{ kind: 'namecard', url: ASSET_BASE + '/namecard/UI_NameCardPic_<X>_P.png' }`.
+- Tests in `amber-source.test.ts`, covering a nameCard present and one missing.
+
+The list and detail routes already expose every media kind by name; a route test asserts `media.namecard`.
+
+**Done when:**
+- `pnpm vitest run packages/db apps/api` is green, and lint and typecheck are green.
+- Commit `feat(api): sync character namecards`.
+
+### Task 10: legacy shell (background, top bar, menu, bottom buttons, selection panel)
+
+**Search:** `characterSearch` gains `section: 'attributes'|'weapon'|'artifacts'|'constellation'|'talents'|'profile'`. Invalid values are dropped.
+
+**Components in `apps/web/src/characters/`:**
+- `LegacyBackground` (namecard plus splash cross-fade, element-gradient fallback)
+- `TopBar` (element glyph with "Element/Name", `AvatarStrip`, close link to `/`)
+- `SectionMenu` (rhombus list of Links that set `section`)
+- `BottomButtons` (grid and hide)
+- `SelectionPanel` (heading, avatar grid, filters with chips; Escape closes it)
+
+**Layout `routes/characters.tsx`:**
+- Composes the components above.
+- Holds the `selectionOpen` and `uiHidden` state.
+- The `$id` route renders the right panel.
+
+**Strings:** add `section.*`, `selection.title`, `button.selection`, `button.hide`, `button.show`, `close`, `stat.stamina`, `details`, `friendship`, `wardrobe` in all four locales, with zh-TW generated.
+
+**Tests** (rewrite `characters.test.tsx` route tests on the new UI):
+- the redirect, filtered redirect, empty and not-found tests are kept;
+- the strip switch keeps the search;
+- the filters live in the selection panel (the grid button opens it, a chip writes the URL, Escape closes it);
+- the menu sets `section`, and the section survives a character switch;
+- hide removes the menu and panel, and show restores them;
+- invalid `section` is dropped.
+
+**Done when:** `pnpm vitest run apps/web` is green, typecheck, lint and build are green, and the work is committed.
+
+### Task 11: right panel sections and detail modal
+
+**`RightPanel` in `apps/web/src/characters/`:**
+- **attributes:** name, stars, level bar, 5 stats as "—", a Details modal ("No data yet"), Friendship 10, description, disabled Wardrobe;
+- **weapon / artifacts:** placeholder;
+- **talents / constellation:** a list of buttons that open `DetailModal`, which renders the game text and, for talents with `promote`, the level select and scaling `dl`;
+- **profile.**
+
+**Modal:** `role="dialog"`, closes on Escape, the close button or a backdrop click.
+
+**Tests:** rewrite `panel.test.tsx` and keep its assertions (kinds, no raw markup, 36.7% to 39.7% at level 2, icon versus placeholder, 6 constellations, profile, empty details). They now go through list item buttons and the modal.
+
+**Done when:** tests, typecheck, lint and build are green, and the work is committed.
+
+### Task 12: phone layout, theme fix, manual check, README
+
+1. **Theme:** `@theme static` in `theme.css`, so `var(--color-*)` resolves at runtime.
+2. **Phone layout** per the spec.
+3. **Manual check** against production data at 1440 and 375 widths, plus ru and zh-CN. Compare against the legacy screenshot.
+4. **README:** the `?details=1` re-sync, the `i18n:zh-tw` script, and removing the stale Railway text.
+5. **Commit.**
