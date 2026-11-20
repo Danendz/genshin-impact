@@ -2,6 +2,8 @@ import {
   characterI18n,
   characters,
   createDb,
+  materialI18n,
+  materials,
   mediaAssets,
   weaponI18n,
   weapons,
@@ -98,6 +100,7 @@ describe('characters', () => {
     expect(res.headers.get('cache-control')).toBe(
       'public, max-age=300, s-maxage=3600',
     )
+    expect(body.details).toEqual({ x: 1 })
   })
 
   it('falls back to en per entity', async () => {
@@ -160,20 +163,73 @@ describe('weapons', () => {
     await db
       .insert(weapons)
       .values({ id: 'w1', rarity: 5, weaponType: 'sword', sourceHash: 'h' })
-    await db
-      .insert(weaponI18n)
-      .values({ weaponId: 'w1', locale: 'en', name: 'Blade', details: {} })
+    await db.insert(weaponI18n).values({
+      weaponId: 'w1',
+      locale: 'en',
+      name: 'Blade',
+      details: { y: [2] },
+    })
     const list = (await (
       await app.request('/v1/weapons?locale=ru&weaponType=sword')
     ).json()) as { items: { name: string }[] }
     expect(list.items[0]?.name).toBe('Blade')
     const d = await app.request('/v1/weapons/w1?locale=ru')
-    expect(await d.json()).toMatchObject({ locale: 'en', name: 'Blade' })
+    expect(await d.json()).toMatchObject({
+      locale: 'en',
+      name: 'Blade',
+      details: { y: [2] },
+    })
     expect((await app.request('/v1/weapons/zzz')).status).toBe(404)
   })
 })
 
+describe('caching headers', () => {
+  const CC = 'public, max-age=300, s-maxage=3600'
+  it('weapons and materials lists carry Cache-Control and ETag', async () => {
+    for (const path of ['/v1/weapons', '/v1/materials']) {
+      const res = await app.request(path)
+      expect(res.status).toBe(200)
+      expect(res.headers.get('cache-control')).toBe(CC)
+      expect(res.headers.get('etag')).toBeTruthy()
+    }
+  })
+  it('no Cache-Control on errors or admin', async () => {
+    for (const path of ['/v1/characters?locale=jp', '/v1/characters/nope'])
+      expect((await app.request(path)).headers.get('cache-control')).toBeNull()
+    const res = await app.request('/admin/sync', { method: 'POST' })
+    expect(res.headers.get('cache-control')).toBeNull()
+  })
+})
+
 describe('materials', () => {
+  beforeEach(async () => {
+    await db.insert(materials).values([
+      { id: 'm1', rarity: 3, category: 'ore', sourceHash: 'h' },
+      { id: 'm2', rarity: 2, category: 'food', sourceHash: 'h' },
+    ])
+    await db.insert(materialI18n).values([
+      { materialId: 'm1', locale: 'en', name: 'Iron' },
+      { materialId: 'm1', locale: 'ru', name: 'Железо' },
+      { materialId: 'm2', locale: 'en', name: 'Bread' },
+    ])
+  })
+  it('falls back per entity and filters by category', async () => {
+    const all = (await (
+      await app.request('/v1/materials?locale=ru')
+    ).json()) as {
+      items: { name: string }[]
+    }
+    expect(all.items.map((i) => i.name)).toEqual(['Железо', 'Bread'])
+    const food = (await (
+      await app.request('/v1/materials?locale=ru&category=food')
+    ).json()) as { items: { name: string }[] }
+    expect(food.items.map((i) => i.name)).toEqual(['Bread'])
+  })
+  it('unknown category is an empty list, not an error', async () => {
+    const res = await app.request('/v1/materials?category=x')
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ items: [] })
+  })
   it('rejects bad locale', async () => {
     expect((await app.request('/v1/materials?locale=xx')).status).toBe(400)
     expect((await app.request('/v1/materials')).status).toBe(200)

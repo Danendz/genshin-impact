@@ -17,7 +17,8 @@ export function adminRoute(deps: { adminToken: string; sync: SyncController }) {
     let result: Awaited<ReturnType<SyncController['trigger']>>
     try {
       result = await deps.sync.trigger({ full: c.req.query('full') === '1' })
-    } catch {
+    } catch (e) {
+      console.error('[admin] POST /sync failed to start:', e)
       return c.json({ error: 'sync_failed_to_start' }, 500)
     }
     if (result === 'busy') return c.json({ error: 'sync_running' }, 409)

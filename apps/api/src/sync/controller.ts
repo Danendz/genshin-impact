@@ -4,11 +4,15 @@ import { type RunSyncDeps, runSync } from './run-sync'
 export function createSyncController(
   deps: Omit<RunSyncDeps, 'onStart'>,
 ): SyncController {
+  const inflight = new Set<Promise<unknown>>()
   return {
+    async idle() {
+      while (inflight.size > 0) await Promise.allSettled([...inflight])
+    },
     trigger(opts = {}) {
       return new Promise((resolve, reject) => {
         let started = false
-        runSync(
+        const run = runSync(
           {
             ...deps,
             onStart: (runId) => {
@@ -18,6 +22,9 @@ export function createSyncController(
           },
           { full: opts.full },
         )
+        inflight.add(run)
+        run
+          .finally(() => inflight.delete(run))
           .then((r) => {
             if (r === 'busy') resolve('busy')
           })
