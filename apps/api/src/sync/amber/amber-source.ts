@@ -138,7 +138,12 @@ export function createAmberSource(
     listCharacters: () =>
       listEntries('avatar', avatarListResponse, (d) => d.data.items),
     listWeapons: () =>
-      listEntries('weapon', weaponListResponse, (d) => d.data.items),
+      listEntries('weapon', weaponListResponse, (d) =>
+        // weapon skins (isWeaponSkin) have no stats/affix and aren't real weapons
+        Object.fromEntries(
+          Object.entries(d.data.items).filter(([, w]) => !w.isWeaponSkin),
+        ),
+      ),
 
     async getCharacter(id): Promise<CharacterRecord> {
       const byLocale = await fetchAllLocales(

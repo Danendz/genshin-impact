@@ -7,6 +7,7 @@
     "dev": "tsx watch --env-file=../../.env src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
+    "sync": "tsx --env-file-if-exists=../../.env src/sync/cli.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

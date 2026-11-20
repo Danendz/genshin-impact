@@ -192,6 +192,16 @@ describe('failure classes', () => {
     ).rejects.toBeInstanceOf(UpstreamError)
   })
 
+  test('weapon skins are excluded from the weapon list', async () => {
+    const en = fixture('weapon-list-en')
+    const [skinId] = Object.keys(en.data.items)
+    en.data.items[skinId as string].isWeaponSkin = true
+    const f = fakeFetch({ [`${BASE}/en/weapon`]: () => json(en) })
+    const l = await createAmberSource({ fetch: f.fn }).listWeapons()
+    expect(l.map((e) => e.id)).not.toContain(skinId)
+    expect(l.length).toBeGreaterThan(0)
+  })
+
   test('bad material items are skipped, good ones returned', async () => {
     const en = fixture('material-list-en')
     const ids = Object.keys(en.data.items)

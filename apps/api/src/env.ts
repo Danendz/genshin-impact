@@ -14,8 +14,32 @@ const schema = z.object({
 
 export type Env = z.infer<typeof schema>
 
+const cliSchema = schema.pick({
+  DATABASE_URL: true,
+  R2_ENDPOINT: true,
+  R2_ACCESS_KEY_ID: true,
+  R2_SECRET_ACCESS_KEY: true,
+  R2_BUCKET: true,
+  MEDIA_PUBLIC_URL: true,
+})
+export type CliEnv = z.infer<typeof cliSchema>
+
 export function parseEnv(source: Record<string, string | undefined>): Env {
   const result = schema.safeParse(source)
+  if (!result.success) {
+    const lines = result.error.issues.map(
+      (i) => `${i.path.join('.')}: ${i.message}`,
+    )
+    throw new Error(`Invalid environment:\n${lines.join('\n')}`)
+  }
+  return result.data
+}
+
+/** Narrower env for the sync CLI: no ADMIN_TOKEN/CORS_ORIGIN/PORT needed. */
+export function parseCliEnv(
+  source: Record<string, string | undefined>,
+): CliEnv {
+  const result = cliSchema.safeParse(source)
   if (!result.success) {
     const lines = result.error.issues.map(
       (i) => `${i.path.join('.')}: ${i.message}`,

@@ -46,6 +46,7 @@ export const weaponListItem = z.looseObject({
   type: z.string(),
   name: z.string(),
   icon: z.string(),
+  isWeaponSkin: z.boolean().optional(),
 })
 export const weaponListResponse = envelope(
   z.looseObject({ items: z.record(z.string(), weaponListItem) }),
