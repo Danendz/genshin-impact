@@ -1,5 +1,5 @@
 import { type Db, materialI18n, materials } from '@gi/db'
-import { aliasedTable, and, desc, eq, type SQL, sql } from 'drizzle-orm'
+import { aliasedTable, and, asc, desc, eq, type SQL, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import type { MediaStore } from '../media/store'
@@ -40,7 +40,11 @@ export function materialsRoute(deps: { db: Db; store: MediaStore }) {
         sql`${fb.materialId} = ${materials.id} and ${fb.locale} = 'en'`,
       )
       .where(and(...conds))
-      .orderBy(desc(materials.rarity), sql`coalesce(${req.name}, ${fb.name})`)
+      .orderBy(
+        desc(materials.rarity),
+        sql`coalesce(${req.name}, ${fb.name})`,
+        asc(materials.id),
+      )
     const media = await loadMedia(
       db,
       store,

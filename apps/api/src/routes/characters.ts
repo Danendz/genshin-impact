@@ -1,6 +1,6 @@
 import { characterI18n, characters, type Db } from '@gi/db'
 import { ELEMENTS, WEAPON_TYPES } from '@gi/shared'
-import { aliasedTable, and, desc, eq, type SQL, sql } from 'drizzle-orm'
+import { aliasedTable, and, asc, desc, eq, type SQL, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import type { MediaStore } from '../media/store'
@@ -58,6 +58,7 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         .orderBy(
           desc(characters.rarity),
           sql`coalesce(${req.name}, ${fb.name})`,
+          asc(characters.id),
         )
       const media = await loadMedia(
         db,

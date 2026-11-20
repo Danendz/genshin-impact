@@ -266,3 +266,45 @@ describe('POST /admin/sync', () => {
     expect(await res.json()).toEqual({ error: 'sync_failed_to_start' })
   })
 })
+
+describe('list ordering', () => {
+  it('breaks rarity+name ties by id asc for all list endpoints', async () => {
+    // inserted in reverse id order so insertion order cannot satisfy the test
+    for (const id of ['20000000-b', '20000000-a']) {
+      await seedChar(id, 'pyro', 5, { en: 'Traveler' })
+      await db.insert(weapons).values({
+        id: `w${id}`,
+        rarity: 3,
+        weaponType: 'sword',
+        sourceHash: 'h',
+      })
+      await db
+        .insert(weaponI18n)
+        .values({ weaponId: `w${id}`, locale: 'en', name: 'Same', details: {} })
+      await db
+        .insert(materials)
+        .values({ id: `m${id}`, rarity: 1, category: 'c', sourceHash: 'h' })
+      await db
+        .insert(materialI18n)
+        .values({ materialId: `m${id}`, locale: 'en', name: 'Same' })
+    }
+    const ids = async (path: string) => {
+      const res = await app.request(path)
+      const { items } = (await res.json()) as { items: { id: string }[] }
+      return items.map((i) => i.id)
+    }
+    expect(
+      (await ids('/v1/characters?locale=en')).filter((i) =>
+        i.startsWith('20000000'),
+      ),
+    ).toEqual(['20000000-a', '20000000-b'])
+    expect(await ids('/v1/weapons?locale=en')).toEqual([
+      'w20000000-a',
+      'w20000000-b',
+    ])
+    expect(await ids('/v1/materials?locale=en')).toEqual([
+      'm20000000-a',
+      'm20000000-b',
+    ])
+  })
+})

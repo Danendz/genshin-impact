@@ -1,6 +1,6 @@
 import { type Db, weaponI18n, weapons } from '@gi/db'
 import { WEAPON_TYPES } from '@gi/shared'
-import { aliasedTable, and, desc, eq, type SQL, sql } from 'drizzle-orm'
+import { aliasedTable, and, asc, desc, eq, type SQL, sql } from 'drizzle-orm'
 import { Hono } from 'hono'
 import { z } from 'zod'
 import type { MediaStore } from '../media/store'
@@ -46,7 +46,11 @@ export function weaponsRoute(deps: { db: Db; store: MediaStore }) {
       if (q.rarity) conds.push(eq(weapons.rarity, q.rarity))
       const rows = await base(q.locale)
         .where(and(...conds))
-        .orderBy(desc(weapons.rarity), sql`coalesce(${req.name}, ${fb.name})`)
+        .orderBy(
+          desc(weapons.rarity),
+          sql`coalesce(${req.name}, ${fb.name})`,
+          asc(weapons.id),
+        )
       const media = await loadMedia(
         db,
         store,
