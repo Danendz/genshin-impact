@@ -5,16 +5,19 @@ export function createSyncController(
   deps: Omit<RunSyncDeps, 'onStart'>,
 ): SyncController {
   return {
-    trigger() {
+    trigger(opts = {}) {
       return new Promise((resolve, reject) => {
         let started = false
-        runSync({
-          ...deps,
-          onStart: (runId) => {
-            started = true
-            resolve({ runId })
+        runSync(
+          {
+            ...deps,
+            onStart: (runId) => {
+              started = true
+              resolve({ runId })
+            },
           },
-        })
+          { full: opts.full },
+        )
           .then((r) => {
             if (r === 'busy') resolve('busy')
           })

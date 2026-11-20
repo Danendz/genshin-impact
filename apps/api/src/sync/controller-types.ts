@@ -1,3 +1,3 @@
 export type SyncController = {
-  trigger(): Promise<{ runId: number } | 'busy'>
+  trigger(opts?: { full?: boolean }): Promise<{ runId: number } | 'busy'>
 }

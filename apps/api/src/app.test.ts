@@ -2,6 +2,7 @@ import type { Db } from '@gi/db'
 import { describe, expect, it } from 'vitest'
 import { createApp } from './app'
 import { parseEnv } from './env'
+import { createMemoryStore } from './media/memory-store'
 
 const env = parseEnv({
   DATABASE_URL: 'postgres://x',
@@ -18,6 +19,7 @@ const app = createApp({
   db: {} as Db,
   env,
   sync: { trigger: async () => 'busy' },
+  store: createMemoryStore(),
 })
 
 describe('app', () => {

@@ -11,7 +11,7 @@ export function createMemoryStore(
     async put(key, body, contentType) {
       objects.set(key, { body, contentType })
     },
-    publicUrl: (key) => `${publicBase}/${key}`,
+    publicUrl: (key) => `${publicBase.replace(/\/+$/, '')}/${key}`,
     keys: () => [...objects.keys()],
   }
 }
