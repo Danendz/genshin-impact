@@ -81,6 +81,22 @@
   --color-tile-glow: #f7e4ba;
   --color-tile-active: #faedd3;
   --color-tile-text: #bdc1ca;
+  --color-home-panel: #e6e5d6;
+  --color-home-panel-fade: rgb(255 255 255 / 0.116);
+  --color-options: #4b5269;
+  --color-options-fade: rgb(75 82 105 / 0.38);
+  --color-options-soft: rgb(75 82 105 / 0.62);
+  --color-options-icon: #cfbc8f;
+  --color-profile-text: rgb(255 255 255 / 0.78);
+  --color-profile-name: #e9e6e6;
+  --color-profile-band: rgb(0 0 0 / 0.082);
+  --color-profile-pill: rgb(0 0 0 / 0.41);
+  --color-profile-button: #ebe6d6;
+  --color-namecard-dim: rgb(0 0 0 / 0.05);
+  --color-white: #fff;
+  --color-well: rgb(0 0 0 / 0.16);
+  --color-band-strong: rgb(0 0 0 / 0.27);
+  --color-ink-dark: #323646;
 
   --font-genshin: "Genshin", system-ui, sans-serif;
   --font-genshin-icon: "GenshinIcon";
