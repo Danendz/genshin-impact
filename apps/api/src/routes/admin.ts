@@ -16,7 +16,10 @@ export function adminRoute(deps: { adminToken: string; sync: SyncController }) {
       return c.json({ error: 'unauthorized' }, 401)
     let result: Awaited<ReturnType<SyncController['trigger']>>
     try {
-      result = await deps.sync.trigger({ full: c.req.query('full') === '1' })
+      result = await deps.sync.trigger({
+        full: c.req.query('full') === '1',
+        details: c.req.query('details') === '1',
+      })
     } catch (e) {
       console.error('[admin] POST /sync failed to start:', e)
       return c.json({ error: 'sync_failed_to_start' }, 500)

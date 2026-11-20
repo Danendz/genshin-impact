@@ -13,7 +13,7 @@ const store = createS3Store(env)
 const sync = createSyncController({
   db,
   sql,
-  source: createAmberSource(),
+  createSource: () => createAmberSource(),
   store,
   fetch,
   log: (m) => console.log(`[sync] ${m}`),

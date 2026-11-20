@@ -505,6 +505,24 @@ describe('runSync', () => {
 })
 
 describe('createSyncController', () => {
+  const controllerDeps = (source: GameDataSource) => {
+    const { source: _, ...rest } = deps(source)
+    return { ...rest, createSource: () => source }
+  }
+
+  it('creates a fresh source for every run, so lists are never stale', async () => {
+    const { source } = fakeSource()
+    const createSource = vi.fn(() => source)
+    const c = createSyncController({ ...controllerDeps(source), createSource })
+    await c.trigger()
+    await c.idle?.()
+    await c.trigger({ details: true })
+    await c.idle?.()
+    expect(createSource).toHaveBeenCalledTimes(2)
+    const runs = await db.select().from(syncRuns)
+    expect(runs.map((r) => r.status)).toEqual(['succeeded', 'succeeded'])
+  })
+
   it('returns a runId immediately and busy while running', async () => {
     let release!: () => void
     const gate = new Promise<void>((r) => (release = r))
@@ -514,7 +532,7 @@ describe('createSyncController', () => {
         return []
       },
     })
-    const c = createSyncController(deps(source))
+    const c = createSyncController(controllerDeps(source))
     const first = await c.trigger()
     expect(first).toEqual({ runId: expect.any(Number) })
     expect(await c.trigger()).toBe('busy')
@@ -528,7 +546,7 @@ describe('createSyncController', () => {
   it('rejects on a real error before the run starts', async () => {
     const { source } = fakeSource()
     const c = createSyncController({
-      ...deps(source),
+      ...controllerDeps(source),
       sql: {
         reserve: async () => {
           throw new Error('db down')
@@ -543,7 +561,9 @@ describe('createSyncController', () => {
     const conn = await sql.reserve()
     try {
       await conn`select pg_try_advisory_lock(${SYNC_LOCK_KEY})`
-      expect(await createSyncController(deps(source)).trigger()).toBe('busy')
+      expect(await createSyncController(controllerDeps(source)).trigger()).toBe(
+        'busy',
+      )
     } finally {
       await conn`select pg_advisory_unlock(${SYNC_LOCK_KEY})`
       conn.release()

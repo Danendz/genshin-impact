@@ -247,14 +247,16 @@ describe('POST /admin/sync', () => {
     expect((await post()).status).toBe(401)
     expect((await post('/admin/sync', 'nope')).status).toBe(401)
   })
-  it('202 with runId, passing full', async () => {
+  it('202 with runId, passing full and details', async () => {
     const res = await post(
       '/admin/sync?full=1',
       'secret-secret-secret-secret-secret-00',
     )
     expect(res.status).toBe(202)
     expect(await res.json()).toEqual({ runId: 1 })
-    expect(triggerOpts).toEqual({ full: true })
+    expect(triggerOpts).toEqual({ full: true, details: false })
+    await post('/admin/sync?details=1', 'secret-secret-secret-secret-secret-00')
+    expect(triggerOpts).toEqual({ full: false, details: true })
   })
   it('409 when busy', async () => {
     triggerResult = 'busy'

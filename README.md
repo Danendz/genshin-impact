@@ -49,6 +49,8 @@ Environment variables:
 ```sh
 # full re-sync through the API
 curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" "https://<api-domain>/admin/sync?full=1"
+# re-check every entity's details (what the daily cron does)
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" "https://<api-domain>/admin/sync?details=1"
 ```
 
 ### Running against production from your machine

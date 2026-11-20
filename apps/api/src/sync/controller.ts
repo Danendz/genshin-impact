@@ -1,9 +1,14 @@
 import type { SyncController } from './controller-types'
 import { type RunSyncDeps, runSync } from './run-sync'
+import type { GameDataSource } from './source'
 
 export function createSyncController(
-  deps: Omit<RunSyncDeps, 'onStart'>,
+  deps: Omit<RunSyncDeps, 'onStart' | 'source'> & {
+    /** Called per run: a source caches upstream lists, so one per process would go stale. */
+    createSource: () => GameDataSource
+  },
 ): SyncController {
+  const { createSource, ...runDeps } = deps
   const inflight = new Set<Promise<unknown>>()
   return {
     async idle() {
@@ -14,13 +19,14 @@ export function createSyncController(
         let started = false
         const run = runSync(
           {
-            ...deps,
+            ...runDeps,
+            source: createSource(),
             onStart: (runId) => {
               started = true
               resolve({ runId })
             },
           },
-          { full: opts.full },
+          { full: opts.full, details: opts.details },
         )
         inflight.add(run)
         run
