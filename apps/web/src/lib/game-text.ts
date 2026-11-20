@@ -6,7 +6,27 @@ export type TextToken =
 const TOKEN =
   /<color=([^>]*)>|<\/color>|<i>|<\/i>|<[^>]*>|\{\/?LINK[^}]*\}|\\n|\n/g
 
-export function tokenizeGameText(s: string): TextToken[] {
+/** Traveler text comes in {M#..}{F#..} pairs */
+export type Gender = 'M' | 'F'
+
+/**
+ * Resolves Amber placeholders that are not tags: the leading "#" that marks
+ * them, {LAYOUT_PC#..} (other platforms dropped), {M#..}{F#..} by gender,
+ * and the payload of any other {UPPER#..}.
+ */
+export function cleanGameText(s: string, gender: Gender = 'M'): string {
+  return s
+    .replace(/^#/, '')
+    .replace(/\{([A-Z_]+)#([^{}]*)\}/g, (_, key: string, text: string) => {
+      if (key === 'LAYOUT_PC') return text
+      if (key.startsWith('LAYOUT_')) return ''
+      if (key === 'M' || key === 'F') return key === gender ? text : ''
+      return key === 'LINK' ? _ : text
+    })
+}
+
+export function tokenizeGameText(s: string, gender?: Gender): TextToken[] {
+  s = cleanGameText(s, gender)
   const out: TextToken[] = []
   const colors: string[] = []
   let italic = 0
@@ -69,5 +89,5 @@ export function formatParamRow(
   const value = template.replace(PARAM, (_, i: string, fmt: string) =>
     formatParam(params[Number(i) - 1], fmt),
   )
-  return { label, value }
+  return { label: cleanGameText(label), value }
 }

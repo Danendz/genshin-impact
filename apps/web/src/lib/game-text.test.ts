@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import travelerRu from '../../../api/test/fixtures/amber/avatar-10000005-pyro-ru.json'
+import nahida from '../../../api/test/fixtures/amber/avatar-10000073-en.json'
 import { formatParamRow, tokenizeGameText } from './game-text'
+
+const plain = (s: string, gender?: 'M' | 'F') =>
+  tokenizeGameText(s, gender)
+    .map((t) => ('text' in t ? t.text : '\n'))
+    .join('')
 
 describe('tokenizeGameText', () => {
   it('handles color, escaped newline and italics', () => {
@@ -51,5 +58,52 @@ describe('formatParamRow', () => {
 
   it('skips empty rows', () => {
     expect(formatParamRow('', [])).toBeNull()
+  })
+})
+
+describe('Amber placeholders', () => {
+  const travelerBio = travelerRu.data.fetter.detail
+
+  it('resolves gendered text, default male', () => {
+    expect(plain(travelerBio)).toMatch(
+      /^Путешественник из другого мира, разлучённый со своей сестрой\. Он отправляе/,
+    )
+    expect(plain(travelerBio, 'F')).toMatch(
+      /^Путешественница из другого мира, разлучённая со своим братом\. Она отправляе/,
+    )
+  })
+
+  it('keeps the PC wording of layout variants and drops the leading #', () => {
+    expect(
+      plain('#{LAYOUT_MOBILE#Tap}{LAYOUT_PC#Press}{LAYOUT_PS#Press} DMG'),
+    ).toBe('Press DMG')
+  })
+
+  it('keeps the payload of other upper-case markers', () => {
+    expect(plain('a {SOMETHING#b} c')).toBe('a b c')
+  })
+
+  it('leaves no raw markers in real talent rows and texts', () => {
+    const talents = Object.values(nahida.data.talent) as {
+      description: string
+      promote?: Record<string, { description: string[]; params: number[] }>
+    }[]
+    for (const t of talents) {
+      expect(plain(t.description)).not.toMatch(/[{}]|^#/)
+      for (const lvl of Object.values(t.promote ?? {}))
+        for (const row of lvl.description) {
+          const r = formatParamRow(row, lvl.params)
+          if (r) expect(r.label).not.toMatch(/[{}]|^#/)
+        }
+    }
+  })
+
+  it('cleans scaling labels', () => {
+    expect(
+      formatParamRow(
+        '#{LAYOUT_MOBILE#Tap}{LAYOUT_PC#Press}{LAYOUT_PS#Press} DMG|{param1:F1P}',
+        [1.2],
+      ),
+    ).toEqual({ label: 'Press DMG', value: '120.0%' })
   })
 })

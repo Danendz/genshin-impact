@@ -37,8 +37,10 @@ export function Scaling({
         </select>
       </label>
       <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1">
-        {rows.map((r) => (
-          <div key={r.label} className="contents">
+        {rows.map((r, i) => (
+          // labels can repeat; rows are static for a level
+          // biome-ignore lint/suspicious/noArrayIndexKey: see above
+          <div key={i} className="contents">
             <dt className="text-white/70">{r.label}</dt>
             <dd className="text-right">{r.value}</dd>
           </div>

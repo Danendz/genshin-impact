@@ -2,6 +2,7 @@ import type { Locale } from '@gi/shared'
 import { useMemo, useState } from 'react'
 import { GameText } from '../components/GameText'
 import { regionLabel, type StringKey, t } from '../i18n/strings'
+import type { Gender } from '../lib/game-text'
 import styles from './characters.module.css'
 import {
   type Constellation,
@@ -32,6 +33,7 @@ export function RightPanel({
     [detail.details],
   )
   const icons = detail.skillIcons ?? {}
+  const gender = genderOf(detail.id)
   return (
     <article className={styles.card}>
       {section === 'attributes' && (
@@ -44,6 +46,7 @@ export function RightPanel({
         <SkillList
           entries={talents.map((talent) => ({ talent }))}
           icons={icons}
+          gender={gender}
           locale={locale}
         />
       )}
@@ -54,6 +57,7 @@ export function RightPanel({
             rank: i + 1,
           }))}
           icons={icons}
+          gender={gender}
           locale={locale}
         />
       )}
@@ -61,6 +65,9 @@ export function RightPanel({
     </article>
   )
 }
+
+/** Lumine's ids start 10000007; every other text reads as Aether's */
+const genderOf = (id: string): Gender => (id.startsWith('10000007') ? 'F' : 'M')
 
 function Placeholder({ locale }: { locale: Locale }) {
   return <p className="text-white/70">{t(locale, 'placeholder')}</p>
@@ -136,7 +143,11 @@ function Attributes({
         </p>
         <div className={`${styles.bar} ${styles.barFriendship}`} />
       </div>
-      <GameText text={detail.description} className={styles.description} />
+      <GameText
+        text={detail.description}
+        className={styles.description}
+        gender={genderOf(detail.id)}
+      />
       <button type="button" className={styles.wardrobe} disabled>
         <Icon name="wardrobe" className="size-5" />
         <span className="flex-1">{t(locale, 'wardrobe')}</span>
@@ -165,10 +176,12 @@ const entryOf = (e: Entry) => e.talent ?? e.constellation
 function SkillList({
   entries,
   icons,
+  gender,
   locale,
 }: {
   entries: Entry[]
   icons: Record<string, string>
+  gender: Gender
   locale: Locale
 }) {
   const [open, setOpen] = useState<Entry>()
@@ -219,6 +232,7 @@ function SkillList({
           <div className="flex flex-col gap-3">
             <GameText
               text={entryOf(open).description}
+              gender={gender}
               className="text-sm text-white/85"
             />
             {open.talent && <Scaling talent={open.talent} locale={locale} />}
@@ -270,7 +284,11 @@ function Profile({
             </div>
           ))}
       </dl>
-      <GameText text={detail.description} className={styles.description} />
+      <GameText
+        text={detail.description}
+        className={styles.description}
+        gender={genderOf(detail.id)}
+      />
     </div>
   )
 }

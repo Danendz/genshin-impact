@@ -111,4 +111,16 @@ describe('RightPanel', () => {
     rerender(<RightPanel detail={empty} section="profile" locale="en" />)
     expect(screen.queryByText('Mondstadt')).toBeNull()
   })
+
+  it.each([
+    ['10000005-anemo', 'He travels'],
+    ['10000007-anemo', 'She travels'],
+  ])('resolves gendered Traveler text for %s', (id, text) => {
+    renderAt('profile', {
+      ...detail,
+      id,
+      description: '#{M#He}{F#She} travels',
+    })
+    expect(screen.getByText(text)).toBeInTheDocument()
+  })
 })

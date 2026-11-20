@@ -1,15 +1,20 @@
 import { useMemo } from 'react'
-import { tokenizeGameText } from '../lib/game-text'
+import { type Gender, tokenizeGameText } from '../lib/game-text'
 
 /** Renders Amber game text as React nodes (never as raw HTML). */
 export function GameText({
   text,
   className,
+  gender,
 }: {
   text: string | null | undefined
   className?: string
+  gender?: Gender
 }) {
-  const tokens = useMemo(() => tokenizeGameText(text ?? ''), [text])
+  const tokens = useMemo(
+    () => tokenizeGameText(text ?? '', gender),
+    [text, gender],
+  )
   return (
     <span className={className}>
       {tokens.map((t, i) => {
