@@ -16,6 +16,21 @@ const listQuery = z.object({
 })
 const detailQuery = z.object({ locale: localeParam })
 
+/** icon names referenced by talents and constellations; tolerant of any shape */
+function skillIconNames(details: unknown): string[] {
+  const d = (details ?? {}) as Record<string, unknown>
+  const names = new Set<string>()
+  for (const key of ['talents', 'constellations']) {
+    const list = d[key]
+    if (!Array.isArray(list)) continue
+    for (const entry of list) {
+      const icon = (entry as { icon?: unknown } | null)?.icon
+      if (typeof icon === 'string' && icon) names.add(icon)
+    }
+  }
+  return [...names]
+}
+
 export function charactersRoute(deps: { db: Db; store: MediaStore }) {
   const { db, store } = deps
   const req = aliasedTable(characterI18n, 'req')
@@ -84,6 +99,14 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         .limit(1)
       if (!r || r.name == null) return c.json({ error: 'not_found' }, 404)
       const media = await loadMedia(db, store, 'character', [r.c.id])
+      const icons = await loadMedia(
+        db,
+        store,
+        'skill_icon',
+        skillIconNames(r.details),
+      )
+      const skillIcons: Record<string, string> = {}
+      for (const [name, m] of icons) if (m.icon) skillIcons[name] = m.icon
       const ch = r.c
       return c.json({
         id: ch.id,
@@ -102,6 +125,7 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         description: r.description,
         details: r.details,
         media: media.get(ch.id) ?? {},
+        skillIcons,
       })
     })
 }

@@ -9,6 +9,7 @@ import {
   weapons,
 } from '@gi/db'
 import { resetDb } from '@gi/db/test-utils'
+import { eq } from 'drizzle-orm'
 import { afterAll, beforeEach, describe, expect, inject, it } from 'vitest'
 import { createApp } from '../app'
 import { parseEnv } from '../env'
@@ -139,6 +140,40 @@ describe('characters', () => {
       headers: { 'If-None-Match': tag as string },
     })
     expect(second.status).toBe(304)
+  })
+
+  it('maps referenced skill icons to urls', async () => {
+    await seedChar('10000099', 'pyro', 4, { en: 'Icons' })
+    await db
+      .update(characterI18n)
+      .set({
+        details: {
+          talents: [{ icon: 'Skill_A_01' }, { name: 'no icon' }],
+          constellations: [{ icon: 'UI_Talent_X' }],
+        },
+      })
+      .where(eq(characterI18n.characterId, '10000099'))
+    const icon = (ownerId: string) => ({
+      ownerType: 'skill_icon' as const,
+      ownerId,
+      kind: 'icon' as const,
+      sourceUrl: 's',
+      r2Key: `skill_icon/${ownerId}/icon.webp`,
+      width: 1,
+      height: 1,
+      contentHash: 'c',
+    })
+    await db.insert(mediaAssets).values([icon('Skill_A_01'), icon('Unrelated')])
+    const body = (await (
+      await app.request('/v1/characters/10000099')
+    ).json()) as { skillIcons: Record<string, string> }
+    expect(body.skillIcons).toEqual({
+      Skill_A_01: 'http://media.test/gi-media/skill_icon/Skill_A_01/icon.webp',
+    })
+    const plain = (await (
+      await app.request('/v1/characters/10000005-pyro')
+    ).json()) as { skillIcons: Record<string, string> }
+    expect(plain.skillIcons).toEqual({})
   })
 
   it('emits absolute media urls under MEDIA_PUBLIC_URL', async () => {
