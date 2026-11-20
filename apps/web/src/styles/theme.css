@@ -97,6 +97,9 @@
   --color-well: rgb(0 0 0 / 0.16);
   --color-band-strong: rgb(0 0 0 / 0.27);
   --color-ink-dark: #323646;
+  --color-settings: rgb(0 0 0 / 0.28);
+  --color-settings-header: rgb(0 0 0 / 0.39);
+  --color-settings-title: #c7b18c;
 
   --font-genshin: "Genshin", system-ui, sans-serif;
   --font-genshin-icon: "GenshinIcon";

@@ -681,3 +681,156 @@ a.tile:focus-visible {
     padding: 10px 0;
   }
 }
+
+/* ---- settings: HomeSettings.vue, HomeSettingsOption.vue ---- */
+
+.settings {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: var(--color-settings);
+  animation: fadeIn var(--dur-base) ease;
+}
+
+.settingsHeader {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background: var(--color-settings-header);
+}
+
+.settingsHeader > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1600px;
+  padding: 10px;
+  color: var(--color-settings-title);
+}
+
+.settingsIcon {
+  width: 35px;
+  height: 35px;
+}
+
+.settingsHeader h2 {
+  margin-left: 10px;
+}
+
+.settingsClose {
+  margin-left: auto;
+  margin-right: 5px;
+}
+
+.settingsMain {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1500px;
+  height: 100%;
+  padding: 0 10px;
+}
+
+.settingsSections {
+  width: 20%;
+  padding-left: 2px;
+  font-size: 20px;
+}
+
+.settingsContent {
+  width: 100%;
+  padding-right: 10px;
+}
+
+.settingsContent h3 {
+  margin-bottom: 10px;
+  color: var(--color-white);
+  font-size: 20px;
+}
+
+.settingsOption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background: var(--color-dock);
+  color: var(--color-white);
+  font-size: 18px;
+}
+
+.settingsChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.settingsChoices button {
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: var(--color-hover);
+  color: var(--color-menu-text);
+  transition: background var(--dur-fast);
+}
+
+.settingsChoices button:hover {
+  background: var(--color-selected);
+}
+
+.settingsChoices button[aria-pressed="true"] {
+  background: var(--color-cream);
+  color: var(--color-ink-dark);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 915px) {
+  .settings {
+    gap: 15px;
+  }
+
+  .settingsHeader > div {
+    padding: 6px;
+  }
+
+  .settingsIcon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .settingsSections,
+  .settingsContent h3 {
+    font-size: 17px;
+  }
+
+  .settingsOption {
+    font-size: 14px;
+  }
+}
+
+@media (orientation: portrait) {
+  .settingsMain {
+    flex-direction: column;
+    padding: 0 5px;
+  }
+
+  .settingsSections {
+    width: 100%;
+    padding: 5px;
+    border-radius: 10px;
+    background: var(--color-glass);
+  }
+  .settingsContent {
+    padding-right: 0;
+  }
+}

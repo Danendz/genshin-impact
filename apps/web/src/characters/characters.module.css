@@ -237,14 +237,17 @@
   top: calc(50% - 8px - 7.5px);
 }
 .rhombus:hover,
-.rhombus[aria-current="page"] {
+.rhombus[aria-current="page"],
+.rhombus[aria-current="true"] {
   color: white;
 }
-.rhombus[aria-current="page"]::before {
+.rhombus[aria-current="page"]::before,
+.rhombus[aria-current="true"]::before {
   background: transparent;
   transform: rotate(45deg) scale(0.9);
 }
-.rhombus[aria-current="page"]::after {
+.rhombus[aria-current="page"]::after,
+.rhombus[aria-current="true"]::after {
   opacity: 1;
   animation: nudge 1s infinite linear;
 }
