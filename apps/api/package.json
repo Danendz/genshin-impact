@@ -8,6 +8,7 @@
     "build": "tsup",
     "start": "node dist/index.js",
     "sync": "tsx --env-file-if-exists=../../.env src/sync/cli.ts",
+    "seed:site": "tsx --env-file-if-exists=../../.env src/site/seed-cli.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

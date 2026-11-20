@@ -7,6 +7,7 @@ import type { MediaStore } from './media/store'
 import { adminRoute } from './routes/admin'
 import { charactersRoute } from './routes/characters'
 import { materialsRoute } from './routes/materials'
+import { siteRoute } from './routes/site'
 import { weaponsRoute } from './routes/weapons'
 import type { SyncController } from './sync/controller-types'
 
@@ -25,12 +26,13 @@ export function createApp(deps: AppDeps) {
     .use('/v1/*', etag())
     .use('/v1/*', async (c, next) => {
       await next()
-      if (c.res.status === 200)
+      if (c.res.status === 200 && !c.res.headers.has('Cache-Control'))
         c.header('Cache-Control', 'public, max-age=300, s-maxage=3600')
     })
     .route('/v1/characters', charactersRoute({ db, store }))
     .route('/v1/weapons', weaponsRoute({ db, store }))
     .route('/v1/materials', materialsRoute({ db, store }))
+    .route('/v1/site', siteRoute({ db, store }))
     .route(
       '/admin',
       adminRoute({ adminToken: deps.env.ADMIN_TOKEN, sync: deps.sync }),
