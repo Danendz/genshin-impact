@@ -15,28 +15,23 @@ services:
       interval: 2s
       timeout: 3s
       retries: 30
-  minio:
-    image: minio/minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+  s3:
+    image: chrislusf/seaweedfs:4.40
+    command: server -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json -ip.bind=0.0.0.0 -dir=/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:8333"
     volumes:
-      - miniodata:/data
-  minio-init:
-    image: minio/mc
-    depends_on:
-      - minio
-    restart: "no"
-    entrypoint: >
-      /bin/sh -c "
-      until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done;
-      mc mb --ignore-existing local/gi-media;
-      mc anonymous set download local/gi-media;
-      "
+      - s3data:/data
+      - ./infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://localhost:9333/cluster/status || exit 1",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 30
 volumes:
   pgdata:
-  miniodata:
+  s3data:
