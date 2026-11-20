@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../api'
 import { homeIcons, navIcons, statsIcons } from '../assets/icons'
 import { GenshinIcon } from '../components/GenshinIcon'
+import { genshinIcons } from '../components/genshinIconGlyphs'
 import { Route } from './index'
 
 vi.mock('../api', () => ({ api: { health: { $get: vi.fn() } } }))
@@ -33,6 +34,12 @@ describe('icon maps', () => {
 })
 
 describe('GenshinIcon', () => {
+  it('maps exactly the 57 glyphs present in genshinicon.woff2', () => {
+    expect(Object.keys(genshinIcons)).toHaveLength(57)
+    expect(new Set(Object.values(genshinIcons)).size).toBe(57)
+    expect(genshinIcons.mondstadt).toBe('u')
+  })
+
   it('renders the glyph as aria-hidden by default', () => {
     const { container } = render(<GenshinIcon name="pyro" />)
     const el = container.firstElementChild

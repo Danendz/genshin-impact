@@ -1,4 +1,4 @@
-import { GENSHIN_ICONS, type GenshinIconName } from './genshinIconGlyphs'
+import { type GenshinIconName, genshinIcons } from './genshinIconGlyphs'
 
 type Props = {
   name: GenshinIconName
@@ -20,7 +20,7 @@ export function GenshinIcon({ name, label, className }: Props) {
         ? { role: 'img', 'aria-label': label }
         : { 'aria-hidden': true })}
     >
-      {GENSHIN_ICONS[name]}
+      {genshinIcons[name]}
     </span>
   )
 }

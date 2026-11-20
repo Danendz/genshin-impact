@@ -131,7 +131,7 @@ def main(src):
         size = write_subset(src, codes, fname)
         print(f"{fname}: {len(codes)} cps, {size // 1024} KB")
         css.append(
-            f"@font-face {{\n  /* {label} */\n  font-family: \"HYWenHei\";\n  font-style: normal;\n"
+            f"@font-face {{\n  /* {label} */\n  font-family: \"Genshin\";\n  font-style: normal;\n"
             f"  font-weight: 400;\n  font-display: swap;\n"
             f"  src: url(\"../assets/fonts/hywenhei/{fname}\") format(\"woff2\");\n"
             f"  unicode-range: {declared.get(label) or ranges(codes)};\n}}"

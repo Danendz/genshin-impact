@@ -1,5 +1,5 @@
-/** Glyph map from legacy:public/css/genshinIcons.css (genshinicon.woff2). */
-export const GENSHIN_ICONS = {
+/** Glyphs present in genshinicon.woff2; names from legacy:public/css/genshinIcons.css (`mondstadt` is the font's "montstad"). */
+export const genshinIcons = {
   anemo: '\u0061',
   'arrow-left': '\u0062',
   'arrow-right': '\u0063',
@@ -57,9 +57,6 @@ export const GENSHIN_ICONS = {
   win: '\u0033',
   selected: '\u0032',
   guaranteed: '\u0035',
-  apple: '\u0034',
-  android: '\u0036',
-  windows: '\u0037',
 } as const
 
-export type GenshinIconName = keyof typeof GENSHIN_ICONS
+export type GenshinIconName = keyof typeof genshinIcons
