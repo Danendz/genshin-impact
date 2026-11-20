@@ -54,7 +54,7 @@ export type CharacterSearch = {
   element?: Element[]
   weaponType?: WeaponType[]
   rarity?: (4 | 5)[]
-  region?: string[]
+  region?: Region[]
   section?: Section
   locale?: Locale
 }
@@ -90,7 +90,10 @@ export function characterSearch(raw: Record<string, unknown>): CharacterSearch {
   const rarity = many(raw.rarity, (v) =>
     v === '4' || v === '5' ? (Number(v) as 4 | 5) : undefined,
   )
-  const region = many(raw.region, (v) => (/^[A-Z_]+$/.test(v) ? v : undefined))
+  // folded like the list, so links with old upstream codes still match
+  const region = many(raw.region, (v) =>
+    /^[A-Z_]+$/.test(v) ? regionGroup(v) : undefined,
+  )
   if (element) out.element = element
   if (weaponType) out.weaponType = weaponType
   if (rarity) out.rarity = rarity

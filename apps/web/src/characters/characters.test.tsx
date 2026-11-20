@@ -455,6 +455,10 @@ describe('details helpers', () => {
       rarity: [4, 5],
       region: ['SUMERU'],
     })
+    // old links carry upstream codes; they fold into nations like the list does
+    expect(characterSearch({ region: 'FATUI,SNEZHNAYA,MAINACTOR' })).toEqual({
+      region: ['SNEZHNAYA', 'TEYVAT'],
+    })
     // a single value arrives from the URL as a plain string or number
     expect(characterSearch({ element: 'geo', rarity: 5 })).toEqual({
       element: ['geo'],
