@@ -36,6 +36,7 @@ jobs:
       R2_SECRET_ACCESS_KEY: gi-local-secret
       R2_BUCKET: gi-media
       MEDIA_PUBLIC_URL: http://localhost:9000/gi-media
+      S3_INTEGRATION: "1"
     steps:
       - uses: actions/checkout@v4
 
