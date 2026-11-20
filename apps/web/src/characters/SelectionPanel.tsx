@@ -1,7 +1,8 @@
 import { ELEMENTS, type Element, type Locale, WEAPON_TYPES } from '@gi/shared'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { GenshinIcon } from '../components/GenshinIcon'
+import { useEscape } from '../components/layers'
 import { regionLabel, type StringKey, t } from '../i18n/strings'
 import styles from './characters.module.css'
 import { type CharacterSearch, FILTER_KEYS, type FilterKey } from './details'
@@ -67,11 +68,7 @@ export function SelectionPanel({
   const grid = useRef<HTMLUListElement>(null)
   const drawer = useRef<HTMLFieldSetElement>(null)
   useFlip(grid)
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  useEscape(onClose)
 
   const picked = (from: Picks | CharacterSearch, key: FilterKey) =>
     (from[key] ?? []) as (string | number)[]

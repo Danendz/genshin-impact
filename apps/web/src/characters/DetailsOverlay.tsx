@@ -1,7 +1,8 @@
 import type { Locale } from '@gi/shared'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { type StatsIconName, statsIcons } from '../assets/icons'
+import { useModalLayer } from '../components/layers'
 import { type StringKey, t } from '../i18n/strings'
 import styles from './characters.module.css'
 import { animateOut } from './motion'
@@ -73,22 +74,21 @@ export function DetailsOverlay({
       ),
     [onClose],
   )
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [close])
+  const dialog = useRef<HTMLDivElement>(null)
+  useModalLayer(dialog, close)
   const label = (key: string) => t(locale, `stats.${key}` as StringKey)
   return createPortal(
-    // biome-ignore lint/a11y/noStaticElementInteractions: click-outside; Escape is handled on window
+    // biome-ignore lint/a11y/noStaticElementInteractions: click-outside; Escape is handled by useModalLayer
     <div
       ref={backdrop}
       className={styles.detailsBackdrop}
       onMouseDown={(e) => e.target === e.currentTarget && close()}
     >
       <div
+        ref={dialog}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
         aria-label={t(locale, 'details')}
         className={styles.details}
       >
