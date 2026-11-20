@@ -28,6 +28,15 @@ function fakeFetch(overrides: Record<string, () => Response> = {}) {
     try {
       return json(fixture(name))
     } catch {
+      // A detail missing for a locale whose list contains the id would now be
+      // an entity error, so derive that locale's detail from en. Ids absent
+      // from the locale list stay 404 (legitimately untranslated).
+      if (id) {
+        try {
+          const listed = id in fixture(`${kind}-list-${lang}`).data.items
+          if (listed) return json(fixture(`${kind}-${id}-en`))
+        } catch {}
+      }
       return json({ code: 404, data: 'Data Not Found!' }, 404)
     }
   })
@@ -48,7 +57,7 @@ describe('getCharacter', () => {
     expect(c.releaseAt).toEqual(new Date(1667253600 * 1000))
     expect(c.i18n.en?.name).toBe('Nahida')
     expect(c.i18n.ru).toBeDefined()
-    expect(c.i18n['zh-CN']).toBeUndefined()
+    expect(c.i18n['zh-CN']).toBeDefined()
     expect(c.i18n.en?.title).toBe('Physic of Purity')
     expect(c.i18n.en?.details.talents.length).toBeGreaterThan(0)
     const urls = c.media.map((m) => m.url)
@@ -113,6 +122,26 @@ describe('getWeapon', () => {
     expect(
       w.media[1]?.url.endsWith('UI_Gacha_EquipIcon_Sword_Narukami.png'),
     ).toBe(true)
+  })
+})
+
+describe('locale detail 404s', () => {
+  test('404 for an id that IS in that locale list fails the entity', async () => {
+    const f = fakeFetch({
+      [`${BASE}/ru/avatar/10000073`]: () => json({ code: 404 }, 404),
+    })
+    await expect(
+      createAmberSource({ fetch: f.fn }).getCharacter('10000073'),
+    ).rejects.toBeInstanceOf(SourceEntityError)
+  })
+
+  test('a non-en list 404 fails the list instead of dropping the locale', async () => {
+    const f = fakeFetch({
+      [`${BASE}/ru/material`]: () => json({ code: 404 }, 404),
+    })
+    await expect(
+      createAmberSource({ fetch: f.fn }).listMaterials(),
+    ).rejects.toBeInstanceOf(UpstreamError)
   })
 })
 

@@ -95,6 +95,8 @@ export function createAmberSource(
     path: string,
     schema: S,
     entityId: string | null,
+    /** locales whose list contains the entity: a 404 there is an error, not absence */
+    listedIn?: (l: Locale) => boolean,
   ) {
     const results = await Promise.all(
       LOCALES.map(
@@ -102,7 +104,14 @@ export function createAmberSource(
       ),
     )
     const out = new Map<Locale, z.output<S>>()
-    for (const [l, r] of results) if (r !== null) out.set(l, r)
+    for (const [l, r] of results) {
+      if (r !== null) out.set(l, r)
+      else if (entityId !== null && listedIn?.(l))
+        throw new SourceEntityError(
+          entityId,
+          `${l} detail missing (404) although listed`,
+        )
+    }
     return out
   }
 
@@ -118,38 +127,74 @@ export function createAmberSource(
     }))
   }
 
+  /**
+   * All locale lists of one kind, fetched once per source instance. Any locale
+   * missing (404) is an upstream error: silently treating it as "no
+   * translations" would wipe that locale for every entity.
+   */
+  const listCache = new Map<string, Promise<Map<Locale, z.output<z.ZodType>>>>()
+  function loadLists<S extends z.ZodType>(kind: string, schema: S) {
+    let p = listCache.get(kind)
+    if (!p) {
+      p = (async () => {
+        const byLocale = await fetchAllLocales(kind, schema, null)
+        for (const l of LOCALES) {
+          if (!byLocale.has(l))
+            throw new UpstreamError(kind, 404, `${kind} list missing for ${l}`)
+        }
+        return byLocale
+      })()
+      p.catch(() => listCache.delete(kind)) // allow a retry after failure
+      listCache.set(kind, p)
+    }
+    return p as Promise<Map<Locale, z.output<S>>>
+  }
+
   async function listEntries<S extends z.ZodType>(
     kind: string,
     schema: S,
     items: (d: z.output<S>) => Record<string, unknown>,
   ): Promise<ListEntry[]> {
-    const byLocale = await fetchAllLocales(kind, schema, null)
-    const enItems = byLocale.get('en')
-    if (!enItems) {
-      throw new UpstreamError(kind, 404, `${kind} list missing for en`)
-    }
+    const byLocale = await loadLists(kind, schema)
+    const enItems = byLocale.get('en') as z.output<S>
     const ids = Object.keys(items(enItems))
     const itemMaps = new Map<Locale, Record<string, unknown>>()
     for (const [l, d] of byLocale) itemMaps.set(l, items(d))
     return hashEntries(ids, itemMaps)
   }
 
+  /** locales whose (cached) list contains the id */
+  async function listedLocales<S extends z.ZodType>(
+    kind: string,
+    schema: S,
+    items: (d: z.output<S>) => Record<string, unknown>,
+    id: string,
+  ): Promise<(l: Locale) => boolean> {
+    const byLocale = await loadLists(kind, schema)
+    return (l) => {
+      const d = byLocale.get(l)
+      return d !== undefined && id in items(d)
+    }
+  }
+
+  const avatarItems = (d: z.output<typeof avatarListResponse>) => d.data.items
+  // weapon skins (isWeaponSkin) have no stats/affix and aren't real weapons
+  const weaponItems = (d: z.output<typeof weaponListResponse>) =>
+    Object.fromEntries(
+      Object.entries(d.data.items).filter(([, w]) => !w.isWeaponSkin),
+    )
+
   return {
     listCharacters: () =>
-      listEntries('avatar', avatarListResponse, (d) => d.data.items),
-    listWeapons: () =>
-      listEntries('weapon', weaponListResponse, (d) =>
-        // weapon skins (isWeaponSkin) have no stats/affix and aren't real weapons
-        Object.fromEntries(
-          Object.entries(d.data.items).filter(([, w]) => !w.isWeaponSkin),
-        ),
-      ),
+      listEntries('avatar', avatarListResponse, avatarItems),
+    listWeapons: () => listEntries('weapon', weaponListResponse, weaponItems),
 
     async getCharacter(id): Promise<CharacterRecord> {
       const byLocale = await fetchAllLocales(
         `avatar/${id}`,
         avatarDetailResponse,
         id,
+        await listedLocales('avatar', avatarListResponse, avatarItems, id),
       )
       const en = byLocale.get('en')?.data
       if (!en) throw new SourceEntityError(id, 'en detail missing')
@@ -204,6 +249,7 @@ export function createAmberSource(
         `weapon/${id}`,
         weaponDetailResponse,
         id,
+        await listedLocales('weapon', weaponListResponse, weaponItems, id),
       )
       const en = byLocale.get('en')?.data
       if (!en) throw new SourceEntityError(id, 'en detail missing')
@@ -235,14 +281,8 @@ export function createAmberSource(
     },
 
     async listMaterials() {
-      const byLocale = await fetchAllLocales(
-        'material',
-        materialListResponse,
-        null,
-      )
-      const en = byLocale.get('en')?.data.items
-      if (!en)
-        throw new UpstreamError('material', 404, 'material list missing for en')
+      const byLocale = await loadLists('material', materialListResponse)
+      const en = byLocale.get('en')?.data.items as Record<string, unknown>
       const records: MaterialRecord[] = []
       const skipped: { id: string; reason: string }[] = []
       for (const [key, raw] of Object.entries(en)) {
