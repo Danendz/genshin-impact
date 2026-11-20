@@ -1,5 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { createDb } from '@gi/db'
 import { parseCliEnv } from '../env'
 import { createS3Store } from '../media/s3-store'
@@ -7,20 +7,25 @@ import { filterImageFiles } from './seed-files'
 import { seedSiteAssets } from './seed-site-assets'
 
 async function main(): Promise<number> {
-  const [group, dir] = process.argv.slice(2)
+  const raw = process.argv.includes('--raw')
+  const [group, dir] = process.argv.slice(2).filter((a) => a !== '--raw')
   if (!group || !dir) {
-    console.error('usage: seed:site <group> <dir>')
+    console.error('usage: seed:site <group> <dir> [--raw]')
     return 1
   }
   const env = parseCliEnv(process.env)
-  const entries = await readdir(dir, { withFileTypes: true })
+  // sub-folders count too: `gi/sky.webp` is named `gi/sky.webp`
+  const entries = await readdir(dir, { withFileTypes: true, recursive: true })
   const all = await Promise.all(
     entries
       .filter((e) => e.isFile())
-      .map(async (e) => ({
-        name: e.name,
-        bytes: new Uint8Array(await readFile(join(dir, e.name))),
-      })),
+      .map(async (e) => {
+        const path = join(e.parentPath, e.name)
+        return {
+          name: relative(dir, path),
+          bytes: new Uint8Array(await readFile(path)),
+        }
+      }),
   )
   const files = await filterImageFiles(all, (m) => console.log(`[seed] ${m}`))
   const { db, close } = createDb(env.DATABASE_URL)
@@ -29,6 +34,7 @@ async function main(): Promise<number> {
       { db, store: createS3Store(env) },
       group,
       files,
+      { raw },
     )
     console.log(`uploaded ${uploaded}, skipped ${skipped}`)
     return 0

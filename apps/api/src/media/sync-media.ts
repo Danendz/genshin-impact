@@ -23,6 +23,7 @@ export async function syncMedia(
       eq(mediaAssets.ownerType, owner.type),
       eq(mediaAssets.ownerId, owner.id),
       eq(mediaAssets.kind, ref.kind),
+      eq(mediaAssets.variant, ''),
     )
     if (!opts.force) {
       const [row] = await db
@@ -61,7 +62,12 @@ export async function syncMedia(
       .insert(mediaAssets)
       .values(values)
       .onConflictDoUpdate({
-        target: [mediaAssets.ownerType, mediaAssets.ownerId, mediaAssets.kind],
+        target: [
+          mediaAssets.ownerType,
+          mediaAssets.ownerId,
+          mediaAssets.kind,
+          mediaAssets.variant,
+        ],
         set: values,
       })
     result.uploaded++

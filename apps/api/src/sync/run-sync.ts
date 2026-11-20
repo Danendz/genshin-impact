@@ -7,7 +7,7 @@ import {
   syncRuns,
   weapons,
 } from '@gi/db'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import type { MediaStore } from '../media/store'
 import { syncMedia } from '../media/sync-media'
 import type { GameDataSource, ListEntry, MediaRef, SkillIcon } from './source'
@@ -116,7 +116,7 @@ export async function runSync(
     await db
       .update(syncRuns)
       .set({ status: 'failed', error: 'abandoned', finishedAt: new Date() })
-      .where(eq(syncRuns.status, 'running'))
+      .where(and(eq(syncRuns.status, 'running'), eq(syncRuns.source, 'amber')))
     const [run] = await db
       .insert(syncRuns)
       .values({ status: 'running', counts: {} })

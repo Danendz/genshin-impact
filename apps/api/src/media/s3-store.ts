@@ -1,5 +1,7 @@
 import {
+  DeleteObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -54,6 +56,27 @@ export function createS3Store(
           ContentType: contentType,
           CacheControl: 'public, max-age=31536000, immutable',
         }),
+      )
+    },
+    async list(prefix) {
+      const keys: string[] = []
+      let token: string | undefined
+      do {
+        const page = await client.send(
+          new ListObjectsV2Command({
+            Bucket: env.R2_BUCKET,
+            Prefix: prefix,
+            ContinuationToken: token,
+          }),
+        )
+        for (const o of page.Contents ?? []) if (o.Key) keys.push(o.Key)
+        token = page.IsTruncated ? page.NextContinuationToken : undefined
+      } while (token)
+      return keys
+    },
+    async delete(key) {
+      await client.send(
+        new DeleteObjectCommand({ Bucket: env.R2_BUCKET, Key: key }),
       )
     },
     publicUrl: (key) => `${base}/${key}`,

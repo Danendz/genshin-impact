@@ -21,6 +21,7 @@ export const mediaOwnerTypeEnum = pgEnum('media_owner_type', [
   'weapon',
   'material',
   'skill_icon',
+  'skowt_character',
 ])
 export const mediaKindEnum = pgEnum('media_kind', [
   'icon',
@@ -28,30 +29,47 @@ export const mediaKindEnum = pgEnum('media_kind', [
   'gacha_icon',
   'model_glb',
   'namecard',
+  'side_icon',
+  'round_icon',
+  'wish_icon',
+  'outfit_icon',
+  'outfit_splash',
+  'sheet',
+  'art',
+  'kit',
 ])
+export const mediaSourceEnum = pgEnum('media_source', ['amber', 'skowt'])
+export const mediaQualityEnum = pgEnum('media_quality', ['original', 'preview'])
 export const syncStatusEnum = pgEnum('sync_status', [
   'running',
   'succeeded',
   'partial',
   'failed',
 ])
+export const syncSourceEnum = pgEnum('sync_source', ['amber', 'skowt'])
 
 const updatedAt = () => timestamp({ withTimezone: true }).notNull().defaultNow()
 
-export const characters = pgTable('characters', {
-  id: text().primaryKey(),
-  rarity: smallint().notNull(),
-  element: elementEnum(),
-  weaponType: weaponTypeEnum().notNull(),
-  region: text(),
-  birthdayMonth: smallint(),
-  birthdayDay: smallint(),
-  releaseAt: timestamp({ withTimezone: true }),
-  sourceHash: text().notNull(),
-  /** sha256 of the normalized detail record; null until a sync computed it */
-  detailHash: text(),
-  updatedAt: updatedAt(),
-})
+export const characters = pgTable(
+  'characters',
+  {
+    id: text().primaryKey(),
+    rarity: smallint().notNull(),
+    element: elementEnum(),
+    weaponType: weaponTypeEnum().notNull(),
+    region: text(),
+    birthdayMonth: smallint(),
+    birthdayDay: smallint(),
+    releaseAt: timestamp({ withTimezone: true }),
+    sourceHash: text().notNull(),
+    /** sha256 of the normalized detail record; null until a sync computed it */
+    detailHash: text(),
+    /** skowt.cc character slug; shared by the Traveler's element rows */
+    skowtSlug: text(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index().on(t.skowtSlug)],
+)
 
 export const characterI18n = pgTable(
   'character_i18n',
@@ -119,6 +137,11 @@ export const mediaAssets = pgTable(
     ownerType: mediaOwnerTypeEnum().notNull(),
     ownerId: text().notNull(),
     kind: mediaKindEnum().notNull(),
+    /** '' for one-per-owner kinds; outfit label, kit role or asset id otherwise */
+    variant: text().notNull().default(''),
+    label: text(),
+    source: mediaSourceEnum().notNull().default('amber'),
+    quality: mediaQualityEnum().notNull().default('original'),
     sourceUrl: text().notNull(),
     r2Key: text().notNull(),
     width: integer().notNull(),
@@ -126,13 +149,35 @@ export const mediaAssets = pgTable(
     contentHash: text().notNull(),
     updatedAt: updatedAt(),
   },
-  (t) => [unique().on(t.ownerType, t.ownerId, t.kind)],
+  (t) => [unique().on(t.ownerType, t.ownerId, t.kind, t.variant)],
+)
+
+/** One built 3D model per skowt character variant (`default`, `Outfit 1`, ...). */
+export const characterModels = pgTable(
+  'character_models',
+  {
+    skowtSlug: text().notNull(),
+    variant: text().notNull(),
+    /** null: the variant isn't a rigged character (skill props); kept so it isn't refetched */
+    glbKey: text(),
+    weaponKey: text(),
+    propsKey: text(),
+    /** R2 prefix holding toon.json and its textures */
+    toonPrefix: text(),
+    clips: jsonb().$type<string[]>().notNull(),
+    bytes: integer().notNull(),
+    /** sorted SKV container hashes the build came from */
+    sourceHashes: text().array().notNull(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [primaryKey({ columns: [t.skowtSlug, t.variant] })],
 )
 
 export const syncRuns = pgTable('sync_runs', {
   id: serial().primaryKey(),
   startedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   finishedAt: timestamp({ withTimezone: true }),
+  source: syncSourceEnum().notNull().default('amber'),
   status: syncStatusEnum().notNull(),
   counts: jsonb().notNull(),
   error: text(),
@@ -143,6 +188,8 @@ export const siteAssets = pgTable(
   {
     id: serial().primaryKey(),
     group: text().notNull(),
+    /** source file name, for assets looked up by name (backdrops) */
+    name: text(),
     r2Key: text().notNull(),
     width: integer().notNull(),
     height: integer().notNull(),

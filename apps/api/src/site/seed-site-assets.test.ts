@@ -83,4 +83,23 @@ describe('seedSiteAssets', () => {
     const byHash = new Map(rows.map((r) => [r.sortOrder, r]))
     expect([...byHash.keys()].sort()).toEqual([0, 1, 2])
   })
+
+  it('stores raw files byte for byte, keeping their name', async () => {
+    const store = createMemoryStore()
+    const bytes = await img(1, 2, 3)
+    await seedSiteAssets(
+      { db, store },
+      'backdrop',
+      [{ name: 'shared/palette.png', bytes }],
+      { raw: true },
+    )
+    const [row] = await db.select().from(siteAssets)
+    expect(row).toMatchObject({
+      name: 'shared/palette.png',
+      width: 16,
+      height: 9,
+    })
+    expect(row?.r2Key).toMatch(/^site\/backdrop\/[0-9a-f]{12}\.png$/)
+    expect(store.get(row?.r2Key as string)?.body).toEqual(bytes)
+  })
 })

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter @gi/api... build"
+  },
+  "deploy": {
+    "preDeployCommand": ["pnpm --filter @gi/db db:migrate"],
+    "startCommand": "node apps/api/dist/models-cli.js",
+    "cronSchedule": "0 5 * * *",
+    "restartPolicyType": "NEVER"
+  }
+}

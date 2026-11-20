@@ -5,7 +5,12 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import type { MediaStore } from '../media/store'
 import { localeParam } from './locale'
-import { loadMedia } from './media'
+import {
+  loadCharacterMedia,
+  loadMedia,
+  loadModels,
+  loadSkowtAssets,
+} from './media'
 import { validate } from './validate'
 
 const listQuery = z.object({
@@ -75,11 +80,10 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
           sql`coalesce(${req.name}, ${fb.name})`,
           asc(characters.id),
         )
-      const media = await loadMedia(
+      const media = await loadCharacterMedia(
         db,
         store,
-        'character',
-        rows.map((r) => r.c.id),
+        rows.map((r) => r.c),
       )
       return c.json({
         items: rows.map((r) => ({
@@ -99,7 +103,14 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         .where(eq(characters.id, c.req.param('id')))
         .limit(1)
       if (!r || r.name == null) return c.json({ error: 'not_found' }, 404)
-      const media = await loadMedia(db, store, 'character', [r.c.id])
+      const media = await loadCharacterMedia(db, store, [r.c])
+      const slug = r.c.skowtSlug
+      const [models, assets] = slug
+        ? await Promise.all([
+            loadModels(db, store, slug),
+            loadSkowtAssets(db, store, slug),
+          ])
+        : [[], []]
       const icons = await loadMedia(
         db,
         store,
@@ -127,6 +138,8 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         details: r.details,
         media: media.get(ch.id) ?? {},
         skillIcons,
+        models,
+        assets,
       })
     })
 }

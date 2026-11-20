@@ -1,5 +1,6 @@
 import {
   characterI18n,
+  characterModels,
   characters,
   createDb,
   materialI18n,
@@ -226,6 +227,101 @@ describe('characters', () => {
     expect(detail.media.icon?.startsWith('http://media.test/gi-media/')).toBe(
       true,
     )
+  })
+})
+
+describe('characters: skowt assets', () => {
+  const skowtRow = (kind: 'side_icon' | 'kit' | 'outfit_icon', variant = '') =>
+    ({
+      ownerType: 'skowt_character',
+      ownerId: 'diluc',
+      kind,
+      variant,
+      label: variant || null,
+      source: 'skowt',
+      quality: 'original',
+      sourceUrl: `skowt:asset/${kind}${variant}`,
+      r2Key: `skowt_character/diluc/${kind}${variant}.webp`,
+      width: 2,
+      height: 2,
+      contentHash: 'c',
+    }) as const
+
+  beforeEach(async () => {
+    await db
+      .update(characters)
+      .set({ skowtSlug: 'diluc' })
+      .where(eq(characters.id, '10000005-pyro'))
+    await db
+      .insert(mediaAssets)
+      .values([
+        skowtRow('side_icon'),
+        skowtRow('kit', 'constellation.1'),
+        skowtRow('outfit_icon', 'Outfit'),
+      ])
+    await db.insert(characterModels).values([
+      {
+        skowtSlug: 'diluc',
+        variant: 'default',
+        glbKey: 'model/diluc/default/model-1.glb',
+        weaponKey: 'model/diluc/default/weapon-1.glb',
+        toonPrefix: 'model/diluc/default/toon-1/',
+        clips: ['Idle'],
+        bytes: 1,
+        sourceHashes: ['a'],
+      },
+      {
+        skowtSlug: 'diluc',
+        variant: 'Skill',
+        clips: [],
+        bytes: 0,
+        sourceHashes: ['b'],
+      },
+    ])
+  })
+
+  it('merges the side icon into list media, keeping Amber kinds', async () => {
+    const list = (await (await app.request('/v1/characters')).json()) as {
+      items: { id: string; media: Record<string, string> }[]
+    }
+    const d = list.items.find((i) => i.id === '10000005-pyro')
+    expect(d?.media).toEqual({
+      icon: 'http://media.test/gi-media/character/10000005-pyro/icon.webp',
+      side_icon:
+        'http://media.test/gi-media/skowt_character/diluc/side_icon.webp',
+    })
+  })
+
+  it('lists built models and every skowt image on detail', async () => {
+    const body = (await (
+      await app.request('/v1/characters/10000005-pyro')
+    ).json()) as {
+      models: unknown[]
+      assets: { kind: string; variant: string }[]
+    }
+    expect(body.models).toEqual([
+      {
+        variant: 'default',
+        glb: 'http://media.test/gi-media/model/diluc/default/model-1.glb',
+        weapon: 'http://media.test/gi-media/model/diluc/default/weapon-1.glb',
+        props: null,
+        toon: 'http://media.test/gi-media/model/diluc/default/toon-1/',
+        clips: ['Idle'],
+      },
+    ])
+    expect(body.assets.map((a) => `${a.kind}:${a.variant}`)).toEqual([
+      'side_icon:',
+      'outfit_icon:Outfit',
+      'kit:constellation.1',
+    ])
+  })
+
+  it('returns empty models and assets for unlinked characters', async () => {
+    const body = (await (
+      await app.request('/v1/characters/10000002-dendro')
+    ).json()) as { models: unknown[]; assets: unknown[] }
+    expect(body.models).toEqual([])
+    expect(body.assets).toEqual([])
   })
 })
 

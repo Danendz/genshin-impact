@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto'
 import { type Db, siteAssets } from '@gi/db'
 import { eq } from 'drizzle-orm'
+import sharp from 'sharp'
 import { processImage } from '../media/process-image'
 import type { MediaStore } from '../media/store'
 
@@ -25,13 +27,17 @@ export async function seedSiteAssets(
   deps: { db: Db; store: MediaStore },
   group: string,
   files: SiteFile[],
+  opts: { raw?: boolean } = {},
 ): Promise<{ uploaded: number; skipped: number }> {
   const { db, store } = deps
   const orders = sortOrders(files)
   let uploaded = 0
   let skipped = 0
   for (const file of files) {
-    const img = await processImage(file.bytes)
+    // raw: stored byte for byte (data textures such as the backdrop palette)
+    const img = opts.raw
+      ? await rawImage(file.bytes)
+      : { ...(await processImage(file.bytes)), ext: 'webp' }
     const [existing] = await db
       .select({ id: siteAssets.id })
       .from(siteAssets)
@@ -40,10 +46,11 @@ export async function seedSiteAssets(
       skipped++
       continue
     }
-    const key = `site/${group}/${img.contentHash.slice(0, 12)}.webp`
-    await store.put(key, img.body, 'image/webp')
+    const key = `site/${group}/${img.contentHash.slice(0, 12)}.${img.ext}`
+    await store.put(key, img.body, `image/${img.ext}`)
     await db.insert(siteAssets).values({
       group,
+      name: file.name,
       r2Key: key,
       width: img.width,
       height: img.height,
@@ -53,4 +60,15 @@ export async function seedSiteAssets(
     uploaded++
   }
   return { uploaded, skipped }
+}
+
+async function rawImage(bytes: Uint8Array) {
+  const meta = await sharp(bytes).metadata()
+  return {
+    body: bytes,
+    ext: meta.format === 'jpeg' ? 'jpg' : (meta.format as string),
+    width: meta.width as number,
+    height: meta.height as number,
+    contentHash: createHash('sha256').update(bytes).digest('hex'),
+  }
 }

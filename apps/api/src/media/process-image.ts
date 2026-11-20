@@ -1,14 +1,17 @@
 import { createHash } from 'node:crypto'
 import sharp from 'sharp'
 
-export async function processImage(input: Uint8Array): Promise<{
+export async function processImage(
+  input: Uint8Array,
+  quality = 85,
+): Promise<{
   body: Uint8Array
   width: number
   height: number
   contentHash: string
 }> {
   const { data, info } = await sharp(input)
-    .webp({ quality: 85 })
+    .webp({ quality })
     .toBuffer({ resolveWithObject: true })
   const body = new Uint8Array(data)
   return {
