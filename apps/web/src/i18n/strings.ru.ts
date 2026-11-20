@@ -1,6 +1,7 @@
 import type { Dictionary } from './strings.zh-CN'
 
 export const ru: Dictionary = {
+  'nav.characters': 'Персонажи',
   'tab.attributes': 'Атрибуты',
   'tab.talents': 'Таланты',
   'tab.constellations': 'Созвездие',

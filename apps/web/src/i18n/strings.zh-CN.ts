@@ -1,5 +1,6 @@
 /** Source of truth for UI strings: written in zh-CN first; zh-TW is generated from it. */
 export const zhCN = {
+  'nav.characters': '角色',
   'tab.attributes': '属性',
   'tab.talents': '天赋',
   'tab.constellations': '命之座',

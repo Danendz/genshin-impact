@@ -1,0 +1,109 @@
+/* Icon strip: native scroll + snap; vertical on desktop, a bottom row on phones. */
+.strip {
+  display: flex;
+  gap: 14px;
+  padding: 16px 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+.strip[data-dragging] {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+.strip > li {
+  scroll-snap-align: center;
+  transform: translateX(var(--bounce, 0px));
+  transition: transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.strip[data-dragging] > li {
+  transition: none;
+}
+@media (min-width: 768px) {
+  .strip {
+    flex-direction: column;
+    scroll-snap-type: y mandatory;
+    padding: 24px 16px;
+  }
+  .strip > li {
+    transform: translateY(var(--bounce, 0px));
+  }
+}
+
+/* legacy ScrollCharacter look */
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 3px solid #6c9992;
+  background-color: rgb(0 0 0 / 0.21);
+  overflow: hidden;
+  transition: 0.3s;
+}
+.icon:hover,
+.icon[data-status="active"] {
+  background-color: #5bb8d9;
+  border-color: #7ec8b9;
+}
+.icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+  -webkit-user-drag: none;
+}
+.icon[data-status="active"] img {
+  transform: scale(1.15) translateY(-3px);
+}
+
+/* Backdrop: element-coloured gradient under a cross-faded gacha splash. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 60% 40%, var(--el) 0%, transparent 65%),
+    linear-gradient(160deg, #1d2333, #0d1018);
+  transition: background 0.4s;
+}
+.splash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 55% 20%;
+  mask-image: radial-gradient(
+    ellipse 75% 85% at 55% 45%,
+    #000 55%,
+    transparent 100%
+  );
+}
+.incoming {
+  opacity: 0;
+  transition: opacity 0.45s ease-out;
+}
+.incoming[data-loaded] {
+  opacity: 1;
+}
+
+.chip {
+  border-radius: 999px;
+  padding: 4px 12px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  transition: 0.2s;
+}
+.chip[aria-pressed="true"] {
+  background: #ece5d8;
+  color: #3b4255;
+  border-color: #ece5d8;
+}

@@ -18,10 +18,15 @@ export function resolveLocale(
   return 'en'
 }
 
-export function useLocale(): Locale {
-  const search = useSearch({ strict: false }) as { locale?: string }
+/** resolveLocale against this browser's languages */
+export function browserLocale(search: string | undefined): Locale {
   return resolveLocale(
-    search.locale,
+    search,
     typeof navigator === 'undefined' ? [] : navigator.languages,
   )
+}
+
+export function useLocale(): Locale {
+  const search = useSearch({ strict: false }) as { locale?: string }
+  return browserLocale(search.locale)
 }

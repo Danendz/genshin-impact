@@ -1,6 +1,7 @@
 import type { Dictionary } from './strings.zh-CN'
 
 export const en: Dictionary = {
+  'nav.characters': 'Characters',
   'tab.attributes': 'Attributes',
   'tab.talents': 'Talents',
   'tab.constellations': 'Constellation',

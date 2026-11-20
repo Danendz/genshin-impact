@@ -2,6 +2,7 @@
 import type { Dictionary } from './strings.zh-CN'
 
 export const zhTW: Dictionary = {
+  'nav.characters': '角色',
   'tab.attributes': '屬性',
   'tab.talents': '天賦',
   'tab.constellations': '命之座',
