@@ -1,5 +1,5 @@
 import type { Db } from '@gi/db'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createApp } from './app'
 import { parseEnv } from './env'
 import { createMemoryStore } from './media/memory-store'
@@ -43,6 +43,28 @@ describe('app', () => {
       headers: { Origin: 'https://evil.example' },
     })
     expect(res.headers.get('access-control-allow-origin')).toBeNull()
+  })
+})
+
+describe('onError', () => {
+  it('returns JSON 500 and logs when a route throws', async () => {
+    const boom = new Error('db exploded')
+    const throwing = createApp({
+      db: {
+        select: () => {
+          throw boom
+        },
+      } as unknown as Db,
+      env,
+      sync: { trigger: async () => 'busy' },
+      store: createMemoryStore(),
+    })
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const res = await throwing.request('/v1/characters?locale=en')
+    expect(res.status).toBe(500)
+    expect(await res.json()).toEqual({ error: 'internal_error' })
+    expect(spy).toHaveBeenCalledWith(expect.any(String), boom)
+    spy.mockRestore()
   })
 })
 

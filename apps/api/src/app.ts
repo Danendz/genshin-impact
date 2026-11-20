@@ -21,6 +21,10 @@ export type AppDeps = {
 export function createApp(deps: AppDeps) {
   const { db, store } = deps
   return new Hono()
+    .onError((err, c) => {
+      console.error(`[api] ${c.req.method} ${c.req.path} failed:`, err)
+      return c.json({ error: 'internal_error' }, 500)
+    })
     .use(cors({ origin: deps.env.CORS_ORIGIN }))
     .get('/health', (c) => c.json({ ok: true }))
     .use('/v1/*', etag())
