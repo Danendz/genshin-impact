@@ -1,14 +1,26 @@
 import { z } from 'zod'
 
+const trimSlash = (s: string) => s.replace(/\/+$/, '')
+const httpUrl = z.url({ protocol: /^https?$/ })
+
 const schema = z.object({
-  DATABASE_URL: z.string().min(1),
-  R2_ENDPOINT: z.string().min(1),
+  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  R2_ENDPOINT: httpUrl,
   R2_ACCESS_KEY_ID: z.string().min(1),
   R2_SECRET_ACCESS_KEY: z.string().min(1),
   R2_BUCKET: z.string().min(1),
-  MEDIA_PUBLIC_URL: z.string().min(1),
-  ADMIN_TOKEN: z.string().min(1),
-  CORS_ORIGIN: z.string().min(1),
+  MEDIA_PUBLIC_URL: httpUrl.transform(trimSlash),
+  ADMIN_TOKEN: z.string().min(32, 'must be at least 32 characters'),
+  /** comma-separated list of allowed origins (e.g. prod + Vercel previews) */
+  CORS_ORIGIN: z
+    .string()
+    .transform((v) =>
+      v
+        .split(',')
+        .map((o) => trimSlash(o.trim()))
+        .filter(Boolean),
+    )
+    .pipe(z.array(httpUrl).min(1)),
   PORT: z.coerce.number().int().positive(),
 })
 

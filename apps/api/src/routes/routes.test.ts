@@ -23,7 +23,7 @@ const env = parseEnv({
   R2_SECRET_ACCESS_KEY: 's',
   R2_BUCKET: 'b',
   MEDIA_PUBLIC_URL: 'http://media.test/gi-media/',
-  ADMIN_TOKEN: 'secret',
+  ADMIN_TOKEN: 'secret-secret-secret-secret-secret-00',
   CORS_ORIGIN: 'http://localhost:5173',
   PORT: '8787',
 })
@@ -248,20 +248,29 @@ describe('POST /admin/sync', () => {
     expect((await post('/admin/sync', 'nope')).status).toBe(401)
   })
   it('202 with runId, passing full', async () => {
-    const res = await post('/admin/sync?full=1', 'secret')
+    const res = await post(
+      '/admin/sync?full=1',
+      'secret-secret-secret-secret-secret-00',
+    )
     expect(res.status).toBe(202)
     expect(await res.json()).toEqual({ runId: 1 })
     expect(triggerOpts).toEqual({ full: true })
   })
   it('409 when busy', async () => {
     triggerResult = 'busy'
-    const res = await post('/admin/sync', 'secret')
+    const res = await post(
+      '/admin/sync',
+      'secret-secret-secret-secret-secret-00',
+    )
     expect(res.status).toBe(409)
     expect(await res.json()).toEqual({ error: 'sync_running' })
   })
   it('500 when the controller rejects', async () => {
     triggerResult = new Error('db down')
-    const res = await post('/admin/sync', 'secret')
+    const res = await post(
+      '/admin/sync',
+      'secret-secret-secret-secret-secret-00',
+    )
     expect(res.status).toBe(500)
     expect(await res.json()).toEqual({ error: 'sync_failed_to_start' })
   })

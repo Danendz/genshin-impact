@@ -36,7 +36,7 @@ jobs:
       R2_SECRET_ACCESS_KEY: gi-local-secret
       R2_BUCKET: gi-media
       MEDIA_PUBLIC_URL: http://localhost:9000/gi-media
-      ADMIN_TOKEN: dev-admin-token
+      ADMIN_TOKEN: dev-admin-token-change-me-0123456789abcdef
       CORS_ORIGIN: http://localhost:5173
       PORT: "8787"
       S3_INTEGRATION: "1"

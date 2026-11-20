@@ -13,7 +13,7 @@ const env = parseEnv({
   R2_SECRET_ACCESS_KEY: 's',
   R2_BUCKET: 'b',
   MEDIA_PUBLIC_URL: 'http://media.test/gi-media/',
-  ADMIN_TOKEN: 'secret',
+  ADMIN_TOKEN: 'secret-secret-secret-secret-secret-00',
   CORS_ORIGIN: 'http://localhost:5173',
   PORT: '8787',
 })

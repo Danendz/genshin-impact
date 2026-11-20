@@ -11,7 +11,7 @@ const env = parseEnv({
   R2_SECRET_ACCESS_KEY: 's',
   R2_BUCKET: 'b',
   MEDIA_PUBLIC_URL: 'http://media',
-  ADMIN_TOKEN: 't',
+  ADMIN_TOKEN: 'tttttttttttttttttttttttttttttttt',
   CORS_ORIGIN: 'http://localhost:5173',
   PORT: '8787',
 })
@@ -40,6 +40,44 @@ describe('app', () => {
 
   it('does not allow other origins', async () => {
     const res = await app.request('/health', {
+      headers: { Origin: 'https://evil.example' },
+    })
+    expect(res.headers.get('access-control-allow-origin')).toBeNull()
+  })
+})
+
+describe('CORS origin list', () => {
+  const listApp = createApp({
+    db: {} as Db,
+    env: parseEnv({
+      ...Object.fromEntries(
+        Object.entries({
+          DATABASE_URL: 'postgres://x',
+          R2_ENDPOINT: 'http://r2',
+          R2_ACCESS_KEY_ID: 'k',
+          R2_SECRET_ACCESS_KEY: 's',
+          R2_BUCKET: 'b',
+          MEDIA_PUBLIC_URL: 'http://media',
+          ADMIN_TOKEN: 'tttttttttttttttttttttttttttttttt',
+          PORT: '8787',
+        }),
+      ),
+      CORS_ORIGIN: 'http://localhost:5173/,https://preview.vercel.app',
+    }),
+    sync: { trigger: async () => 'busy' },
+    store: createMemoryStore(),
+  })
+  it.each(['http://localhost:5173', 'https://preview.vercel.app'])(
+    'allows %s',
+    async (origin) => {
+      const res = await listApp.request('/health', {
+        headers: { Origin: origin },
+      })
+      expect(res.headers.get('access-control-allow-origin')).toBe(origin)
+    },
+  )
+  it('rejects others', async () => {
+    const res = await listApp.request('/health', {
       headers: { Origin: 'https://evil.example' },
     })
     expect(res.headers.get('access-control-allow-origin')).toBeNull()
