@@ -4,11 +4,12 @@ import type { MediaStore } from '../media/store'
 
 export type MediaKind = (typeof mediaAssets.$inferSelect)['kind']
 export type MediaMap = Partial<Record<MediaKind, string>>
+export type MediaOwnerType = (typeof mediaAssets.$inferSelect)['ownerType']
 
 export async function loadMedia(
   db: Db,
   store: MediaStore,
-  ownerType: 'character' | 'weapon' | 'material',
+  ownerType: MediaOwnerType,
   ids: string[],
 ): Promise<Map<string, MediaMap>> {
   const out = new Map<string, MediaMap>()

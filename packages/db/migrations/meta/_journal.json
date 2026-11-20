@@ -15,6 +15,13 @@
       "when": 1795159830763,
       "tag": "0001_calm_blackheart",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795175363129,
+      "tag": "0002_outgoing_madame_masque",
+      "breakpoints": true
     }
   ]
 }

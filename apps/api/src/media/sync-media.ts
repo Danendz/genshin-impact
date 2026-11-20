@@ -5,7 +5,7 @@ import { mediaKey, processImage } from './process-image'
 import type { MediaStore } from './store'
 
 export type MediaOwner = {
-  type: 'character' | 'weapon' | 'material'
+  type: (typeof mediaAssets.$inferSelect)['ownerType']
   id: string
 }
 

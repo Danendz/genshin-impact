@@ -74,4 +74,18 @@ describe('schema', () => {
       db.insert(mediaAssets).values({ ...media, r2Key: 'b' }),
     ).rejects.toThrow()
   })
+
+  it('accepts skill_icon media owned by icon name', async () => {
+    await db.insert(mediaAssets).values({
+      ownerType: 'skill_icon',
+      ownerId: 'Skill_A_01',
+      kind: 'icon',
+      sourceUrl: 'http://x/Skill_A_01.png',
+      r2Key: 'skill_icon/Skill_A_01/icon.webp',
+      width: 1,
+      height: 1,
+      contentHash: 'c',
+    })
+    expect(await db.select().from(mediaAssets)).toHaveLength(1)
+  })
 })

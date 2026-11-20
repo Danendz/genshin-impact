@@ -20,6 +20,7 @@ export const mediaOwnerTypeEnum = pgEnum('media_owner_type', [
   'character',
   'weapon',
   'material',
+  'skill_icon',
 ])
 export const mediaKindEnum = pgEnum('media_kind', [
   'icon',
