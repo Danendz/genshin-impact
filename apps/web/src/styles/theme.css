@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme {
+  /* Vision colors: legacy src/assets/Styles/_vision_colors.scss */
+  --color-anemo: #27ae60;
+  --color-pyro: #ff7979;
+  --color-geo: #f39c12;
+  --color-hydro: #54a0ff;
+  --color-cryo: #82ccdd;
+  --color-electro: #9b59b6;
+  --color-dendro: #228b4e;
+
+  /* Rarity colors: legacy _rarity_colors.scss (5 and 4 stars); 1-3 are new neutral-to-cool tones */
+  --color-rarity-1: #9ca3af;
+  --color-rarity-2: #2ecc71;
+  --color-rarity-3: #3498db;
+  --color-rarity-4: #8e44ad;
+  --color-rarity-5: #e67e22;
+
+  --font-genshin: "HYWenHei", system-ui, sans-serif;
+  --font-genshin-icon: "GenshinIcon";
+}
+
+@layer base {
+  body {
+    font-family: var(--font-genshin);
+    background-color: #dfdcd1;
+  }
+}
