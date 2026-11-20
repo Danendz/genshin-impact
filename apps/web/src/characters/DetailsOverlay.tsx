@@ -1,9 +1,10 @@
 import type { Locale } from '@gi/shared'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { type StatsIconName, statsIcons } from '../assets/icons'
 import { type StringKey, t } from '../i18n/strings'
 import styles from './characters.module.css'
+import { animateOut } from './motion'
 
 type Stat = [key: string, icon?: StatsIconName]
 
@@ -60,17 +61,30 @@ export function DetailsOverlay({
   locale: Locale
   onClose: () => void
 }) {
+  const backdrop = useRef<HTMLDivElement>(null)
+  // legacy ModalWindow fades out too
+  const close = useCallback(
+    () =>
+      animateOut(
+        backdrop.current,
+        [{ opacity: 1 }, { opacity: 0 }],
+        300,
+        onClose,
+      ),
+    [onClose],
+  )
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [close])
   const label = (key: string) => t(locale, `stats.${key}` as StringKey)
   return createPortal(
     // biome-ignore lint/a11y/noStaticElementInteractions: click-outside; Escape is handled on window
     <div
+      ref={backdrop}
       className={styles.detailsBackdrop}
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => e.target === e.currentTarget && close()}
     >
       <div
         role="dialog"
