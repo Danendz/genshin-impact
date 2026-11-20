@@ -25,9 +25,28 @@ describe('RightPanel', () => {
     expect(screen.getByRole('button', { name: /Wardrobe/ })).toBeDisabled()
     expect(screen.getByText('10')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Details' }))
-    const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByText('No data yet')).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('opens legacy details: full-height stat groups, no close button, backdrop closes', () => {
+    renderAt('attributes')
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+    const dialog = screen.getByRole('dialog', { name: 'Details' })
+    expect(
+      within(dialog)
+        .getAllByRole('heading', { level: 2 })
+        .map((h) => h.textContent),
+    ).toEqual(['Base Stats', 'Advanced Stats', 'Elemental Type'])
+    expect(within(dialog).getByText('Shield Strength')).toBeInTheDocument()
+    expect(within(dialog).getByText('Physical RES')).toBeInTheDocument()
+    expect(within(dialog).getAllByText('—')).toHaveLength(28)
+    expect(within(dialog).queryByRole('button')).toBeNull()
+    // a press inside the column keeps it open; the backdrop closes it
+    fireEvent.mouseDown(within(dialog).getByText('Base Stats'))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    fireEvent.mouseDown(dialog.parentElement as HTMLElement)
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 

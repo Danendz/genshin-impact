@@ -4,6 +4,7 @@ import { GameText } from '../components/GameText'
 import { regionLabel, type StringKey, t } from '../i18n/strings'
 import type { Gender } from '../lib/game-text'
 import styles from './characters.module.css'
+import { DetailsOverlay } from './DetailsOverlay'
 import {
   type Constellation,
   parseCharacterDetails,
@@ -153,14 +154,7 @@ function Attributes({
         <span className="flex-1">{t(locale, 'wardrobe')}</span>
       </button>
       {details && (
-        <Modal
-          label={t(locale, 'details')}
-          closeLabel={t(locale, 'close')}
-          onClose={() => setDetails(false)}
-        >
-          <h2 className="mb-3 text-xl">{t(locale, 'details')}</h2>
-          <Placeholder locale={locale} />
-        </Modal>
+        <DetailsOverlay locale={locale} onClose={() => setDetails(false)} />
       )}
     </div>
   )
