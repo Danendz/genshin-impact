@@ -26,11 +26,11 @@ describe('dictionaries', () => {
 
   it('zh-TW is the OpenCC conversion of zh-CN', () => {
     const toTW = OpenCC.Converter({ from: 'cn', to: 'tw' })
-    expect(zhTW['tab.talents']).toBe(toTW(zhCN['tab.talents']))
+    expect(zhTW['section.talents']).toBe(toTW(zhCN['section.talents']))
   })
 
   it('looks strings up by locale', () => {
-    expect(t('en', 'tab.talents')).toBe('Talents')
+    expect(t('en', 'section.talents')).toBe('Talents')
   })
 })
 

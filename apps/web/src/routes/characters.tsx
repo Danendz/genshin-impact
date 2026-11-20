@@ -5,11 +5,15 @@ import {
   useParams,
   useRouter,
 } from '@tanstack/react-router'
-import { CharacterBackdrop } from '../characters/CharacterBackdrop'
-import { CharacterStrip } from '../characters/CharacterStrip'
+import { useCallback, useState } from 'react'
+import { BottomButtons, ShowButton } from '../characters/BottomButtons'
+import styles from '../characters/characters.module.css'
 import { characterSearch, filterCharacters } from '../characters/details'
-import { FilterOverlay } from '../characters/FilterOverlay'
+import { LegacyBackground } from '../characters/LegacyBackground'
 import { charactersListQuery } from '../characters/queries'
+import { SectionMenu } from '../characters/SectionMenu'
+import { SelectionPanel } from '../characters/SelectionPanel'
+import { TopBar } from '../characters/TopBar'
 import { browserLocale, useLocale } from '../i18n/locale'
 import { t } from '../i18n/strings'
 
@@ -24,6 +28,7 @@ export const Route = createFileRoute('/characters')({
   errorComponent: ListError,
 })
 
+/** The legacy character screen; the $id route fills the right-hand panel. */
 function CharactersLayout() {
   const locale = useLocale()
   // the router passes unvalidated keys through next to validated ones
@@ -31,24 +36,47 @@ function CharactersLayout() {
   const { data } = useSuspenseQuery(charactersListQuery(locale))
   const { id } = useParams({ strict: false })
   const current = data.find((c) => c.id === id)
-
+  const items = filterCharacters(data, search)
+  const [selection, setSelection] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const closeSelection = useCallback(() => setSelection(false), [])
   return (
-    <main className="relative h-dvh overflow-hidden bg-[#0d1018] text-white">
-      <CharacterBackdrop
+    <main className={styles.screen}>
+      <LegacyBackground
+        namecard={current?.media.namecard}
         splash={current?.media.gacha_splash}
         element={current?.element}
       />
-      <div className="absolute top-4 left-4 z-20 md:left-28">
-        <FilterOverlay search={search} locale={locale} />
-      </div>
-      <CharacterStrip
-        items={filterCharacters(data, search)}
-        activeId={id}
-        locale={locale}
-        className="absolute inset-x-0 bottom-0 z-20 bg-black/30 backdrop-blur-sm md:inset-x-auto md:top-0 md:left-0 md:max-h-dvh md:bg-transparent md:backdrop-blur-none"
-      />
-      <div data-slot="viewer3d" className="absolute inset-0 -z-0" />
-      <Outlet />
+      <div data-slot="viewer3d" className="absolute inset-0" />
+      {hidden ? (
+        <ShowButton locale={locale} onShow={() => setHidden(false)} />
+      ) : (
+        <>
+          <TopBar items={items} current={current} locale={locale} />
+          {selection ? (
+            <SelectionPanel
+              items={items}
+              activeId={id}
+              search={search}
+              locale={locale}
+              onClose={closeSelection}
+            />
+          ) : (
+            <>
+              <SectionMenu
+                active={search.section ?? 'attributes'}
+                locale={locale}
+              />
+              <BottomButtons
+                locale={locale}
+                onSelection={() => setSelection(true)}
+                onHide={() => setHidden(true)}
+              />
+            </>
+          )}
+          <Outlet />
+        </>
+      )}
     </main>
   )
 }

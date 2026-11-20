@@ -1,11 +1,95 @@
-/* Icon strip: native scroll + snap; vertical on desktop, a bottom row on phones. */
+/*
+ * The legacy character screen (master:src/components/CharacterUI), rebuilt.
+ * Values follow the legacy SCSS; phones (< 768px) get a stacked variant.
+ */
+.screen {
+  --side: max(2.5vw, calc((100vw - 1600px) / 2));
+  --top: 75px;
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  color: white;
+  background: #0d1018;
+  text-shadow:
+    0 0 1px rgb(0 0 0 / 0.32),
+    0 1px 2px rgb(0 0 0 / 0.22),
+    0 0 8px rgb(0 0 0 / 0.16);
+}
+
+/* Background: namecard (cover, dimmed) under the gacha splash at full height. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 40%, var(--el) 0%, transparent 65%),
+    linear-gradient(160deg, #1d2333, #0d1018);
+  transition: background 0.4s;
+}
+.namecard {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.12);
+}
+.splash {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  translate: -50% 0;
+  user-select: none;
+}
+.incoming {
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+}
+.incoming[data-loaded] {
+  opacity: 1;
+}
+
+/* Top bar: legacy CharactersPanel. */
+.topBar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 20;
+  height: var(--top);
+  background: rgb(0 0 0 / 0.21);
+  user-select: none;
+  animation: fadeDown 0.5s ease-out;
+}
+.topBarInner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  margin: 0 var(--side);
+}
+.info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 22%;
+  min-width: 0;
+  font-size: 20px;
+}
+.infoGlyph {
+  font-size: 30px;
+}
 .strip {
   display: flex;
-  gap: 14px;
-  padding: 16px 12px;
-  overflow: auto;
+  gap: 12px;
+  padding: 8px 4px;
+  overflow-x: auto;
   overscroll-behavior: contain;
-  scroll-snap-type: x mandatory;
   scrollbar-width: none;
   cursor: grab;
 }
@@ -13,144 +97,460 @@
   display: none;
 }
 .strip[data-dragging] {
-  scroll-snap-type: none;
   cursor: grabbing;
   user-select: none;
 }
 .strip > li {
-  scroll-snap-align: center;
   transform: translateX(var(--bounce, 0px));
   transition: transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 .strip[data-dragging] > li {
   transition: none;
 }
-@media (min-width: 768px) {
-  .strip {
-    flex-direction: column;
-    scroll-snap-type: y mandatory;
-    padding: 24px 16px;
-  }
-  .strip > li {
-    transform: translateY(var(--bounce, 0px));
-  }
-}
 
-/* legacy ScrollCharacter look */
-.icon {
+/* legacy ScrollCharacter */
+.avatar {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  position: relative;
   width: 55px;
   height: 55px;
   border-radius: 50%;
   border: 3px solid #6c9992;
-  background-color: rgb(0 0 0 / 0.21);
   overflow: hidden;
   transition: 0.3s;
 }
-.icon:hover,
-.icon[data-status="active"] {
+.avatar:hover,
+.avatar[data-status="active"] {
   background-color: #5bb8d9;
   border-color: #7ec8b9;
 }
-.icon img {
+.avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
   -webkit-user-drag: none;
 }
-.icon[data-status="active"] img {
+.avatar[data-status="active"] img {
   transform: scale(1.15) translateY(-3px);
 }
 
-/* Backdrop: element-coloured gradient under a cross-faded gacha splash. */
-.backdrop {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 60% 40%, var(--el) 0%, transparent 65%),
-    linear-gradient(160deg, #1d2333, #0d1018);
-  transition: background 0.4s;
+/* legacy BackButton */
+.close {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e0ddd4;
+  color: #3b3e4a;
+  text-shadow: none;
+  font-size: 18px;
+  transition: 0.3s;
 }
-.splash {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 55% 20%;
-  mask-image: radial-gradient(
-    ellipse 75% 85% at 55% 45%,
-    #000 55%,
-    transparent 100%
-  );
+.close:hover {
+  box-shadow: #a0afbe99 0 0 7px 2px;
 }
-.incoming {
-  opacity: 0;
-  transition: opacity 0.45s ease-out;
-}
-.incoming[data-loaded] {
-  opacity: 1;
+.close:active {
+  transform: scale(0.9);
 }
 
+/* Left menu: legacy ContentOptions + ListItemRhombus. */
+.menu {
+  position: absolute;
+  top: calc(var(--top) + 20px);
+  left: var(--side);
+  z-index: 10;
+  font-size: clamp(22px, 2.4vw, 38px);
+  animation: fadeRight 0.5s ease-out;
+}
+.rhombus {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-bottom: 16px;
+  color: rgb(212 212 212);
+  white-space: nowrap;
+  user-select: none;
+  transition: color 0.3s;
+}
+.rhombus::before {
+  content: "";
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+  border: 1px solid rgb(163 163 163);
+  border-radius: 2px;
+  background: rgb(163 163 163);
+  transform: rotate(45deg) scale(0.6);
+  transition: 0.5s;
+}
+.rhombus::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  background: linear-gradient(45deg, transparent 50%, white 50%);
+  filter: drop-shadow(0 0 5px white);
+  transform: rotate(45deg) scale(0.45);
+  opacity: 0;
+}
+/* the glyph row is the text line; keep the diamonds centred on it */
+.rhombus::after {
+  top: calc(50% - 8px - 7.5px);
+}
+.rhombus:hover,
+.rhombus[aria-current="page"] {
+  color: white;
+}
+.rhombus[aria-current="page"]::before {
+  background: transparent;
+  transform: rotate(45deg) scale(0.9);
+}
+.rhombus[aria-current="page"]::after {
+  opacity: 1;
+  animation: nudge 1s infinite linear;
+}
+
+/* Bottom-left buttons: legacy CharactersBottom. */
+.bottom {
+  position: absolute;
+  bottom: 12px;
+  left: var(--side);
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  padding: 5px 15px;
+  border-radius: 5px;
+  background: rgb(0 0 0 / 0.36);
+  animation: fadeUp 0.5s ease-out;
+}
+.bottom button {
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border-radius: 5px;
+  background: white;
+  transition: transform 0.3s;
+}
+.bottom button:hover {
+  transform: scale(1.05);
+}
+
+/* Character selection: legacy CharacterSelection, a left panel. */
+.selection {
+  position: absolute;
+  top: var(--top);
+  bottom: 0;
+  left: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(440px, 100vw);
+  padding: 16px 16px 16px var(--side);
+  box-sizing: content-box;
+  max-width: calc(100vw - 32px);
+  background: linear-gradient(90deg, rgb(13 16 24 / 0.85), rgb(13 16 24 / 0.6));
+  backdrop-filter: blur(6px);
+  animation: fadeRight 0.4s ease-out;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  scrollbar-width: thin;
+}
+.pick {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 6px 6px 18px 6px;
+  background: #e9e5dc;
+  color: #3b4255;
+  text-shadow: none;
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.pickImg {
+  aspect-ratio: 1;
+  width: 100%;
+  object-fit: cover;
+  background: linear-gradient(160deg, #6b5d8c, #a07ab5);
+}
+.pick[data-rarity="5"] .pickImg {
+  background: linear-gradient(160deg, #94653a, #c8813e);
+}
+.pick span {
+  padding: 2px 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pick:hover {
+  transform: translateY(-2px);
+}
+.pick[aria-current="page"] {
+  outline: 3px solid #f3d17f;
+}
 .chip {
   border-radius: 999px;
-  padding: 4px 12px;
+  padding: 3px 10px;
   border: 1px solid rgb(255 255 255 / 0.35);
+  font-size: 14px;
   transition: 0.2s;
 }
 .chip[aria-pressed="true"] {
   background: #ece5d8;
   color: #3b4255;
   border-color: #ece5d8;
+  text-shadow: none;
 }
 
-/*
- * Detail sheet. Phones: a native scroll container with two snap points:
- * collapsed (spacer in view, panel peeking) and expanded (panel at the top).
- * Desktop: a fixed right-hand column, no snapping.
- */
-.sheet {
+/* Right column: legacy ContentRight + AttributesContent. */
+.right {
   position: absolute;
-  inset: 0 0 88px 0;
+  top: calc(var(--top) + 20px);
+  right: var(--side);
+  z-index: 10;
+  width: 300px;
+  max-height: calc(100dvh - var(--top) - 40px);
   overflow-y: auto;
-  overscroll-behavior: contain;
-  scroll-snap-type: y mandatory;
   scrollbar-width: none;
-  pointer-events: none;
+  animation: fadeLeft 0.5s ease-out;
 }
-.sheet::-webkit-scrollbar {
-  display: none;
+.card {
+  display: block;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgb(0 0 0 / 0.16);
+  backdrop-filter: blur(2px);
 }
-.sheetSpacer {
-  height: 62%;
-  scroll-snap-align: start;
+.name {
+  font-size: 28px;
+  line-height: 1.2;
 }
-.sheetBody {
+.star {
+  width: 16px;
+  height: 16px;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.4));
+}
+.level {
+  font-size: 21px;
+  text-shadow: 0 0 10px rgb(255 255 255 / 0.38);
+}
+.bar {
+  height: 3px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+.barLevel {
+  background: #3ed2ff;
+  box-shadow: 0 0 8px #3ed2ff;
+}
+.barFriendship {
+  width: 90%;
+  background: #fc8ef3;
+  box-shadow: 0 0 8px #fc8ef3;
+}
+.stat {
   display: flex;
-  height: calc(100% - 4rem);
-  padding: 0 12px;
-  scroll-snap-align: start;
-  pointer-events: auto;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px;
+  border-radius: 5px;
 }
-.sheetBody > * {
-  flex: 1;
+.stat:nth-child(odd) {
+  background: rgb(0 0 0 / 0.1);
 }
-@media (min-width: 768px) {
-  .sheet {
-    inset: 5rem 1.5rem 1.5rem auto;
-    width: min(440px, 42vw);
-    overflow: visible;
-    scroll-snap-type: none;
+.detailsBtn {
+  padding: 8px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.19);
+  font-size: 16px;
+  transition: 0.3s;
+}
+.detailsBtn:hover {
+  background: rgb(0 0 0 / 0.19);
+}
+.description {
+  display: block;
+  max-height: 90px;
+  overflow-y: auto;
+  padding: 0 5px;
+  font-size: 14px;
+  word-break: break-word;
+}
+.wardrobe {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: #dfdcd1;
+  color: #3b4255;
+  text-shadow: none;
+}
+.wardrobe:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.skill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.skill:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+/* legacy ModalWindow */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 0.55);
+  animation: fade 0.2s ease-out;
+}
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 85dvh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 12px;
+  background: #3b4255f2;
+  color: white;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+}
+
+@keyframes nudge {
+  50% {
+    translate: 4px;
   }
-  .sheetSpacer {
-    display: none;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
   }
-  .sheetBody {
-    height: 100%;
-    padding: 0;
+}
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    translate: 0 -12px;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    translate: -16px 0;
+  }
+}
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    translate: 16px 0;
+  }
+}
+
+/* Phones: menu as a pill bar under the top bar, panel as a bottom sheet. */
+@media (max-width: 767px) {
+  .screen {
+    --top: 56px;
+    --side: 8px;
+  }
+  .topBarInner {
+    gap: 8px;
+  }
+  .info {
+    width: auto;
+    max-width: 30%;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .infoGlyph {
+    font-size: 20px;
+  }
+  .strip {
+    gap: 8px;
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-width: 2px;
+  }
+  .menu {
+    top: calc(var(--top) + 8px);
+    right: var(--side);
+    font-size: 15px;
+  }
+  .menu ul {
+    display: flex;
+    gap: 4px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgb(0 0 0 / 0.5);
+    scrollbar-width: none;
+  }
+  .rhombus {
+    padding: 4px 8px 4px 2px;
+  }
+  .rhombus::after {
+    top: calc(50% - 7.5px);
+  }
+  .bottom {
+    top: calc(var(--top) + 56px);
+    bottom: auto;
+    padding: 4px 8px;
+  }
+  .right {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-height: 45dvh;
+    padding: 0 8px 8px;
+  }
+  .right .card {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+  }
+  .name {
+    font-size: 24px;
+  }
+  .level {
+    font-size: 17px;
+  }
+  .stat {
+    font-size: 14px;
+  }
+  .selection {
+    padding-left: 16px;
   }
 }

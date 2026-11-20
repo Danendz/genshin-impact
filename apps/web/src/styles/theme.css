@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
-@theme {
+@theme static {
   /* Vision colors: legacy src/assets/Styles/_vision_colors.scss */
   --color-anemo: #27ae60;
   --color-pyro: #ff7979;

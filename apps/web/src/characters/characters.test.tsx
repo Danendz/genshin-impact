@@ -1,6 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createMemoryHistory, RouterProvider } from '@tanstack/react-router'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../api'
 import { makeRouter } from '../router'
@@ -131,23 +138,76 @@ describe('characters routes', () => {
     expect(router.state.location.search).toMatchObject({ element: 'dendro' })
   })
 
-  it('toggles filters into the URL and closes on Escape', async () => {
+  it('filters from the selection panel and closes it on Escape', async () => {
     const router = await renderAt('/characters/10000038?locale=en')
-    fireEvent.click(await screen.findByRole('button', { name: /Filter/ }))
-    const dialog = screen.getByRole('dialog')
-    fireEvent.click(screen.getByRole('button', { name: /Bow/ }))
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Toggle characters' }),
+    )
+    const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+    fireEvent.click(within(panel).getByRole('button', { name: /Bow/ }))
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ weaponType: 'bow' }),
     )
     expect(screen.queryByRole('link', { name: 'Albedo' })).toBeNull()
-    expect(dialog).toBeInTheDocument()
+    expect(panel).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
+  it('shows element/name in the top bar and links close to home', async () => {
+    await renderAt('/characters/10000038?locale=en')
+    expect(await screen.findByText('Geo/Albedo')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Close' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+  })
+
+  it('keeps the menu section in the URL across character switches', async () => {
+    const router = await renderAt('/characters/10000038?locale=en')
+    const menu = await screen.findByRole('navigation', { name: 'Sections' })
+    expect(
+      within(menu).getByRole('link', { name: 'Attributes' }),
+    ).toHaveAttribute('aria-current', 'page')
+    fireEvent.click(within(menu).getByRole('link', { name: 'Talents' }))
+    await waitFor(() =>
+      expect(router.state.location.search).toMatchObject({
+        section: 'talents',
+      }),
+    )
+    // only the chosen section is current, never the default one too
+    await waitFor(() =>
+      expect(
+        within(menu).getByRole('link', { name: 'Attributes' }),
+      ).not.toHaveAttribute('aria-current'),
+    )
+    expect(within(menu).getByRole('link', { name: 'Talents' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    fireEvent.click(screen.getByRole('link', { name: 'Nahida' }))
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/characters/10000073'),
+    )
+    expect(router.state.location.search).toMatchObject({ section: 'talents' })
+  })
+
+  it('hides the interface and restores it', async () => {
+    await renderAt('/characters/10000038?locale=en')
+    await screen.findByRole('heading', { name: 'Albedo' })
+    fireEvent.click(screen.getByRole('button', { name: 'Hide interface' }))
+    expect(screen.queryByRole('navigation', { name: 'Sections' })).toBeNull()
+    expect(screen.queryByRole('heading', { name: 'Albedo' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Show interface' }))
+    expect(
+      screen.getByRole('navigation', { name: 'Sections' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Albedo' })).toBeInTheDocument()
+  })
+
   it('drops invalid search values instead of failing', async () => {
     const router = await renderAt(
-      '/characters/10000038?element=lava&rarity=9&locale=en',
+      '/characters/10000038?element=lava&rarity=9&section=bogus&locale=en',
     )
     expect(
       await screen.findByRole('heading', { name: 'Albedo' }),
@@ -156,6 +216,12 @@ describe('characters routes', () => {
     for (const name of ['Albedo', 'Nahida', 'Collei'])
       expect(screen.getByRole('link', { name })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/characters/10000038')
+    expect(
+      within(screen.getByRole('navigation', { name: 'Sections' })).getByRole(
+        'link',
+        { name: 'Attributes' },
+      ),
+    ).toHaveAttribute('aria-current', 'page')
   })
 })
 

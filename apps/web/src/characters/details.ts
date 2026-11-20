@@ -7,10 +7,22 @@ import {
   type WeaponType,
 } from '@gi/shared'
 
+/** left menu sections, in legacy order */
+export const SECTIONS = [
+  'attributes',
+  'weapon',
+  'artifacts',
+  'constellation',
+  'talents',
+  'profile',
+] as const
+export type Section = (typeof SECTIONS)[number]
+
 export type CharacterSearch = {
   element?: Element
   weaponType?: WeaponType
   rarity?: 4 | 5
+  section?: Section
   locale?: Locale
 }
 
@@ -26,6 +38,8 @@ export function characterSearch(raw: Record<string, unknown>): CharacterSearch {
   if (element) out.element = element
   if (weaponType) out.weaponType = weaponType
   if (rarity === 4 || rarity === 5) out.rarity = rarity
+  const section = oneOf(SECTIONS, raw.section)
+  if (section) out.section = section
   if (isLocale(raw.locale)) out.locale = raw.locale
   return out
 }
