@@ -74,6 +74,7 @@ const char = (id: string, name = id): CharacterRecord => ({
     },
   },
   media: [{ kind: 'icon', url: `https://cdn.test/${id}.png` }],
+  skillIcons: [],
 })
 const weapon = (id: string): WeaponRecord => ({
   id,
@@ -142,6 +143,35 @@ const deps = (source: GameDataSource, f: typeof fetch = ok) => ({
 })
 
 describe('runSync', () => {
+  it('stores shared skill icons once by name; a 404 icon is not a failure', async () => {
+    const { source, state } = fakeSource()
+    const shared = {
+      name: 'Skill_A_01',
+      url: 'https://cdn.test/Skill_A_01.png',
+    }
+    const [a, b] = state.chars
+    if (!a || !b) throw new Error('fixture')
+    a.skillIcons = [
+      shared,
+      { name: 'Skill_404', url: 'https://cdn.test/Skill_404.png' },
+    ]
+    b.skillIcons = [shared]
+    const f = (async (url: string) =>
+      url.includes('Skill_404')
+        ? new Response(null, { status: 404 })
+        : new Response(png, { status: 200 })) as typeof fetch
+    const res = await runSync(deps(source, f))
+    if (res === 'busy') throw new Error('busy')
+    expect(res.status).toBe('succeeded')
+    const icons = await db
+      .select()
+      .from(mediaAssets)
+      .where(eq(mediaAssets.ownerType, 'skill_icon'))
+    expect(icons.map((r) => [r.ownerId, r.kind])).toEqual([
+      ['Skill_A_01', 'icon'],
+    ])
+  })
+
   it('syncs an empty db', async () => {
     const { source } = fakeSource()
     const res = await runSync(deps(source))

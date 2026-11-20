@@ -10,7 +10,7 @@ import {
 import { eq } from 'drizzle-orm'
 import type { MediaStore } from '../media/store'
 import { syncMedia } from '../media/sync-media'
-import type { GameDataSource, ListEntry, MediaRef } from './source'
+import type { GameDataSource, ListEntry, MediaRef, SkillIcon } from './source'
 import {
   setSourceHash,
   upsertCharacter,
@@ -155,7 +155,9 @@ export async function runSync(
     }
 
     /** Fetch + upsert + media for one entity; any error counts as entity failure. */
-    async function syncEntity<R extends { id: string; media: MediaRef[] }>(
+    async function syncEntity<
+      R extends { id: string; media: MediaRef[]; skillIcons?: SkillIcon[] },
+    >(
       kind: 'character' | 'weapon',
       c: EntityCounts,
       entry: ListEntry,
@@ -180,6 +182,13 @@ export async function runSync(
         await syncMedia(mediaDeps, { type: kind, id: entry.id }, record.media, {
           force: full,
         })
+        for (const icon of record.skillIcons ?? [])
+          await syncMedia(
+            mediaDeps,
+            { type: 'skill_icon', id: icon.name },
+            [{ kind: 'icon', url: icon.url }],
+            { force: full },
+          )
         await setSourceHash(db, kind, entry.id, entry.listHash, detailHash)
         c.upserted++
       } catch (e) {

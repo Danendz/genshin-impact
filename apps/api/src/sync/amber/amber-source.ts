@@ -14,6 +14,7 @@ import {
   type ListEntry,
   type MaterialRecord,
   type MediaRef,
+  type SkillIcon,
   SourceEntityError,
   type WeaponRecord,
 } from '../source'
@@ -39,6 +40,22 @@ export type AmberSourceOptions = {
 
 const ASSET_BASE = 'https://gi.yatta.moe/assets/UI'
 const asset = (name: string) => `${ASSET_BASE}/${name}.png`
+
+/** unique talent then constellation icon names, in upstream order */
+function skillIconsOf(d: {
+  talent?: Record<string, unknown> | null
+  constellation?: Record<string, unknown> | null
+}): SkillIcon[] {
+  const names = new Set<string>()
+  for (const entry of [
+    ...Object.values(d.talent ?? {}),
+    ...Object.values(d.constellation ?? {}),
+  ]) {
+    const icon = (entry as { icon?: unknown } | null)?.icon
+    if (typeof icon === 'string' && icon) names.add(icon)
+  }
+  return [...names].map((name) => ({ name, url: asset(name) }))
+}
 
 /** upstream uses 105 for "5-star featured"; treat as 5 */
 function rarityOf(raw: number, id: string) {
@@ -236,6 +253,7 @@ export function createAmberSource(
         rarity,
         element,
         weaponType,
+        skillIcons: skillIconsOf(en),
         region: en.region ?? null,
         birthday,
         releaseAt: en.release ? new Date(en.release * 1000) : null,

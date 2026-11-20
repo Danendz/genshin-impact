@@ -66,6 +66,13 @@ describe('getCharacter', () => {
       true,
     )
     expect(c.media.map((m) => m.kind)).toEqual(['icon', 'gacha_splash'])
+    const names = c.skillIcons.map((i) => i.name)
+    expect(names.length).toBeGreaterThan(0)
+    expect(new Set(names).size).toBe(names.length)
+    for (const i of c.skillIcons)
+      expect(i.url).toBe(`https://gi.yatta.moe/assets/UI/${i.name}.png`)
+    expect(names.some((n) => n.startsWith('Skill_S_'))).toBe(true)
+    expect(names.some((n) => n.startsWith('UI_Talent_'))).toBe(true)
   })
 
   test('traveler keeps composite id; zero birthday -> null', async () => {
