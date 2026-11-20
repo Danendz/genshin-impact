@@ -25,6 +25,7 @@
 /* ---- tile grid: HomeMainNavigationItems.vue ---- */
 
 .tilesWrap {
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -830,7 +831,154 @@ a.tile:focus-visible {
     border-radius: 10px;
     background: var(--color-glass);
   }
+
   .settingsContent {
     padding-right: 0;
+  }
+}
+
+/* ---- layout: HomeLayout.vue, HomeMenuOptions.vue, HomeMain.vue ---- */
+
+.page {
+  min-height: 100dvh;
+}
+
+.home {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100dvh;
+  animation: fadeIn var(--dur-base) ease;
+}
+
+.options {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-width: 50px;
+  padding: 0 15px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-options) 0%,
+    var(--color-options-fade) 100%
+  );
+  color: var(--color-options-icon);
+  animation: optionsInLandscape 0.45s ease both;
+}
+
+.option {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  transition: color var(--dur-fast);
+}
+
+.option svg {
+  width: 100%;
+  height: 100%;
+}
+
+button.option:not([aria-disabled]):hover {
+  color: var(--color-white);
+}
+
+.option .lock {
+  top: -4px;
+  right: -6px;
+}
+
+.main {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  max-height: 100dvh;
+  background: linear-gradient(
+    to bottom,
+    var(--color-home-panel) 0%,
+    var(--color-home-panel-fade) 100%
+  );
+  animation: mainInLandscape 0.4s ease 0.15s both;
+}
+
+@keyframes optionsInLandscape {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+}
+
+@keyframes mainInLandscape {
+  from {
+    opacity: 0;
+    transform: translateX(-80px);
+  }
+}
+
+@keyframes optionsInPortrait {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+}
+
+@keyframes mainInPortrait {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (max-width: 915px) and (orientation: landscape) {
+  .options {
+    gap: 10px;
+    min-width: 20px;
+    padding: 0 5px;
+  }
+
+  .option {
+    width: 30px;
+    height: 30px;
+  }
+
+  .main {
+    max-width: 45%;
+  }
+}
+
+@media (max-width: 667px) and (orientation: landscape) {
+  .main {
+    max-width: 50%;
+  }
+}
+
+@media (orientation: portrait) {
+  .home {
+    flex-direction: column-reverse;
+  }
+
+  .options {
+    flex-direction: row;
+    gap: 13px;
+    padding: 5px 0;
+    background: var(--color-options-soft);
+    animation-name: optionsInPortrait;
+  }
+
+  .option {
+    width: 30px;
+    height: 30px;
+  }
+
+  .main {
+    align-items: center;
+    max-width: 100%;
+    height: 100%;
+    background: none;
+    animation-name: mainInPortrait;
   }
 }
