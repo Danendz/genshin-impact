@@ -1,6 +1,6 @@
 import * as OpenCC from 'opencc-js'
 import { afterEach, describe, expect, it } from 'vitest'
-import { resolveLocale, saveLocale, savedLocale } from './locale'
+import { resolveLocale, savedLocale, saveLocale } from './locale'
 import { dictionaries, regionLabel, t } from './strings'
 import { zhCN } from './strings.zh-CN'
 import { zhTW } from './strings.zh-TW'
