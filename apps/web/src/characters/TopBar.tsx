@@ -51,9 +51,8 @@ function AvatarStrip({
   activeId: string | undefined
   locale: Locale
 }) {
-  const ref = useDragScroll<HTMLUListElement>()
+  const [strip, ref] = useDragScroll<HTMLUListElement>()
   useEffect(() => {
-    const strip = ref.current
     const active = strip?.querySelector('[data-status="active"]')
     if (!activeId || !strip || !active) return
     // scroll the strip itself: scrollIntoView would also scroll the clipped page
@@ -63,7 +62,7 @@ function AvatarStrip({
       left: strip.scrollLeft + a.left - s.left - (s.width - a.width) / 2,
       behavior: 'smooth',
     })
-  }, [activeId, ref])
+  }, [activeId, strip])
   if (items.length === 0)
     return (
       <p className="min-w-0 flex-1 truncate px-4 text-sm text-white/80">

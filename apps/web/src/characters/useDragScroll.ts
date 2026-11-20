@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 const BOUNCE_MAX = 24
 
@@ -7,11 +7,12 @@ const BOUNCE_MAX = 24
  * Touch and pen keep the browser's own scrolling; there is no momentum code.
  * Sets `data-dragging` while dragging (CSS turns scroll-snap off) and
  * `--bounce` to how far the drag overshoots an end (CSS translates by it).
+ * Returns the element and a callback ref, so a container that mounts later
+ * (after an empty first render) still gets the listeners.
  */
 export function useDragScroll<T extends HTMLElement>() {
-  const ref = useRef<T>(null)
+  const [el, setEl] = useState<T | null>(null)
   useEffect(() => {
-    const el = ref.current
     if (!el) return
     let start: { x: number; y: number; left: number; top: number } | null = null
     let dragged = false
@@ -76,6 +77,6 @@ export function useDragScroll<T extends HTMLElement>() {
       el.removeEventListener('pointercancel', up)
       el.removeEventListener('click', click, true)
     }
-  }, [])
-  return ref
+  }, [el])
+  return [el, setEl] as const
 }
