@@ -24,11 +24,9 @@ import { t } from '../i18n/strings'
 
 export const Route = createFileRoute('/characters')({
   validateSearch: characterSearch,
-  loaderDeps: ({ search }) => ({ locale: search.locale }),
+  loaderDeps: ({ search }) => ({ locale: browserLocale(search.locale) }),
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(
-      charactersListQuery(browserLocale(deps.locale)),
-    ),
+    context.queryClient.ensureQueryData(charactersListQuery(deps.locale)),
   component: CharactersLayout,
   errorComponent: ListError,
 })

@@ -79,6 +79,21 @@ describe('Background', () => {
     expect(visible()).not.toBe(first)
   })
 
+  it('keeps rotating after an image fails to load', () => {
+    class BrokenImage {
+      onerror: (() => void) | null = null
+      set src(url: string) {
+        loaded.push(url)
+        this.onerror?.()
+      }
+    }
+    vi.stubGlobal('Image', BrokenImage)
+    renderWith(items(3))
+    act(() => vi.advanceTimersByTime(ROTATE_MS))
+    act(() => vi.advanceTimersByTime(ROTATE_MS))
+    expect(loaded).toHaveLength(2)
+  })
+
   it('keeps a single image without rotating', () => {
     renderWith(items(1))
     act(() => vi.advanceTimersByTime(ROTATE_MS * 3))

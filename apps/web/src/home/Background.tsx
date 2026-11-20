@@ -18,6 +18,9 @@ export function Background() {
   }
 
   const index = layers?.index
+  // bumped when an image fails, so the timer schedules another try
+  const [failures, setFailures] = useState(0)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `failures` re-arms the timer after a broken image
   useEffect(() => {
     if (!data || count <= 1 || index === undefined) return
     let img: HTMLImageElement | undefined
@@ -34,13 +37,17 @@ export function Background() {
           urls[back] = url
           return { urls, front: back, index: next }
         })
+      img.onerror = () => setFailures((n) => n + 1)
       img.src = url
     }, ROTATE_MS)
     return () => {
       clearTimeout(timer)
-      if (img) img.onload = null
+      if (img) {
+        img.onload = null
+        img.onerror = null
+      }
     }
-  }, [data, count, index])
+  }, [data, count, index, failures])
 
   return (
     <div className={styles.background} data-testid="home-bg-fallback">

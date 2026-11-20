@@ -8,11 +8,11 @@ import { browserLocale, useLocale } from '../i18n/locale'
 import { t } from '../i18n/strings'
 
 export const Route = createFileRoute('/characters/$id')({
-  loaderDeps: ({ search }) => ({ locale: search.locale }),
+  loaderDeps: ({ search }) => ({ locale: browserLocale(search.locale) }),
   // not awaited: the panel shows its skeleton while the detail loads
   loader: ({ context, params, deps }) => {
     void context.queryClient.prefetchQuery(
-      characterDetailQuery(params.id, browserLocale(deps.locale)),
+      characterDetailQuery(params.id, deps.locale),
     )
   },
   component: CharacterPage,

@@ -109,6 +109,14 @@ describe('characters routes', () => {
     ).toBeInTheDocument()
   })
 
+  it('redirects without adding a language the URL did not have', async () => {
+    const router = await renderAt('/characters')
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/characters/10000038'),
+    )
+    expect(router.state.location.search).toEqual({})
+  })
+
   it('redirects to the first filtered character and keeps the filter', async () => {
     const router = await renderAt('/characters?element=dendro&locale=en')
     await waitFor(() =>
