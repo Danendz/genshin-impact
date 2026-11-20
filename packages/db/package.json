@@ -10,7 +10,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx --env-file-if-exists=../../.env src/migrate.ts"
+    "db:migrate": "tsx --env-file-if-exists=../../.env src/migrate-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
