@@ -14,6 +14,7 @@ export const en: Dictionary = {
   'button.hide': 'Hide interface',
   'button.show': 'Show interface',
   close: 'Close',
+  back: 'Back',
   'stat.stamina': 'Stamina',
   details: 'Details',
   friendship: 'Friendship Lv.',

@@ -146,9 +146,15 @@ describe('characters routes', () => {
     const panel = screen.getByRole('dialog', { name: 'Character Selection' })
     fireEvent.click(within(panel).getByRole('button', { name: 'Filter' }))
     const filter = within(panel).getByRole('group', { name: 'Filter' })
-    fireEvent.click(within(filter).getByRole('button', { name: /Bow/ }))
+    const bow = within(filter).getByRole('button', { name: 'Bow' })
+    expect(bow).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(bow)
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ weaponType: 'bow' }),
+    )
+    expect(within(filter).getByRole('button', { name: 'Bow' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
     )
     expect(screen.queryByRole('link', { name: 'Albedo' })).toBeNull()
     fireEvent.click(within(filter).getByRole('button', { name: 'Confirm' }))
@@ -156,6 +162,24 @@ describe('characters routes', () => {
     expect(panel).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('hides the top bar while selecting and closes with the legacy back button', async () => {
+    await renderAt('/characters/10000038?locale=en')
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Toggle characters' }),
+    )
+    const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+    expect(screen.queryByRole('navigation', { name: 'Characters' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Close' })).toBeNull()
+    expect(within(panel).queryByRole('button', { name: 'Close' })).toBeNull()
+    // the right card stays, the back button sits above it
+    expect(screen.getByRole('heading', { name: 'Albedo' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(
+      screen.getByRole('navigation', { name: 'Characters' }),
+    ).toBeInTheDocument()
   })
 
   it('shows legacy cards and sorts and reverses the selection grid', async () => {
@@ -170,14 +194,71 @@ describe('characters routes', () => {
         .map((a) => a.getAttribute('aria-label'))
     expect(names()).toEqual(['Albedo', 'Nahida', 'Collei'])
     expect(within(panel).getAllByText('Lv. 90')).toHaveLength(3)
-    fireEvent.change(within(panel).getByRole('combobox', { name: 'Sort' }), {
-      target: { value: 'rarity' },
-    })
+    // legacy TogglerWithList: shows the current sort, opens a list of options
+    const sort = within(panel).getByRole('button', { name: 'Sort: All' })
+    expect(sort).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(sort)
+    const options = within(panel).getByRole('list', { name: 'Sort' })
+    expect(
+      within(options).getByRole('button', { name: 'All' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(within(options).getByRole('button', { name: 'Rarity' }))
+    expect(within(panel).queryByRole('list', { name: 'Sort' })).toBeNull()
+    expect(
+      within(panel).getByRole('button', { name: 'Sort: Rarity' }),
+    ).toBeInTheDocument()
     expect(names()).toEqual(['Collei', 'Albedo', 'Nahida'])
     fireEvent.click(
       within(panel).getByRole('button', { name: 'Reverse order' }),
     )
     expect(names()).toEqual(['Nahida', 'Albedo', 'Collei'])
+  })
+
+  it('slides cards to their new places when the order changes', async () => {
+    // jsdom has no layout: place each grid cell by its index, one per row
+    const top = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetTop',
+    )
+    Object.defineProperty(HTMLElement.prototype, 'offsetTop', {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.parentElement
+          ? [...this.parentElement.children].indexOf(this) * 150
+          : 0
+      },
+    })
+    const animate = vi.fn()
+    HTMLElement.prototype.animate = animate
+    try {
+      await renderAt('/characters/10000038?locale=en')
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Toggle characters' }),
+      )
+      const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+      animate.mockClear()
+      fireEvent.click(
+        within(panel).getByRole('button', { name: 'Reverse order' }),
+      )
+      // Albedo moved from row 0 to row 2: it starts 300px up and slides down
+      const albedo = within(panel)
+        .getByRole('link', { name: 'Albedo' })
+        .closest('li')
+      const call = animate.mock.contexts.indexOf(albedo)
+      expect(call).toBeGreaterThanOrEqual(0)
+      expect(animate.mock.calls[call]?.[0]).toEqual([
+        { transform: 'translate(0px, -300px)' },
+        { transform: 'none' },
+      ])
+      // Nahida stayed in the middle: nothing to animate
+      const nahida = within(panel)
+        .getByRole('link', { name: 'Nahida' })
+        .closest('li')
+      expect(animate.mock.contexts).not.toContain(nahida)
+    } finally {
+      if (top) Object.defineProperty(HTMLElement.prototype, 'offsetTop', top)
+      Reflect.deleteProperty(HTMLElement.prototype, 'animate')
+    }
   })
 
   it('scrolls only the avatar strip, never the page, when switching', async () => {

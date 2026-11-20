@@ -14,6 +14,7 @@ export const ru: Dictionary = {
   'button.hide': 'Скрыть интерфейс',
   'button.show': 'Показать интерфейс',
   close: 'Закрыть',
+  back: 'Назад',
   'stat.stamina': 'Выносливость',
   details: 'Детали',
   friendship: 'Уровень дружбы',

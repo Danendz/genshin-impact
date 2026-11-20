@@ -13,6 +13,7 @@ export const zhCN = {
   'button.hide': '隐藏界面',
   'button.show': '显示界面',
   close: '关闭',
+  back: '返回',
   'stat.stamina': '体力上限',
   details: '详细信息',
   friendship: '好感等级',

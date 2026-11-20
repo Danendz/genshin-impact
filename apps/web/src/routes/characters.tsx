@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-router'
 import { useCallback, useState } from 'react'
 import { BottomButtons, ShowButton } from '../characters/BottomButtons'
+import { CloseButton } from '../characters/CloseButton'
 import styles from '../characters/characters.module.css'
 import { characterSearch, filterCharacters } from '../characters/details'
 import { LegacyBackground } from '../characters/LegacyBackground'
@@ -55,17 +56,26 @@ function CharactersLayout() {
         <ShowButton locale={locale} onShow={() => setHidden(false)} />
       ) : (
         <>
-          <TopBar items={items} current={current} locale={locale} />
           {selection ? (
-            <SelectionPanel
-              items={items}
-              activeId={id}
-              search={search}
-              locale={locale}
-              onClose={closeSelection}
-            />
+            // legacy: the top bar makes way; a back button sits over the right card
+            <>
+              <SelectionPanel
+                items={items}
+                activeId={id}
+                search={search}
+                locale={locale}
+                onClose={closeSelection}
+              />
+              <CloseButton
+                label={t(locale, 'back')}
+                glyph="reply"
+                onClick={closeSelection}
+                className={styles.back}
+              />
+            </>
           ) : (
             <>
+              <TopBar items={items} current={current} locale={locale} />
               <SectionMenu
                 active={search.section ?? 'attributes'}
                 locale={locale}

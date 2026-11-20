@@ -15,6 +15,7 @@ export const zhTW: Dictionary = {
   'button.hide': '隱藏界面',
   'button.show': '顯示界面',
   close: '關閉',
+  back: '返回',
   'stat.stamina': '體力上限',
   details: '詳細信息',
   friendship: '好感等級',

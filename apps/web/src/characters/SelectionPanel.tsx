@@ -1,19 +1,14 @@
-import {
-  ELEMENTS,
-  type Element,
-  type Locale,
-  WEAPON_TYPES,
-  type WeaponType,
-} from '@gi/shared'
+import { ELEMENTS, type Element, type Locale, WEAPON_TYPES } from '@gi/shared'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { GenshinIcon } from '../components/GenshinIcon'
 import { type StringKey, t } from '../i18n/strings'
-import { CloseButton } from './CloseButton'
 import styles from './characters.module.css'
 import type { CharacterSearch } from './details'
 import { Icon } from './icons'
+import { animateOut, useFlip } from './motion'
 import type { CharacterListItem } from './queries'
+import { SortToggle } from './SortToggle'
 
 type Key = 'element' | 'weaponType' | 'rarity'
 
@@ -44,7 +39,7 @@ function sorted(
   return reverse ? out.reverse() : out
 }
 
-/** Legacy CharacterSelection: a left panel with every character and the filters. */
+/** Legacy CharacterSelection: the character grid on the left, with filters below. */
 export function SelectionPanel({
   items,
   activeId,
@@ -62,12 +57,26 @@ export function SelectionPanel({
   const [filterOpen, setFilterOpen] = useState(false)
   const [sort, setSort] = useState<Sort>('')
   const [reverse, setReverse] = useState(false)
+  const grid = useRef<HTMLUListElement>(null)
+  const drawer = useRef<HTMLFieldSetElement>(null)
+  useFlip(grid)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  // legacy fade-left on the way out too
+  const closeFilter = () =>
+    animateOut(
+      drawer.current,
+      [
+        { opacity: 1, transform: 'none' },
+        { opacity: 0, transform: 'translateX(-100px)' },
+      ],
+      400,
+      () => setFilterOpen(false),
+    )
   const set = (key: Key, value: string | number | undefined) =>
     navigate({
       to: '.',
@@ -83,32 +92,28 @@ export function SelectionPanel({
   const active = (['element', 'weaponType', 'rarity'] as const).filter(
     (k) => search[k] !== undefined,
   )
+  // legacy FilterContainer: a titled two-column list of radio-style options
   const group = (
     key: Key,
     title: StringKey,
     values: readonly (string | number)[],
   ) => (
-    <fieldset className="flex flex-wrap items-center gap-1.5">
-      <legend className="mb-1.5 text-sm text-white/70">
-        {t(locale, title)}
-      </legend>
-      {values.map((v) => (
-        <button
-          key={v}
-          type="button"
-          className={styles.chip}
-          aria-pressed={search[key] === v}
-          onClick={() => set(key, search[key] === v ? undefined : v)}
-        >
-          {key === 'element' && (
-            <GenshinIcon name={v as Element} className="mr-1" />
-          )}
-          {key === 'weaponType' && (
-            <GenshinIcon name={v as WeaponType} className="mr-1" />
-          )}
-          {label(key, v)}
-        </button>
-      ))}
+    <fieldset className={styles.filterGroup}>
+      <legend>{t(locale, title)}</legend>
+      <div className={styles.filterOptions}>
+        {values.map((v) => (
+          <button
+            key={v}
+            type="button"
+            className={styles.filterOption}
+            aria-pressed={search[key] === v}
+            onClick={() => set(key, search[key] === v ? undefined : v)}
+          >
+            <span className={styles.radio} />
+            {label(key, v)}
+          </button>
+        ))}
+      </div>
     </fieldset>
   )
 
@@ -118,18 +123,13 @@ export function SelectionPanel({
       aria-label={t(locale, 'selection.title')}
       className={styles.selection}
     >
-      <header className="flex items-center justify-between">
-        <h2 className="text-2xl text-[#dfdcd1]">
-          {t(locale, 'selection.title')}
-        </h2>
-        <CloseButton label={t(locale, 'close')} onClick={onClose} />
-      </header>
+      <h2 className={styles.selectionTitle}>{t(locale, 'selection.title')}</h2>
       {items.length === 0 ? (
         <p className="py-6 text-white/80">{t(locale, 'filter.empty')}</p>
       ) : (
-        <ul className={styles.grid}>
+        <ul ref={grid} className={styles.grid}>
           {sorted(items, sort, reverse, locale).map((c) => (
-            <li key={c.id}>
+            <li key={c.id} data-flip={c.id}>
               <Link
                 to="/characters/$id"
                 params={{ id: c.id }}
@@ -166,6 +166,33 @@ export function SelectionPanel({
           ))}
         </ul>
       )}
+      <div className={styles.filters}>
+        <button
+          type="button"
+          className={styles.filterBtn}
+          aria-label={t(locale, 'filter.title')}
+          aria-expanded={filterOpen}
+          onClick={() => (filterOpen ? closeFilter() : setFilterOpen(true))}
+        >
+          <Icon name="filter" className="size-5" />
+        </button>
+        <SortToggle
+          label={t(locale, 'sort.label')}
+          value={sort}
+          options={SORTS}
+          optionLabel={(o) => t(locale, `sort.${o || 'default'}` as StringKey)}
+          onChange={setSort}
+        />
+        <button
+          type="button"
+          className={styles.filterBtn}
+          aria-label={t(locale, 'sort.reverse')}
+          aria-pressed={reverse}
+          onClick={() => setReverse((r) => !r)}
+        >
+          <Icon name="sort" className="size-5" />
+        </button>
+      </div>
       {active.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {active.map((k) => (
@@ -197,57 +224,25 @@ export function SelectionPanel({
           </button>
         </div>
       )}
-      <div className={styles.filters}>
-        <button
-          type="button"
-          className={styles.filterBtn}
-          aria-label={t(locale, 'filter.title')}
-          aria-expanded={filterOpen}
-          onClick={() => setFilterOpen((o) => !o)}
-        >
-          <Icon name="filter" className="size-5" />
-        </button>
-        <select
-          aria-label={t(locale, 'sort.label')}
-          className={styles.sortSelect}
-          value={sort}
-          onChange={(e) => setSort(e.target.value as Sort)}
-        >
-          {SORTS.map((o) => (
-            <option key={o} value={o}>
-              {t(locale, `sort.${o || 'default'}` as StringKey)}
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          className={styles.filterBtn}
-          aria-label={t(locale, 'sort.reverse')}
-          aria-pressed={reverse}
-          onClick={() => setReverse((r) => !r)}
-        >
-          <Icon name="sort" className="size-5" />
-        </button>
-      </div>
       {filterOpen && (
         <fieldset
+          ref={drawer}
           aria-label={t(locale, 'filter.title')}
-          className={styles.filterSheet}
+          className={styles.filterDrawer}
         >
-          <h3 className="text-2xl text-[#c9c2a6]">
-            {t(locale, 'filter.title')}
-          </h3>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+          <div className={styles.filterScroll}>
+            <h3 className={styles.filterTitle}>{t(locale, 'filter.title')}</h3>
             {group('element', 'filter.element', ELEMENTS)}
             {group('weaponType', 'filter.weapon', WEAPON_TYPES)}
-            {group('rarity', 'filter.rarity', [5, 4])}
+            {group('rarity', 'filter.rarity', [4, 5])}
           </div>
           <button
             type="button"
             className={styles.confirm}
-            onClick={() => setFilterOpen(false)}
+            onClick={closeFilter}
           >
-            {t(locale, 'filter.confirm')}
+            <GenshinIcon name="circle-o" className={styles.confirmIcon} />
+            <span>{t(locale, 'filter.confirm')}</span>
           </button>
         </fieldset>
       )}
