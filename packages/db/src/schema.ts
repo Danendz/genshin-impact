@@ -27,6 +27,7 @@ export const mediaKindEnum = pgEnum('media_kind', [
   'gacha_splash',
   'gacha_icon',
   'model_glb',
+  'namecard',
 ])
 export const syncStatusEnum = pgEnum('sync_status', [
   'running',

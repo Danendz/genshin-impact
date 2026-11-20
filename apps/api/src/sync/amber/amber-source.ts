@@ -247,6 +247,12 @@ export function createAmberSource(
         { kind: 'icon', url: asset(en.icon) },
         { kind: 'gacha_splash', url: asset(`UI_Gacha_AvatarImg_${suffix}`) },
       ]
+      const card = /^UI_NameCardIcon_(.+)$/.exec(en.other?.nameCard?.icon ?? '')
+      if (card)
+        media.push({
+          kind: 'namecard',
+          url: asset(`namecard/UI_NameCardPic_${card[1]}_P`),
+        })
 
       return {
         id,

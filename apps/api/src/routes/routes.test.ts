@@ -104,6 +104,28 @@ describe('characters', () => {
     expect(body.details).toEqual({ x: 1 })
   })
 
+  it('exposes namecard media by kind on list and detail', async () => {
+    await db.insert(mediaAssets).values({
+      ownerType: 'character',
+      ownerId: '10000005-pyro',
+      kind: 'namecard',
+      sourceUrl: 's',
+      r2Key: 'character/10000005-pyro/namecard.webp',
+      width: 1,
+      height: 1,
+      contentHash: 'n',
+    })
+    const detail = (await (
+      await app.request('/v1/characters/10000005-pyro')
+    ).json()) as { media: Record<string, string> }
+    expect(detail.media.namecard).toMatch(/namecard\.webp$/)
+    const { items } = (await (await app.request('/v1/characters')).json()) as {
+      items: { id: string; media: Record<string, string> }[]
+    }
+    const diluc = items.find((i) => i.id === '10000005-pyro')
+    expect(diluc?.media.namecard).toMatch(/namecard\.webp$/)
+  })
+
   it('falls back to en per entity', async () => {
     const res = await app.request('/v1/characters/10000002-dendro?locale=ru')
     expect(res.status).toBe(200)

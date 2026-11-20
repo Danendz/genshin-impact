@@ -10,6 +10,7 @@
     "icon": "UI_AvatarIcon_Nahida",
     "birthday": [10, 27],
     "release": 1667253600,
+    "other": { "nameCard": { "id": 210140, "icon": "UI_NameCardIcon_Nahida" } },
     "fetter": {
       "title": "Physic of Purity",
       "detail": "A caged bird secluded within the confines of the Sanctuary of Surasthana who can only see the world in her dreams."

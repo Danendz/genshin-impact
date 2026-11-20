@@ -37,6 +37,11 @@ export const avatarDetailResponse = envelope(
       .nullish(),
     talent: z.record(z.string(), z.unknown()).nullish(),
     constellation: z.record(z.string(), z.unknown()).nullish(),
+    other: z
+      .looseObject({
+        nameCard: z.looseObject({ icon: z.string().nullish() }).nullish(),
+      })
+      .nullish(),
   }),
 )
 

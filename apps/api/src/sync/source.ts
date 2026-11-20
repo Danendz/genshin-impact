@@ -1,6 +1,6 @@
 import type { Element, Locale, Rarity, WeaponType } from '@gi/shared'
 
-export type MediaKind = 'icon' | 'gacha_splash' | 'gacha_icon'
+export type MediaKind = 'icon' | 'gacha_splash' | 'gacha_icon' | 'namecard'
 export type MediaRef = { kind: MediaKind; url: string }
 /** talent/constellation icon, shared across characters and stored by name */
 export type SkillIcon = { name: string; url: string }

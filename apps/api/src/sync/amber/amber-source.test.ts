@@ -65,7 +65,14 @@ describe('getCharacter', () => {
     expect(urls.some((u) => u.endsWith('UI_Gacha_AvatarImg_Nahida.png'))).toBe(
       true,
     )
-    expect(c.media.map((m) => m.kind)).toEqual(['icon', 'gacha_splash'])
+    expect(c.media.map((m) => m.kind)).toEqual([
+      'icon',
+      'gacha_splash',
+      'namecard',
+    ])
+    expect(c.media[2]?.url).toBe(
+      'https://gi.yatta.moe/assets/UI/namecard/UI_NameCardPic_Nahida_P.png',
+    )
     const names = c.skillIcons.map((i) => i.name)
     expect(names.length).toBeGreaterThan(0)
     expect(new Set(names).size).toBe(names.length)
@@ -81,6 +88,8 @@ describe('getCharacter', () => {
     expect(c.id).toBe('10000005-pyro')
     expect(c.element).toBe('pyro')
     expect(c.birthday).toBeNull()
+    // no nameCard in the payload -> no namecard media
+    expect(c.media.map((m) => m.kind)).toEqual(['icon', 'gacha_splash'])
   })
 
   test('unknown element rejects with SourceEntityError', async () => {
