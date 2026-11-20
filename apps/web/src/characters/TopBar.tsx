@@ -83,14 +83,21 @@ function AvatarStrip({
               title={c.name}
               draggable={false}
             >
-              {c.media.icon && (
-                <img
-                  src={c.media.icon}
-                  alt=""
-                  loading="lazy"
-                  draggable={false}
-                />
-              )}
+              {/* side icons (profile heads) sit on the ring unclipped, like the
+                  in-game party list; the bust icon is clipped below only */}
+              <span
+                className={styles.avatarClip}
+                data-side={c.media.side_icon ? '' : undefined}
+              >
+                {(c.media.side_icon ?? c.media.icon) && (
+                  <img
+                    src={c.media.side_icon ?? c.media.icon}
+                    alt=""
+                    loading="lazy"
+                    draggable={false}
+                  />
+                )}
+              </span>
             </Link>
           </li>
         ))}

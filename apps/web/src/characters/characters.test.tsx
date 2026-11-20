@@ -45,6 +45,7 @@ const item = (
   media: {
     icon: `https://m/${id}/icon.webp`,
     gacha_splash: `https://m/${id}/s.webp`,
+    ...(id === '10000038' ? { side_icon: `https://m/${id}/side.webp` } : {}),
   },
 })
 const items = [
@@ -286,6 +287,18 @@ describe('characters routes', () => {
     expect(
       screen.getByRole('navigation', { name: 'Characters' }),
     ).toBeInTheDocument()
+  })
+
+  it('uses the side icon in the avatar strip, falling back to the icon', async () => {
+    await renderAt('/characters/10000038?locale=en')
+    const strip = await screen.findByRole('navigation', { name: 'Characters' })
+    const src = (name: string) =>
+      within(strip)
+        .getByRole('link', { name })
+        .querySelector('img')
+        ?.getAttribute('src')
+    expect(src('Albedo')).toBe('https://m/10000038/side.webp')
+    expect(src('Nahida')).toBe('https://m/10000073/icon.webp')
   })
 
   it('shows legacy cards and sorts and reverses the selection grid', async () => {

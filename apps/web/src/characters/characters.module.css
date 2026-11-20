@@ -117,7 +117,8 @@
 .strip {
   display: flex;
   gap: 12px;
-  padding: 8px 4px;
+  /* room above the rings for the heads that break out of them */
+  padding: 18px 4px 8px;
   overflow-x: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
@@ -140,15 +141,25 @@
 
 /* legacy ScrollCharacter */
 .avatar {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  position: relative;
+  display: block;
   width: 55px;
   height: 55px;
   border-radius: 50%;
   border: 3px solid var(--color-avatar-ring);
-  overflow: hidden;
   transition: var(--dur-base);
+}
+/* Taller than the ring, open at the top: the lower half follows the circle
+   (bottom radii clamp to half the width), the head pokes out above. */
+.avatarClip {
+  position: absolute;
+  inset: auto 0 0;
+  height: 135%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-radius: 0 0 999px 999px;
+  overflow: hidden;
 }
 .avatar:hover,
 .avatar[data-status="active"] {
@@ -156,11 +167,23 @@
   border-color: var(--color-avatar-ring-active);
 }
 .avatar img {
-  width: 100%;
+  width: 115%;
+  max-width: none;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: bottom;
   transition: transform var(--dur-base);
   -webkit-user-drag: none;
+}
+.avatarClip[data-side] {
+  inset: auto -15% 2px;
+  height: 125%;
+  border-radius: 0;
+  overflow: visible;
+}
+.avatarClip[data-side] img {
+  width: 100%;
+  object-fit: contain;
 }
 .avatar[data-status="active"] img {
   transform: scale(1.15) translateY(-3px);
