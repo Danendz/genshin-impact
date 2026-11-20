@@ -24,7 +24,7 @@ import {
 } from 'vitest'
 import { createMemoryStore } from '../media/memory-store'
 import { createSyncController } from './controller'
-import { IGNORED_CHARACTER_IDS, runSync } from './run-sync'
+import { IGNORED_CHARACTER_IDS, runSync, SYNC_LOCK_KEY } from './run-sync'
 import {
   type CharacterRecord,
   type GameDataSource,
@@ -380,6 +380,49 @@ describe('runSync', () => {
     expect(await db.select().from(materials)).toHaveLength(2)
   })
 
+  it('recovers abandoned running rows', async () => {
+    const [old] = await db
+      .insert(syncRuns)
+      .values({ status: 'running', counts: {} })
+      .returning({ id: syncRuns.id })
+    const { source } = fakeSource()
+    const res = await runSync(deps(source))
+    if (res === 'busy') throw new Error('busy')
+    expect(res.status).toBe('succeeded')
+    const [row] = await db
+      .select()
+      .from(syncRuns)
+      .where(eq(syncRuns.id, (old as { id: number }).id))
+    expect(row?.status).toBe('failed')
+    expect(row?.error).toBe('abandoned')
+    expect(row?.finishedAt).not.toBeNull()
+  })
+
+  it('a failing hash update is a partial entity failure, not a crash', async () => {
+    const { source } = fakeSource()
+    const flaky = new Proxy(db, {
+      get(t, p, r) {
+        if (p === 'update')
+          return (table: unknown) => {
+            if (table === characters) throw new Error('hash write failed')
+            return t.update(table as typeof syncRuns)
+          }
+        return Reflect.get(t, p, r)
+      },
+    })
+    const res = await runSync({ ...deps(source), db: flaky })
+    if (res === 'busy') throw new Error('busy')
+    expect(res.status).toBe('partial')
+    expect(res.counts.characters.failed).toBe(2)
+    expect(res.counts.weapons.upserted).toBe(1)
+    const [c] = await db.select().from(characters).limit(1)
+    expect(c?.sourceHash).toBe('')
+    const [lock] =
+      await sql`select pg_try_advisory_lock(${SYNC_LOCK_KEY}) as ok`
+    expect(lock?.ok).toBe(true)
+    await sql`select pg_advisory_unlock(${SYNC_LOCK_KEY})`
+  })
+
   it('wraps image fetches with a timeout signal', async () => {
     const { source } = fakeSource()
     const signals: (AbortSignal | null | undefined)[] = []
@@ -412,5 +455,30 @@ describe('createSyncController', () => {
       const [run] = await db.select().from(syncRuns)
       expect(run?.status).toBe('succeeded')
     })
+  })
+
+  it('rejects on a real error before the run starts', async () => {
+    const { source } = fakeSource()
+    const c = createSyncController({
+      ...deps(source),
+      sql: {
+        reserve: async () => {
+          throw new Error('db down')
+        },
+      } as unknown as typeof sql,
+    })
+    await expect(c.trigger()).rejects.toThrow('db down')
+  })
+
+  it("resolves 'busy' only when the lock is held", async () => {
+    const { source } = fakeSource()
+    const conn = await sql.reserve()
+    try {
+      await conn`select pg_try_advisory_lock(${SYNC_LOCK_KEY})`
+      expect(await createSyncController(deps(source)).trigger()).toBe('busy')
+    } finally {
+      await conn`select pg_advisory_unlock(${SYNC_LOCK_KEY})`
+      conn.release()
+    }
   })
 })

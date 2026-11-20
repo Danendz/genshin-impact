@@ -10,12 +10,7 @@ import {
 import { eq } from 'drizzle-orm'
 import type { MediaStore } from '../media/store'
 import { syncMedia } from '../media/sync-media'
-import {
-  type GameDataSource,
-  type ListEntry,
-  type MediaRef,
-  SourceEntityError,
-} from './source'
+import type { GameDataSource, ListEntry, MediaRef } from './source'
 import {
   setSourceHash,
   upsertCharacter,
@@ -27,7 +22,7 @@ import {
 export const IGNORED_CHARACTER_IDS = ['10000117', '10000118']
 
 /** Arbitrary constant key for pg_try_advisory_lock. */
-const SYNC_LOCK_KEY = 8_420_731
+export const SYNC_LOCK_KEY = 8_420_731
 
 const CONCURRENCY = 4
 
@@ -80,7 +75,11 @@ async function pool<T>(items: T[], fn: (item: T) => Promise<void>) {
   const worker = async () => {
     while (i < items.length) {
       const item = items[i++] as T
-      await fn(item)
+      try {
+        await fn(item)
+      } catch {
+        // fn records its own failures; never let a worker reject the pool
+      }
     }
   }
   await Promise.all(
@@ -112,6 +111,11 @@ export async function runSync(
   }
 
   async function execute(): Promise<SyncResult> {
+    // holding the lock proves no other run is active: close out leftovers
+    await db
+      .update(syncRuns)
+      .set({ status: 'failed', error: 'abandoned', finishedAt: new Date() })
+      .where(eq(syncRuns.status, 'running'))
     const [run] = await db
       .insert(syncRuns)
       .values({ status: 'running', counts: {} })
@@ -157,24 +161,17 @@ export async function runSync(
       get: (id: string) => Promise<R>,
       upsert: (rec: R, hash: string) => Promise<void>,
     ) {
-      let record: R
       try {
-        record = await get(entry.id)
-        await upsert(record, entry.listHash)
-      } catch (e) {
-        const reason = e instanceof SourceEntityError ? e.message : msg(e)
-        fail(c, kind, entry.id, reason)
-        return
-      }
-      try {
+        const record = await get(entry.id)
+        // '' until media succeeds, so a crash anywhere in between retries next run
+        await upsert(record, '')
         await syncMedia(mediaDeps, { type: kind, id: entry.id }, record.media, {
           force: full,
         })
+        await setSourceHash(db, kind, entry.id, entry.listHash)
         c.upserted++
       } catch (e) {
-        // keep upserted data, but force a refetch next run
-        await setSourceHash(db, kind, entry.id, '')
-        fail(c, kind, entry.id, `media: ${msg(e)}`)
+        fail(c, kind, entry.id, msg(e))
       }
     }
 
@@ -248,24 +245,23 @@ export async function runSync(
         return !unchanged
       })
       await pool(todo, async (rec) => {
-        const hash = sha256(stableStringify(rec))
         try {
-          await upsertMaterial(db, rec, hash)
-        } catch (e) {
-          fail(c, 'material', rec.id, msg(e))
-          return
-        }
-        try {
+          await upsertMaterial(db, rec, '')
           await syncMedia(
             mediaDeps,
             { type: 'material', id: rec.id },
             rec.media,
             { force: full },
           )
+          await setSourceHash(
+            db,
+            'material',
+            rec.id,
+            sha256(stableStringify(rec)),
+          )
           c.upserted++
         } catch (e) {
-          await setSourceHash(db, 'material', rec.id, '')
-          fail(c, 'material', rec.id, `media: ${msg(e)}`)
+          fail(c, 'material', rec.id, msg(e))
         }
       })
     }
