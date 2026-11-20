@@ -482,16 +482,25 @@ describe('runSync', () => {
     await sql`select pg_advisory_unlock(${SYNC_LOCK_KEY})`
   })
 
-  it('wraps image fetches with a timeout signal', async () => {
+  it('a hung image fetch fails the entity within the configured timeout', async () => {
     const { source } = fakeSource()
-    const signals: (AbortSignal | null | undefined)[] = []
-    const f = (async (_u: unknown, init?: RequestInit) => {
-      signals.push(init?.signal)
-      return new Response(png, { status: 200 })
-    }) as typeof fetch
-    await runSync({ ...deps(source, f), imageTimeoutMs: 5000 })
-    expect(signals.length).toBeGreaterThan(0)
-    expect(signals.every((s) => s instanceof AbortSignal)).toBe(true)
+    // never resolves on its own; only rejects when the passed signal aborts
+    const hung = ((_u: unknown, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () =>
+          reject(init.signal?.reason),
+        )
+      })) as typeof fetch
+    const started = Date.now()
+    const res = await runSync({ ...deps(source, hung), imageTimeoutMs: 50 })
+    if (res === 'busy') throw new Error('busy')
+    expect(Date.now() - started).toBeLessThan(3000)
+    expect(res.status).toBe('partial')
+    expect(res.counts.characters.failed).toBe(2)
+    expect(res.counts.weapons.failed).toBe(1)
+    expect(res.failures.length).toBeGreaterThan(0)
+    const [c] = await db.select().from(characters).limit(1)
+    expect(c?.sourceHash).toBe('')
   })
 })
 
