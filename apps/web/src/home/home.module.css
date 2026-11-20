@@ -1,0 +1,167 @@
+/* Home screen, ported from legacy components/HomeUI and assets/Styles/HomeUI */
+
+/* ---- locked controls ---- */
+
+.locked {
+  position: relative;
+  cursor: not-allowed;
+}
+
+.locked > :not(.lock) {
+  opacity: 0.5;
+}
+
+.lock {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  color: var(--color-cream);
+  filter: drop-shadow(0 0 2px var(--color-shadow));
+  pointer-events: none;
+}
+
+/* ---- tile grid: HomeMainNavigationItems.vue ---- */
+
+.tilesWrap {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 15px;
+  user-select: none;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100px;
+  padding: 5px;
+  text-align: center;
+  background-color: var(--color-tile);
+  transition: transform var(--dur-base);
+}
+
+.tileArt {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center 10px;
+  background-size: 60px;
+}
+
+.caption {
+  position: relative;
+  z-index: 2;
+  color: var(--color-tile-text);
+}
+
+/* glow and bouncing marker on hover, unlocked tiles only */
+a.tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  box-shadow: 0 0 5px 4px var(--color-tile-glow);
+  transition: opacity var(--dur-base);
+}
+
+a.tile::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(45deg, transparent 50%, var(--color-chip) 50%);
+  filter: drop-shadow(0 0 2px var(--color-chip));
+  transform: rotate(135deg);
+  opacity: 0;
+}
+
+a.tile:hover {
+  transform: scale(1.05) translateZ(0);
+}
+
+a.tile:hover::before {
+  opacity: 1;
+}
+
+a.tile:hover::after {
+  opacity: 1;
+  animation: tileMarker 1s infinite linear;
+}
+
+a.tile:active {
+  background-color: var(--color-tile-active);
+}
+
+a.tile:active .caption {
+  color: var(--color-tile);
+}
+
+a.tile:focus-visible {
+  outline: 2px solid var(--color-tile-glow);
+  outline-offset: 2px;
+}
+
+@keyframes tileMarker {
+  50% {
+    translate: 0 3px;
+  }
+}
+
+@media (max-width: 915px) {
+  .tiles {
+    gap: 5px;
+    padding: 7px 5px 10px;
+  }
+
+  .tile {
+    height: 70px;
+  }
+
+  .tileArt {
+    background-size: 40px;
+  }
+
+  .caption {
+    font-size: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tilesWrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .tiles {
+    max-width: 500px;
+    padding: 10px;
+  }
+
+  .tile,
+  a.tile::before {
+    border-radius: 10px;
+  }
+
+  .tile {
+    background-color: var(--color-tile-soft);
+  }
+
+  .tileArt {
+    background-size: 40px;
+  }
+}

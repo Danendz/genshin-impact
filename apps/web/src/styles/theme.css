@@ -75,6 +75,13 @@
   --color-glow-white: rgb(255 255 255 / 0.38);
   --color-option-hover: rgb(255 255 255 / 0.94);
 
+  /* Home screen: legacy HomeUI SCSS */
+  --color-tile: #51586b;
+  --color-tile-soft: rgb(81 88 107 / 0.78);
+  --color-tile-glow: #f7e4ba;
+  --color-tile-active: #faedd3;
+  --color-tile-text: #bdc1ca;
+
   --font-genshin: "Genshin", system-ui, sans-serif;
   --font-genshin-icon: "GenshinIcon";
 }
