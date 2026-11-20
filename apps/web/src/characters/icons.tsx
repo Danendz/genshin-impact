@@ -9,6 +9,8 @@ const paths = {
     'M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6.5 5 5 0 0 1 21.5 12C19 16.5 12 21 12 21z',
   wardrobe: 'M12 4a2 2 0 0 1 2 2c0 1-.8 1.4-2 2.2V10l9 6v2H3v-2l9-6M12 10v-1.8',
   star: 'M12 1 9 9 1 12l8 3 3 8 3-8 8-3-8-3z',
+  filter: 'M3 4h18l-7 8.5V19l-4 2v-8.5z',
+  sort: 'M8 4v15M4 15l4 4 4-4M16 20V5M12 9l4-4 4 4',
 } as const
 
 export type IconName = keyof typeof paths
@@ -22,7 +24,7 @@ export function Icon({
   className?: string
   style?: React.CSSProperties
 }) {
-  const stroke = name === 'wardrobe'
+  const stroke = name === 'wardrobe' || name === 'sort'
   return (
     <svg
       viewBox="0 0 24 24"

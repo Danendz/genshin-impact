@@ -53,9 +53,16 @@ function AvatarStrip({
 }) {
   const ref = useDragScroll<HTMLUListElement>()
   useEffect(() => {
-    if (!activeId) return
-    const active = ref.current?.querySelector('[data-status="active"]')
-    active?.scrollIntoView?.({ block: 'nearest', inline: 'center' })
+    const strip = ref.current
+    const active = strip?.querySelector('[data-status="active"]')
+    if (!activeId || !strip || !active) return
+    // scroll the strip itself: scrollIntoView would also scroll the clipped page
+    const s = strip.getBoundingClientRect()
+    const a = active.getBoundingClientRect()
+    strip.scrollTo?.({
+      left: strip.scrollLeft + a.left - s.left - (s.width - a.width) / 2,
+      behavior: 'smooth',
+    })
   }, [activeId, ref])
   if (items.length === 0)
     return (
@@ -64,7 +71,7 @@ function AvatarStrip({
       </p>
     )
   return (
-    <nav aria-label={t(locale, 'nav.characters')} className="min-w-0 flex-1">
+    <nav aria-label={t(locale, 'nav.characters')} className={styles.stripNav}>
       <ul ref={ref} className={styles.strip}>
         {items.map((c) => (
           <li key={c.id}>

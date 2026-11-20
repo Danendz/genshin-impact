@@ -7,7 +7,8 @@
   --top: 75px;
   position: relative;
   height: 100dvh;
-  overflow: hidden;
+  /* clip, not hidden: a hidden box can still be scrolled by script */
+  overflow: clip;
   color: white;
   background: #0d1018;
   text-shadow:
@@ -20,10 +21,24 @@
 .backdrop {
   position: absolute;
   inset: 0;
+  background: linear-gradient(160deg, #1d2333, #0d1018);
+}
+/* legacy fade-background: the next namecard fades in over the last (0.6s) */
+.bgLayer,
+.bgLayer > div {
+  position: absolute;
+  inset: 0;
+}
+.bgLayer > div {
   background:
     radial-gradient(circle at 50% 40%, var(--el) 0%, transparent 65%),
     linear-gradient(160deg, #1d2333, #0d1018);
-  transition: background 0.4s;
+}
+.bgLayer {
+  animation: fade 0.6s ease both;
+}
+.bgLayer[data-leaving] {
+  animation: fadeOut 0.6s ease both;
 }
 .namecard {
   position: absolute;
@@ -38,6 +53,15 @@
   inset: 0;
   background: rgb(0 0 0 / 0.12);
 }
+/* legacy fade out-in: the splash fades out, then the next fades in (0.3s each) */
+.splashLayer {
+  position: absolute;
+  inset: 0;
+  animation: fade 0.3s ease 0.3s both;
+}
+.splashLayer[data-leaving] {
+  animation: fadeOut 0.3s ease both;
+}
 .splash {
   position: absolute;
   bottom: 0;
@@ -47,13 +71,12 @@
   max-width: none;
   translate: -50% 0;
   user-select: none;
+  -webkit-user-drag: none;
+  transition: transform 0.5s;
 }
-.incoming {
-  opacity: 0;
-  transition: opacity 0.5s ease-out;
-}
-.incoming[data-loaded] {
-  opacity: 1;
+/* legacy: the art steps aside while the selection list is open */
+.screen[data-selection] .splash {
+  transform: translateX(5%);
 }
 
 /* Top bar: legacy CharactersPanel. */
@@ -83,6 +106,12 @@
 }
 .infoGlyph {
   font-size: 30px;
+}
+/* legacy CharactersScroll: 25–60% of the bar */
+.stripNav {
+  flex: 0 1 auto;
+  min-width: 25%;
+  max-width: 60%;
 }
 .strip {
   display: flex;
@@ -253,7 +282,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: min(440px, 100vw);
+  width: fit-content;
   padding: 16px 16px 16px var(--side);
   box-sizing: content-box;
   max-width: calc(100vw - 32px);
@@ -261,47 +290,134 @@
   backdrop-filter: blur(6px);
   animation: fadeRight 0.4s ease-out;
 }
+/* legacy CharacterSelectionList: 5 × 110px (4 under 1600px), rows of 140px */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(5, 110px);
+  grid-auto-rows: 140px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 6px;
   overflow-y: auto;
   min-height: 0;
   flex: 1;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
-.pick {
+/* legacy CharacterCard */
+.pickCard {
+  position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
-  border-radius: 6px 6px 18px 6px;
-  background: #e9e5dc;
+  border-radius: 4px;
+  background: white;
   color: #3b4255;
   text-shadow: none;
-  font-size: 12px;
-  transition: transform 0.2s;
+  box-shadow: 0 0 3px 2px transparent;
+  transition: 0.3s;
 }
-.pickImg {
-  aspect-ratio: 1;
-  width: 100%;
-  object-fit: cover;
-  background: linear-gradient(160deg, #6b5d8c, #a07ab5);
-}
-.pick[data-rarity="5"] .pickImg {
-  background: linear-gradient(160deg, #94653a, #c8813e);
-}
-.pick span {
-  padding: 2px 4px;
-  text-align: center;
-  white-space: nowrap;
+.cardTop {
+  display: flex;
+  justify-content: center;
+  height: 85%;
   overflow: hidden;
-  text-overflow: ellipsis;
+  border-radius: 4px 4px 25% 0;
+  background: #8e44ad;
 }
-.pick:hover {
-  transform: translateY(-2px);
+.pickCard[data-rarity="5"] .cardTop {
+  background: #e67e22;
 }
-.pick[aria-current="page"] {
-  outline: 3px solid #f3d17f;
+.cardImg {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  transition: transform 0.3s;
+  -webkit-user-drag: none;
+}
+.cardElement {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.5));
+}
+.cardLvl {
+  margin: auto 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  user-select: none;
+}
+.pickCard:hover {
+  box-shadow: 0 0 3px 2px white;
+  transform: scale(1.02);
+}
+.pickCard:active {
+  transform: translateY(2px);
+}
+.pickCard[aria-current="page"] {
+  box-shadow: 0 0 5px 2px white;
+  transform: scale(1.04);
+}
+/* legacy CharacterSelectionFilters: filter, sort, reverse */
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+  user-select: none;
+}
+.filterBtn,
+.sortSelect {
+  height: 32px;
+  border-radius: 10px;
+  background: white;
+  color: #3b4255;
+  text-shadow: none;
+}
+.filterBtn {
+  display: grid;
+  place-items: center;
+  width: 12%;
+  transition: 0.2s;
+}
+.filterBtn[aria-pressed="true"],
+.filterBtn[aria-expanded="true"] {
+  background: #ece5d8;
+  box-shadow: inset 0 0 0 2px #d3bc8e;
+}
+.sortSelect {
+  flex: 1;
+  padding: 0 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* legacy CharacterFilterOptions: a sheet over the list */
+.filterSheet {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 16px 16px 16px var(--side);
+  background: rgb(38 50 64 / 0.99);
+  animation: fadeRight 0.3s ease-out;
+}
+.confirm {
+  align-self: center;
+  min-width: 200px;
+  padding: 8px 24px;
+  border-radius: 999px;
+  background: #ece5d8;
+  color: #3b4255;
+  text-shadow: none;
+  font-weight: 700;
 }
 .chip {
   border-radius: 999px;
@@ -450,6 +566,11 @@
     opacity: 0;
   }
 }
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
 @keyframes fadeDown {
   from {
     opacity: 0;
@@ -475,6 +596,12 @@
   }
 }
 
+@media (max-width: 1600px) {
+  .grid {
+    grid-template-columns: repeat(4, 110px);
+  }
+}
+
 /* Phones: menu as a pill bar under the top bar, panel as a bottom sheet. */
 @media (max-width: 767px) {
   .screen {
@@ -493,8 +620,24 @@
   .infoGlyph {
     font-size: 20px;
   }
+  .stripNav {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
   .strip {
     gap: 8px;
+  }
+  .grid {
+    grid-template-columns: repeat(4, 70px);
+    grid-auto-rows: 80px;
+    gap: 8px;
+  }
+  .cardElement {
+    font-size: 16px;
+  }
+  .cardLvl {
+    font-size: 10px;
   }
   .avatar {
     width: 42px;

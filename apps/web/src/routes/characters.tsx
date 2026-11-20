@@ -41,7 +41,10 @@ function CharactersLayout() {
   const [hidden, setHidden] = useState(false)
   const closeSelection = useCallback(() => setSelection(false), [])
   return (
-    <main className={styles.screen}>
+    <main
+      className={styles.screen}
+      data-selection={selection && !hidden ? '' : undefined}
+    >
       <LegacyBackground
         namecard={current?.media.namecard}
         splash={current?.media.gacha_splash}

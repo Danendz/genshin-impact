@@ -144,14 +144,50 @@ describe('characters routes', () => {
       await screen.findByRole('button', { name: 'Toggle characters' }),
     )
     const panel = screen.getByRole('dialog', { name: 'Character Selection' })
-    fireEvent.click(within(panel).getByRole('button', { name: /Bow/ }))
+    fireEvent.click(within(panel).getByRole('button', { name: 'Filter' }))
+    const filter = within(panel).getByRole('group', { name: 'Filter' })
+    fireEvent.click(within(filter).getByRole('button', { name: /Bow/ }))
     await waitFor(() =>
       expect(router.state.location.search).toMatchObject({ weaponType: 'bow' }),
     )
     expect(screen.queryByRole('link', { name: 'Albedo' })).toBeNull()
+    fireEvent.click(within(filter).getByRole('button', { name: 'Confirm' }))
+    expect(within(panel).queryByRole('group', { name: 'Filter' })).toBeNull()
     expect(panel).toBeInTheDocument()
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('shows legacy cards and sorts and reverses the selection grid', async () => {
+    await renderAt('/characters/10000038?locale=en')
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Toggle characters' }),
+    )
+    const panel = screen.getByRole('dialog', { name: 'Character Selection' })
+    const names = () =>
+      within(panel)
+        .getAllByRole('link')
+        .map((a) => a.getAttribute('aria-label'))
+    expect(names()).toEqual(['Albedo', 'Nahida', 'Collei'])
+    expect(within(panel).getAllByText('Lv. 90')).toHaveLength(3)
+    fireEvent.change(within(panel).getByRole('combobox', { name: 'Sort' }), {
+      target: { value: 'rarity' },
+    })
+    expect(names()).toEqual(['Collei', 'Albedo', 'Nahida'])
+    fireEvent.click(
+      within(panel).getByRole('button', { name: 'Reverse order' }),
+    )
+    expect(names()).toEqual(['Nahida', 'Albedo', 'Collei'])
+  })
+
+  it('scrolls only the avatar strip, never the page, when switching', async () => {
+    const intoView = vi.fn()
+    Element.prototype.scrollIntoView = intoView
+    await renderAt('/characters/10000038?locale=en')
+    fireEvent.click(await screen.findByRole('link', { name: 'Nahida' }))
+    await screen.findByRole('heading', { name: 'Nahida' })
+    expect(intoView).not.toHaveBeenCalled()
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
   })
 
   it('shows element/name in the top bar and links close to home', async () => {
