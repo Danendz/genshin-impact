@@ -17,10 +17,11 @@ import {
   SourceEntityError,
   type WeaponRecord,
 } from '../source'
-import { createHttp } from './http'
+import { createHttp, UpstreamError } from './http'
 import {
   avatarDetailResponse,
   avatarListResponse,
+  materialListItem,
   materialListResponse,
   weaponDetailResponse,
   weaponListResponse,
@@ -77,16 +78,15 @@ export function createAmberSource(
     locale: Locale,
     path: string,
     schema: S,
-    entityId: string,
+    entityId: string | null, // null = list endpoint: failures are upstream errors
   ): Promise<z.output<S> | null> {
     const raw = await http.getJson(`${toAmberLang(locale)}/${path}`)
     if (raw === null) return null
     const parsed = schema.safeParse(raw)
     if (!parsed.success) {
-      throw new SourceEntityError(
-        entityId,
-        `unexpected ${locale} response shape for ${path}: ${parsed.error.message}`,
-      )
+      const reason = `unexpected ${locale} response shape for ${path}: ${parsed.error.message}`
+      if (entityId === null) throw new UpstreamError(path, null, reason)
+      throw new SourceEntityError(entityId, reason)
     }
     return parsed.data
   }
@@ -94,7 +94,7 @@ export function createAmberSource(
   async function fetchAllLocales<S extends z.ZodType>(
     path: string,
     schema: S,
-    entityId: string,
+    entityId: string | null,
   ) {
     const results = await Promise.all(
       LOCALES.map(
@@ -123,10 +123,11 @@ export function createAmberSource(
     schema: S,
     items: (d: z.output<S>) => Record<string, unknown>,
   ): Promise<ListEntry[]> {
-    const byLocale = await fetchAllLocales(kind, schema, kind)
+    const byLocale = await fetchAllLocales(kind, schema, null)
     const enItems = byLocale.get('en')
-    if (!enItems)
-      throw new SourceEntityError(kind, `${kind} list missing for en`)
+    if (!enItems) {
+      throw new UpstreamError(kind, 404, `${kind} list missing for en`)
+    }
     const ids = Object.keys(items(enItems))
     const itemMaps = new Map<Locale, Record<string, unknown>>()
     for (const [l, d] of byLocale) itemMaps.set(l, items(d))
@@ -153,10 +154,9 @@ export function createAmberSource(
       if (!weaponType) {
         throw new SourceEntityError(id, `unknown weaponType ${en.weaponType}`)
       }
-      // Traveler has no element in some forms (null); anything else must map.
       const element = normalizeElement(en.element)
-      if (en.element != null && element === null) {
-        throw new SourceEntityError(id, `unknown element ${en.element}`)
+      if (element === null) {
+        throw new SourceEntityError(id, `unmappable element ${en.element}`)
       }
       const [month, day] = en.birthday ?? []
       const birthday: [number, number] | null =
@@ -229,31 +229,47 @@ export function createAmberSource(
       }
     },
 
-    async listMaterials(): Promise<MaterialRecord[]> {
+    async listMaterials() {
       const byLocale = await fetchAllLocales(
         'material',
         materialListResponse,
-        'material',
+        null,
       )
       const en = byLocale.get('en')?.data.items
-      if (!en) throw new SourceEntityError('material', 'en list missing')
-      const out: MaterialRecord[] = []
-      for (const [key, item] of Object.entries(en)) {
-        const id = String(item.id ?? key)
+      if (!en)
+        throw new UpstreamError('material', 404, 'material list missing for en')
+      const records: MaterialRecord[] = []
+      const skipped: { id: string; reason: string }[] = []
+      for (const [key, raw] of Object.entries(en)) {
+        const item = materialListItem.safeParse(raw)
+        if (!item.success) {
+          skipped.push({
+            id: key,
+            reason: `invalid item: ${item.error.message}`,
+          })
+          continue
+        }
+        const it = item.data
+        const id = String(it.id)
+        const rarity = normalizeRarity(it.rank === 105 ? 5 : it.rank)
+        if (rarity === null) {
+          skipped.push({ id, reason: `unknown rarity ${it.rank}` })
+          continue
+        }
         const i18n: MaterialRecord['i18n'] = {}
         for (const [l, res] of byLocale) {
-          const it = res.data.items[key]
-          if (it) i18n[l] = { name: it.name, description: null }
+          const loc = materialListItem.safeParse(res.data.items[key])
+          if (loc.success) i18n[l] = { name: loc.data.name, description: null }
         }
-        out.push({
+        records.push({
           id,
-          rarity: rarityOf(item.rank, id),
-          category: item.type,
+          rarity,
+          category: it.type,
           i18n,
-          media: [{ kind: 'icon', url: asset(item.icon) }],
+          media: [{ kind: 'icon', url: asset(it.icon) }],
         })
       }
-      return out
+      return { records, skipped }
     },
   }
 }

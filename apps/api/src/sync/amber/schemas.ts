@@ -71,5 +71,5 @@ export const materialListItem = z.looseObject({
   icon: z.string(),
 })
 export const materialListResponse = envelope(
-  z.looseObject({ items: z.record(z.string(), materialListItem) }),
+  z.looseObject({ items: z.record(z.string(), z.unknown()) }),
 )

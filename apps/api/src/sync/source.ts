@@ -66,5 +66,8 @@ export interface GameDataSource {
   listWeapons(): Promise<ListEntry[]>
   getWeapon(id: string): Promise<WeaponRecord>
   /** materials come from the list only (no per-item detail) */
-  listMaterials(): Promise<MaterialRecord[]>
+  listMaterials(): Promise<{
+    records: MaterialRecord[]
+    skipped: { id: string; reason: string }[]
+  }>
 }

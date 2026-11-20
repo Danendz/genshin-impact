@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { SourceEntityError } from '../source'
 import { createAmberSource } from './amber-source'
+import { UpstreamError } from './http'
 
 const FIX = join(import.meta.dirname, '../../../test/fixtures/amber')
 const BASE = 'https://gi.yatta.moe/api/v2'
@@ -138,7 +139,10 @@ describe('lists', () => {
   })
 
   test('listMaterials', async () => {
-    const l = await createAmberSource({ fetch: fakeFetch().fn }).listMaterials()
+    const { records: l, skipped } = await createAmberSource({
+      fetch: fakeFetch().fn,
+    }).listMaterials()
+    expect(skipped).toEqual([])
     expect(l).toHaveLength(5)
     const m = l[0]
     expect(m?.id).toBe('102')
@@ -151,6 +155,55 @@ describe('lists', () => {
         url: 'https://gi.yatta.moe/assets/UI/UI_ItemIcon_102.png',
       },
     ])
+  })
+})
+
+describe('failure classes', () => {
+  test('null element rejects with SourceEntityError', async () => {
+    const bad = fixture('avatar-10000073-en')
+    bad.data.element = null
+    const f = fakeFetch({ [`${BASE}/en/avatar/10000073`]: () => json(bad) })
+    await expect(
+      createAmberSource({ fetch: f.fn }).getCharacter('10000073'),
+    ).rejects.toBeInstanceOf(SourceEntityError)
+  })
+
+  test('malformed en list throws UpstreamError, not SourceEntityError', async () => {
+    type Src = ReturnType<typeof createAmberSource>
+    const cases: Array<[string, (s: Src) => Promise<unknown>]> = [
+      ['avatar', (s) => s.listCharacters()],
+      ['weapon', (s) => s.listWeapons()],
+      ['material', (s) => s.listMaterials()],
+    ]
+    for (const [kind, call] of cases) {
+      const f = fakeFetch({ [`${BASE}/en/${kind}`]: () => json({ data: {} }) })
+      const err = await call(createAmberSource({ fetch: f.fn })).catch((e) => e)
+      expect(err).toBeInstanceOf(UpstreamError)
+      expect(err).not.toBeInstanceOf(SourceEntityError)
+    }
+  })
+
+  test('missing en list throws UpstreamError', async () => {
+    const f = fakeFetch({
+      [`${BASE}/en/weapon`]: () => json({ code: 404 }, 404),
+    })
+    await expect(
+      createAmberSource({ fetch: f.fn }).listWeapons(),
+    ).rejects.toBeInstanceOf(UpstreamError)
+  })
+
+  test('bad material items are skipped, good ones returned', async () => {
+    const en = fixture('material-list-en')
+    const ids = Object.keys(en.data.items)
+    en.data.items[ids[0] as string].rank = 99
+    delete en.data.items[ids[1] as string].icon
+    const f = fakeFetch({ [`${BASE}/en/material`]: () => json(en) })
+    const { records, skipped } = await createAmberSource({
+      fetch: f.fn,
+    }).listMaterials()
+    expect(records).toHaveLength(3)
+    expect(skipped.map((x) => x.id)).toEqual([ids[0], ids[1]])
+    expect(skipped.every((x) => x.reason.length > 0)).toBe(true)
   })
 })
 
@@ -191,7 +244,7 @@ describe('http behaviour', () => {
       timeoutMs: 20,
       retries: 0,
     })
-    await expect(src.listWeapons()).rejects.toBeDefined()
+    await expect(src.listWeapons()).rejects.toBeInstanceOf(UpstreamError)
   })
 
   test('limits concurrency', async () => {
