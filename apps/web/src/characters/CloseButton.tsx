@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { GenshinIcon } from '../components/GenshinIcon'
 import styles from './characters.module.css'
 
-/** Legacy round close/back button (#e0ddd4); a home link when `to` is given. */
+/** Legacy round close/back button (--color-paper-light); a home link when `to` is given. */
 export function CloseButton({
   label,
   onClick,

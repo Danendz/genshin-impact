@@ -16,7 +16,9 @@ export function LegacyBackground({
 }) {
   const card = usePreloaded(namecard)
   const art = usePreloaded(splash)
-  const el = element ? `var(--color-${element})` : '#5b6170'
+  const el = element
+    ? `var(--color-${element})`
+    : 'var(--color-element-fallback)'
   return (
     <div className={styles.backdrop} aria-hidden>
       <Fade

@@ -114,7 +114,7 @@ function Attributes({
         <h1 className={styles.name}>{detail.name}</h1>
         <Stars rarity={detail.rarity} />
         <p className={styles.level}>
-          {t(locale, 'level')} 90 / <span className="text-[#b9b9b9]">90</span>
+          {t(locale, 'level')} 90 / <span className="text-muted">90</span>
         </p>
         <div className={`${styles.bar} ${styles.barLevel}`} />
       </header>
@@ -201,7 +201,7 @@ function SkillList({
                 <SkillIcon url={icons[icon]} />
                 <span className="flex flex-col items-start text-left">
                   <span className="leading-tight">{name}</span>
-                  {cap && <span className="text-xs text-[#d3bc8e]">{cap}</span>}
+                  {cap && <span className="text-xs text-gold">{cap}</span>}
                 </span>
               </button>
             </li>
@@ -219,7 +219,7 @@ function SkillList({
             <div>
               <h3 className="text-xl leading-tight">{entryOf(open).name}</h3>
               {caption(open) && (
-                <p className="text-sm text-[#d3bc8e]">{caption(open)}</p>
+                <p className="text-sm text-gold">{caption(open)}</p>
               )}
             </div>
           </header>

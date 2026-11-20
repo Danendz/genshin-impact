@@ -10,20 +10,21 @@
   /* clip, not hidden: a hidden box can still be scrolled by script */
   overflow: clip;
   color: white;
-  background: #0d1018;
-  text-shadow:
-    0 0 1px rgb(0 0 0 / 0.32),
-    0 1px 2px rgb(0 0 0 / 0.22),
-    0 0 8px rgb(0 0 0 / 0.16);
+  background: var(--color-night);
+  text-shadow: var(--text-shadow-hud);
 }
 
 /* Background: namecard (cover, dimmed) under the gacha splash at full height. */
 .backdrop {
   position: absolute;
   inset: 0;
-  background: linear-gradient(160deg, #1d2333, #0d1018);
+  background: linear-gradient(
+    160deg,
+    var(--color-night-soft),
+    var(--color-night)
+  );
 }
-/* legacy fade-background: the next namecard fades in over the last (0.6s) */
+/* legacy fade-background: the next namecard fades in over the last (var(--dur-bg)) */
 .bgLayer,
 .bgLayer > div {
   position: absolute;
@@ -32,13 +33,13 @@
 .bgLayer > div {
   background:
     radial-gradient(circle at 50% 40%, var(--el) 0%, transparent 65%),
-    linear-gradient(160deg, #1d2333, #0d1018);
+    linear-gradient(160deg, var(--color-night-soft), var(--color-night));
 }
 .bgLayer {
-  animation: fade 0.6s ease both;
+  animation: fade var(--dur-bg) ease both;
 }
 .bgLayer[data-leaving] {
-  animation: fadeOut 0.6s ease both;
+  animation: fadeOut var(--dur-bg) ease both;
 }
 .namecard {
   position: absolute;
@@ -51,16 +52,16 @@
 .dim {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.12);
+  background: var(--color-dim);
 }
-/* legacy fade out-in: the splash fades out, then the next fades in (0.3s each) */
+/* legacy fade out-in: the splash fades out, then the next fades in (var(--dur-base) each) */
 .splashLayer {
   position: absolute;
   inset: 0;
-  animation: fade 0.3s ease 0.3s both;
+  animation: fade var(--dur-base) ease var(--dur-base) both;
 }
 .splashLayer[data-leaving] {
-  animation: fadeOut 0.3s ease both;
+  animation: fadeOut var(--dur-base) ease both;
 }
 .splash {
   position: absolute;
@@ -72,7 +73,7 @@
   translate: -50% 0;
   user-select: none;
   -webkit-user-drag: none;
-  transition: transform 0.5s;
+  transition: transform var(--dur-slow);
 }
 /* legacy: the art steps aside while the selection list is open */
 .screen[data-selection] .splash {
@@ -83,11 +84,11 @@
 .topBar {
   position: absolute;
   inset: 0 0 auto;
-  z-index: 20;
+  z-index: var(--z-top);
   height: var(--top);
-  background: rgb(0 0 0 / 0.21);
+  background: var(--color-bar);
   user-select: none;
-  animation: fadeDown 0.5s ease-out;
+  animation: fadeDown var(--dur-slow) ease-out;
 }
 .topBarInner {
   display: flex;
@@ -131,7 +132,7 @@
 }
 .strip > li {
   transform: translateX(var(--bounce, 0px));
-  transition: transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transition: transform var(--dur-bounce) var(--ease-bounce);
 }
 .strip[data-dragging] > li {
   transition: none;
@@ -145,20 +146,20 @@
   width: 55px;
   height: 55px;
   border-radius: 50%;
-  border: 3px solid #6c9992;
+  border: 3px solid var(--color-avatar-ring);
   overflow: hidden;
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .avatar:hover,
 .avatar[data-status="active"] {
-  background-color: #5bb8d9;
-  border-color: #7ec8b9;
+  background-color: var(--color-avatar-fill);
+  border-color: var(--color-avatar-ring-active);
 }
 .avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform var(--dur-base);
   -webkit-user-drag: none;
 }
 .avatar[data-status="active"] img {
@@ -174,14 +175,14 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #e0ddd4;
-  color: #3b3e4a;
+  background: var(--color-paper-light);
+  color: var(--color-ink);
   text-shadow: none;
   font-size: 18px;
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .close:hover {
-  box-shadow: #a0afbe99 0 0 7px 2px;
+  box-shadow: var(--color-glow) 0 0 7px 2px;
 }
 .close:active {
   transform: scale(0.9);
@@ -192,20 +193,20 @@
   position: absolute;
   top: calc(var(--top) + 10px);
   left: var(--side);
-  z-index: 10;
+  z-index: var(--z-hud);
   font-size: 27px;
   line-height: normal;
-  animation: fadeRight 0.5s ease-out;
+  animation: fadeRight var(--dur-slow) ease-out;
 }
 .rhombus {
   position: relative;
   display: flex;
   align-items: center;
   padding-bottom: 16px;
-  color: rgb(212 212 212);
+  color: var(--color-menu-text);
   white-space: nowrap;
   user-select: none;
-  transition: color 0.3s;
+  transition: color var(--dur-base);
 }
 .rhombus::before {
   content: "";
@@ -213,11 +214,11 @@
   width: 15px;
   height: 15px;
   margin-right: 10px;
-  border: 1px solid rgb(163 163 163);
+  border: 1px solid var(--color-rhombus);
   border-radius: 2px;
-  background: rgb(163 163 163);
+  background: var(--color-rhombus);
   transform: rotate(45deg) scale(0.6);
-  transition: 0.5s;
+  transition: var(--dur-slow);
 }
 .rhombus::after {
   content: "";
@@ -253,13 +254,13 @@
   position: absolute;
   bottom: 12px;
   left: var(--side);
-  z-index: 10;
+  z-index: var(--z-hud);
   display: flex;
   gap: 10px;
   padding: 5px 15px;
   border-radius: 5px;
-  background: rgb(0 0 0 / 0.36);
-  animation: fadeUp 0.5s ease-out;
+  background: var(--color-dock);
+  animation: fadeUp var(--dur-slow) ease-out;
 }
 .bottom button {
   width: 30px;
@@ -267,7 +268,7 @@
   padding: 2px;
   border-radius: 5px;
   background: white;
-  transition: transform 0.3s;
+  transition: transform var(--dur-base);
 }
 .bottom button:hover {
   transform: scale(1.05);
@@ -277,7 +278,7 @@
 .selection {
   position: absolute;
   inset: 0 auto 0 0;
-  z-index: 15;
+  z-index: var(--z-selection);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -285,10 +286,10 @@
   max-width: calc(100vw - 32px);
   padding: 10px 10px 10px var(--side);
   box-sizing: content-box;
-  animation: fadeRight 0.4s ease-out;
+  animation: fadeRight var(--dur-drawer) ease-out;
 }
 .selectionTitle {
-  color: #dfdcd1;
+  color: var(--color-paper);
   font-size: 26px;
   line-height: 1.2;
 }
@@ -297,12 +298,12 @@
   position: absolute;
   top: 25px;
   right: var(--side);
-  z-index: 20;
+  z-index: var(--z-top);
   width: 40px;
   height: 40px;
-  border: 3.5px solid #abbcc6;
+  border: 3.5px solid var(--color-back-ring);
   font-size: 22px;
-  animation: fade 0.3s ease-out;
+  animation: fade var(--dur-base) ease-out;
 }
 .back:hover {
   border-color: white;
@@ -330,10 +331,10 @@
   overflow: hidden;
   border-radius: 4px;
   background: white;
-  color: #3b4255;
+  color: var(--color-ink);
   text-shadow: none;
   box-shadow: 0 0 3px 2px transparent;
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .cardTop {
   display: flex;
@@ -341,16 +342,16 @@
   height: 85%;
   overflow: hidden;
   border-radius: 4px 4px 25% 0;
-  background: #8e44ad;
+  background: var(--color-rarity-4);
 }
 .pickCard[data-rarity="5"] .cardTop {
-  background: #e67e22;
+  background: var(--color-rarity-5);
 }
 .cardImg {
   height: 100%;
   width: auto;
   max-width: none;
-  transition: transform 0.3s;
+  transition: transform var(--dur-base);
   -webkit-user-drag: none;
 }
 .cardElement {
@@ -359,7 +360,7 @@
   left: 2px;
   font-size: 26px;
   line-height: 1;
-  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.5));
+  filter: drop-shadow(0 0 2px var(--color-scrim));
 }
 .cardLvl {
   margin: auto 0;
@@ -396,14 +397,14 @@
   height: 30px;
   border-radius: 10px;
   background: white;
-  color: #3b4255;
+  color: var(--color-ink);
   text-shadow: none;
-  transition: 0.2s;
+  transition: var(--dur-fast);
 }
 .filterBtn[aria-pressed="true"],
 .filterBtn[aria-expanded="true"] {
-  background: #ece5d8;
-  box-shadow: inset 0 0 0 2px #d3bc8e;
+  background: var(--color-cream);
+  box-shadow: inset 0 0 0 2px var(--color-gold);
 }
 /* legacy TogglerWithList + ToggleList */
 .toggler {
@@ -421,7 +422,7 @@
   padding: 0 10px;
   border-radius: 20px;
   background: white;
-  color: #4a5267;
+  color: var(--color-ink-soft);
   text-shadow: none;
   font-size: 15px;
 }
@@ -429,7 +430,7 @@
   flex-shrink: 0;
   width: 10px;
   height: 10px;
-  transition: transform 0.3s;
+  transition: transform var(--dur-base);
 }
 .togglerBtn[aria-expanded="true"] .togglerArrow {
   transform: rotate(180deg);
@@ -445,9 +446,9 @@
   width: 100%;
   padding: 4px;
   border-radius: 15px;
-  background: #4a5267;
+  background: var(--color-ink-soft);
   text-shadow: none;
-  animation: fade 0.3s ease;
+  animation: fade var(--dur-base) ease;
 }
 .togglerList button {
   display: flex;
@@ -456,15 +457,15 @@
   width: 100%;
   padding: 6px;
   border-radius: 15px;
-  color: #e2e2e2;
+  color: var(--color-text-soft);
   font-size: 15px;
-  transition: background 0.2s;
+  transition: background var(--dur-fast);
 }
 .togglerList button:hover {
-  background: rgb(255 255 255 / 0.1);
+  background: var(--color-hover);
 }
 .togglerList button[aria-pressed="true"] {
-  background: rgb(255 255 255 / 0.18);
+  background: var(--color-selected);
 }
 .togglerCheck {
   width: 16px;
@@ -485,10 +486,10 @@
   margin: 0;
   border: 0;
   padding: 10px 0 0 var(--side);
-  background: rgb(38 50 64 / 0.994);
+  background: var(--color-drawer);
   text-shadow: none;
   user-select: none;
-  animation: drawerIn 0.4s ease both;
+  animation: drawerIn var(--dur-drawer) ease both;
 }
 .filterScroll {
   flex: 1;
@@ -498,7 +499,7 @@
 }
 .filterTitle {
   margin-bottom: 20px;
-  color: #c9c2a6;
+  color: var(--color-khaki);
   font-size: 30px;
 }
 .filterGroup {
@@ -509,7 +510,7 @@
 }
 .filterGroup legend {
   margin-bottom: 10px;
-  color: rgb(255 255 255 / 0.6);
+  color: var(--color-legend);
   font-family: sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -525,12 +526,12 @@
   gap: 10px;
   height: 50px;
   padding: 0 10px;
-  border: 1px solid rgb(255 255 255 / 0.25);
+  border: 1px solid var(--color-hairline);
   border-radius: 2px;
-  background: #25313f;
+  background: var(--color-drawer-option);
   font-size: 17px;
   white-space: nowrap;
-  transition: 0.2s;
+  transition: var(--dur-fast);
 }
 .radio {
   display: grid;
@@ -538,30 +539,30 @@
   flex-shrink: 0;
   width: 20px;
   height: 20px;
-  border: 1px solid rgb(255 255 255 / 0.25);
+  border: 1px solid var(--color-hairline);
   border-radius: 50%;
-  transition: 0.2s;
+  transition: var(--dur-fast);
 }
 .radio::after {
   content: "";
   width: 70%;
   height: 70%;
   border-radius: 50%;
-  transition: 0.2s;
+  transition: var(--dur-fast);
 }
 .filterOption[aria-pressed="true"] .radio::after {
-  background: rgb(255 255 255 / 0.25);
+  background: var(--color-hairline);
 }
 @media (hover: hover) {
   .filterOption:hover {
-    background: rgb(255 255 255 / 0.94);
-    color: #3b4255;
+    background: var(--color-option-hover);
+    color: var(--color-ink);
   }
   .filterOption:hover .radio {
-    border-color: #3b4255;
+    border-color: var(--color-ink);
   }
   .filterOption:hover[aria-pressed="true"] .radio::after {
-    background: #3b4255;
+    background: var(--color-ink);
   }
 }
 /* legacy RoundedButtonWithCircle */
@@ -575,17 +576,17 @@
   height: 45px;
   margin: 10px 0;
   padding: 0 15px;
-  border: 1px solid rgb(177 177 177);
+  border: 1px solid var(--color-outline);
   border-radius: 50px;
   opacity: 0.5;
   font-size: 20px;
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .confirmIcon {
   justify-self: start;
   position: relative;
   z-index: 0;
-  color: #f0c879;
+  color: var(--color-gold-bright);
   font-size: 20px;
 }
 .confirmIcon::after {
@@ -597,12 +598,12 @@
   background: black;
   opacity: 0.5;
   transform: scale(1.7);
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .confirm:hover {
   opacity: 1;
-  background: #ede5da;
-  color: #3f4557;
+  background: var(--color-cream);
+  color: var(--color-ink);
 }
 .confirm:hover .confirmIcon::after {
   opacity: 0.7;
@@ -621,8 +622,8 @@
   align-items: center;
   padding: 3px;
   border-radius: 20px;
-  background: rgb(202 202 202 / 0.82);
-  animation: fadeDown 0.3s ease-out;
+  background: var(--color-chips);
+  animation: fadeDown var(--dur-base) ease-out;
 }
 .chosenList {
   display: flex;
@@ -636,18 +637,18 @@
   flex-shrink: 0;
   padding: 0 5px;
   border-radius: 12px;
-  background: rgb(255 255 255 / 0.97);
+  background: var(--color-chip);
   color: black;
   font-size: 17px;
   white-space: nowrap;
-  transition: 0.2s;
+  transition: var(--dur-fast);
 }
 .chosenClear {
   flex-shrink: 0;
   margin-left: 10px;
   padding: 1px 9px;
   border-radius: 12px;
-  background: #4b4a48;
+  background: var(--color-chip-clear);
   color: white;
   font-size: 18px;
   font-weight: bold;
@@ -658,19 +659,19 @@
   position: absolute;
   top: calc(var(--top) + 10px);
   right: var(--side);
-  z-index: 10;
+  z-index: var(--z-hud);
   width: 300px;
   max-height: calc(100dvh - var(--top) - 40px);
   overflow-y: auto;
   scrollbar-width: none;
-  animation: fadeLeft 0.5s ease-out;
+  animation: fadeLeft var(--dur-slow) ease-out;
 }
 .card {
   display: block;
   padding: 10px;
   line-height: normal;
   border-radius: 10px;
-  background: rgb(0 0 0 / 0.16);
+  background: var(--color-glass);
   backdrop-filter: blur(2px);
 }
 .name {
@@ -680,11 +681,11 @@
 .star {
   width: 16px;
   height: 16px;
-  filter: drop-shadow(0 0 2px rgb(0 0 0 / 0.4));
+  filter: drop-shadow(0 0 2px var(--color-shadow));
 }
 .level {
   font-size: 21px;
-  text-shadow: 0 0 10px rgb(255 255 255 / 0.38);
+  text-shadow: 0 0 10px var(--color-glow-white);
 }
 .bar {
   height: 3px;
@@ -692,13 +693,13 @@
   border-radius: 10px;
 }
 .barLevel {
-  background: #3ed2ff;
-  box-shadow: 0 0 8px #3ed2ff;
+  background: var(--color-level);
+  box-shadow: 0 0 8px var(--color-level);
 }
 .barFriendship {
   width: 90%;
-  background: #fc8ef3;
-  box-shadow: 0 0 8px #fc8ef3;
+  background: var(--color-friendship);
+  box-shadow: 0 0 8px var(--color-friendship);
 }
 .stat {
   display: flex;
@@ -708,17 +709,17 @@
   border-radius: 5px;
 }
 .stat:nth-child(odd) {
-  background: rgb(0 0 0 / 0.1);
+  background: var(--color-stripe);
 }
 .detailsBtn {
   padding: 8px;
   border-radius: 20px;
-  background: rgb(255 255 255 / 0.19);
+  background: var(--color-btn-glass);
   font-size: 16px;
-  transition: 0.3s;
+  transition: var(--dur-base);
 }
 .detailsBtn:hover {
-  background: rgb(0 0 0 / 0.19);
+  background: var(--color-press);
 }
 .description {
   display: block;
@@ -733,8 +734,8 @@
   align-items: center;
   padding: 7px 10px;
   border-radius: 20px;
-  background: #dfdcd1;
-  color: #3b4255;
+  background: var(--color-paper);
+  color: var(--color-ink);
   text-shadow: none;
 }
 .wardrobe:disabled {
@@ -748,22 +749,22 @@
   width: 100%;
   padding: 6px;
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: background var(--dur-fast);
 }
 .skill:hover {
-  background: rgb(255 255 255 / 0.12);
+  background: var(--color-hover-strong);
 }
 
 /* legacy ModalWindow */
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgb(0 0 0 / 0.55);
-  animation: fade 0.2s ease-out;
+  background: var(--color-backdrop);
+  animation: fade var(--dur-fast) ease-out;
 }
 .modal {
   position: relative;
@@ -772,9 +773,9 @@
   overflow-y: auto;
   padding: 20px;
   border-radius: 12px;
-  background: #3b4255f2;
+  background: var(--color-modal);
   color: white;
-  box-shadow: 0 10px 40px rgb(0 0 0 / 0.5);
+  box-shadow: 0 10px 40px var(--color-scrim);
 }
 
 @keyframes nudge {
@@ -834,12 +835,12 @@
 .detailsBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: var(--z-modal);
   display: flex;
   justify-content: center;
-  background: rgb(0 0 0 / 0.767);
+  background: var(--color-backdrop-strong);
   color: white;
-  animation: fade 0.3s ease-out;
+  animation: fade var(--dur-base) ease-out;
 }
 .details {
   width: 50%;
@@ -852,7 +853,7 @@
 }
 .detailsGroup h2 {
   font-size: 17px;
-  color: rgb(185 185 185);
+  color: var(--color-muted);
 }
 .detailsGroup dl {
   border-radius: 15px;
@@ -864,10 +865,10 @@
   font-size: 16px;
 }
 .detailsRow:nth-child(odd) {
-  background: rgb(255 255 255 / 0.055);
+  background: var(--color-stripe-light);
 }
 .detailsRow:nth-child(even) {
-  background: rgb(0 0 0 / 0.075);
+  background: var(--color-stripe-dark);
 }
 .detailsRow:first-child {
   border-radius: 5px 5px 0 0;
@@ -979,7 +980,7 @@
     overflow-x: auto;
     padding: 4px;
     border-radius: 10px;
-    background: rgb(0 0 0 / 0.5);
+    background: var(--color-scrim);
     scrollbar-width: none;
   }
   .rhombus {
@@ -1003,7 +1004,7 @@
     padding: 0 8px 8px;
   }
   .right .card {
-    background: rgb(0 0 0 / 0.5);
+    background: var(--color-scrim);
     backdrop-filter: blur(4px);
   }
   .name {

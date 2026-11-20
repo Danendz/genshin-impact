@@ -103,7 +103,7 @@ function ListError() {
   const locale = useLocale()
   const router = useRouter()
   return (
-    <main className="grid h-dvh place-items-center bg-[#0d1018] text-white">
+    <main className="grid h-dvh place-items-center bg-night text-white">
       <div className="flex flex-col items-center gap-3">
         <p>{t(locale, 'loadError')}</p>
         <button
