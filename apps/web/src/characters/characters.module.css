@@ -175,15 +175,13 @@
   transition: transform var(--dur-base);
   -webkit-user-drag: none;
 }
+/* side icons: the head on a 128 canvas with room around it, so draw it
+   larger, but keep the ring's clip so shoulders don't spill past the circle */
 .avatarClip[data-side] {
-  inset: auto -15% 2px;
   height: 125%;
-  border-radius: 0;
-  overflow: visible;
 }
 .avatarClip[data-side] img {
-  width: 100%;
-  object-fit: contain;
+  width: 130%;
 }
 .avatar[data-status="active"] img {
   transform: scale(1.15) translateY(-3px);
