@@ -16,6 +16,7 @@ import {
 } from '@gi/models'
 import { and, eq } from 'drizzle-orm'
 import { mediaKey, processImage } from '../media/process-image'
+import { squareSideIcon } from '../media/side-icon'
 import type { MediaStore } from '../media/store'
 import type { LocalCache } from './local-cache'
 import { matchCharacters } from './match'
@@ -466,6 +467,7 @@ async function execute(
           bytes = await client.download(client.previewUrl(asset.id))
           original = false
         }
+        if (slot.kind === 'side_icon') bytes = await squareSideIcon(bytes)
         const img = await processImage(bytes, IMAGE_QUALITY)
         const kind = slot.variant
           ? `${slot.kind}-${keySlug(slot.variant)}`

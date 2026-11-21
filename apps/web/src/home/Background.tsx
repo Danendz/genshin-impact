@@ -17,6 +17,10 @@ export function Background() {
     setLayers({ urls: [data[index]?.url], front: 0, index })
   }
 
+  // the first image fades in once its file arrives, not as it streams in;
+  // later ones are preloaded before the swap, so they're always ready
+  const [ready, setReady] = useState(false)
+
   const index = layers?.index
   // bumped when an image fails, so the timer schedules another try
   const [failures, setFailures] = useState(0)
@@ -59,7 +63,8 @@ export function Background() {
             src={url}
             alt=""
             data-testid="home-bg"
-            data-visible={layers.front === i}
+            data-visible={ready && layers.front === i}
+            onLoad={() => setReady(true)}
             className={styles.backgroundLayer}
           />
         ) : null,

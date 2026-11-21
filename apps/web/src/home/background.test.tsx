@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '../api'
 import { Background } from './Background'
@@ -52,6 +52,10 @@ function renderWith(data?: ReturnType<typeof items>) {
   )
 }
 
+/** fire the first layer's load event, as the browser does once the file arrives */
+const loadFirst = () =>
+  fireEvent.load(screen.getAllByTestId('home-bg')[0] as HTMLElement)
+
 const visible = () =>
   screen
     .getAllByTestId('home-bg')
@@ -69,8 +73,16 @@ describe('Background', () => {
     vi.unstubAllGlobals()
   })
 
+  it('fades the first image in only once it has loaded', () => {
+    renderWith(items(3))
+    expect(visible()).toBeUndefined()
+    loadFirst()
+    expect(items(3).map((i) => i.url)).toContain(visible())
+  })
+
   it(`crossfades to another image every ${ROTATE_MS} ms`, () => {
     renderWith(items(3))
+    loadFirst()
     const first = visible()
     expect(items(3).map((i) => i.url)).toContain(first)
     act(() => vi.advanceTimersByTime(ROTATE_MS))
@@ -96,6 +108,7 @@ describe('Background', () => {
 
   it('keeps a single image without rotating', () => {
     renderWith(items(1))
+    loadFirst()
     act(() => vi.advanceTimersByTime(ROTATE_MS * 3))
     expect(loaded).toHaveLength(0)
     expect(visible()).toBe('https://r2/bg-0.webp')

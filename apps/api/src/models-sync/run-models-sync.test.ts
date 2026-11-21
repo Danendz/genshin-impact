@@ -229,6 +229,13 @@ describe('runModelsSync', () => {
     expect(
       media.every((m) => m.quality === 'preview' && m.source === 'models'),
     ).toBe(true)
+    // a cropped side icon goes back on the game's canvas; other icons keep their size
+    const size = (kind: string) => {
+      const m = media.find((x) => x.kind === kind)
+      return [m?.width, m?.height]
+    }
+    expect(size('side_icon')).toEqual([128, 128])
+    expect(size('icon')).toEqual([4, 4])
     // the model-less character still gets its images
     expect(
       await db
