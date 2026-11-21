@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     branches: [remake, master]
+  # every PR, whatever its base branch
   pull_request:
-    branches: [remake, master]
 
 concurrency:
   group: ci-${{ github.ref }}
