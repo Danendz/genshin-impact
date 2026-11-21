@@ -1,0 +1,23 @@
+{
+  "response": 200,
+  "data": {
+    "id": 11509,
+    "rank": 5,
+    "type": "Sword",
+    "name": "Mistsplitter Reforged",
+    "description": "A sword that blazes with a fierce violet light. The name \"Reforged\" comes from it having been broken once before.",
+    "icon": "UI_EquipIcon_Sword_Narukami",
+    "affix": {
+      "111509": {
+        "name": "Mistsplitter's Edge",
+        "upgrade": {
+          "0": "Gain a <color=#99FFFFFF>12%</color> Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a <color=#99FFFFF",
+          "1": "Gain a <color=#99FFFFFF>15%</color> Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a <color=#99FFFFF",
+          "2": "Gain a <color=#99FFFFFF>18%</color> Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a <color=#99FFFFF",
+          "3": "Gain a <color=#99FFFFFF>21%</color> Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a <color=#99FFFFF",
+          "4": "Gain a <color=#99FFFFFF>24%</color> Elemental DMG Bonus for all elements and receive the might of the Mistsplitter's Emblem. At stack levels 1/2/3, the Mistsplitter's Emblem provides a <color=#99FFFFF"
+        }
+      }
+    }
+  }
+}

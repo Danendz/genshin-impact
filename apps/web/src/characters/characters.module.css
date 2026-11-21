@@ -1,0 +1,1088 @@
+/*
+ * The legacy character screen (master:src/components/CharacterUI), rebuilt.
+ * Values follow the legacy SCSS; phones (< 768px) get a stacked variant.
+ */
+.screen {
+  --side: max(2.5vw, calc((100vw - 1600px) / 2));
+  --top: 75px;
+  position: relative;
+  height: 100dvh;
+  /* clip, not hidden: a hidden box can still be scrolled by script */
+  overflow: clip;
+  color: white;
+  background: var(--color-night);
+  text-shadow: var(--text-shadow-hud);
+}
+
+/* Background: namecard (cover, dimmed) under the gacha splash at full height. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    var(--color-night-soft),
+    var(--color-night)
+  );
+}
+/* legacy fade-background: the next namecard fades in over the last (var(--dur-bg)) */
+.bgLayer,
+.bgLayer > div {
+  position: absolute;
+  inset: 0;
+}
+.bgLayer > div {
+  background:
+    radial-gradient(circle at 50% 40%, var(--el) 0%, transparent 65%),
+    linear-gradient(160deg, var(--color-night-soft), var(--color-night));
+}
+.bgLayer {
+  animation: fade var(--dur-bg) ease both;
+}
+.bgLayer[data-leaving] {
+  animation: fadeOut var(--dur-bg) ease both;
+}
+.namecard {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+.dim {
+  position: absolute;
+  inset: 0;
+  background: var(--color-dim);
+}
+/* legacy fade out-in: the splash fades out, then the next fades in (var(--dur-base) each) */
+.splashLayer {
+  position: absolute;
+  inset: 0;
+  animation: fade var(--dur-base) ease var(--dur-base) both;
+}
+.splashLayer[data-leaving] {
+  animation: fadeOut var(--dur-base) ease both;
+}
+.splash {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  translate: -50% 0;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: transform var(--dur-slow);
+}
+/* legacy: the art steps aside while the selection list is open */
+.screen[data-selection] .splash {
+  transform: translateX(5%);
+}
+
+/* Top bar: legacy CharactersPanel. */
+.topBar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: var(--z-top);
+  height: var(--top);
+  background: var(--color-bar);
+  user-select: none;
+  animation: fadeDown var(--dur-slow) ease-out;
+}
+.topBarInner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  margin: 0 var(--side);
+}
+.info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 22%;
+  min-width: 0;
+  font-size: 20px;
+}
+.infoGlyph {
+  font-size: 30px;
+}
+/* legacy CharactersScroll: 25–60% of the bar */
+.stripNav {
+  flex: 0 1 auto;
+  min-width: 25%;
+  max-width: 60%;
+}
+.strip {
+  display: flex;
+  gap: 12px;
+  /* room above the rings for the heads that break out of them */
+  padding: 18px 4px 8px;
+  overflow-x: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+.strip[data-dragging] {
+  cursor: grabbing;
+  user-select: none;
+}
+.strip > li {
+  transform: translateX(var(--bounce, 0px));
+  transition: transform var(--dur-bounce) var(--ease-bounce);
+}
+.strip[data-dragging] > li {
+  transition: none;
+}
+
+/* legacy ScrollCharacter */
+.avatar {
+  position: relative;
+  display: block;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 3px solid var(--color-avatar-ring);
+  transition: var(--dur-base);
+}
+/* Taller than the ring, open at the top: the lower half follows the circle
+   (bottom radii clamp to half the width), the head pokes out above. */
+.avatarClip {
+  position: absolute;
+  inset: auto 0 0;
+  height: 135%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-radius: 0 0 999px 999px;
+  overflow: hidden;
+}
+.avatar:hover,
+.avatar[data-status="active"] {
+  background-color: var(--color-avatar-fill);
+  border-color: var(--color-avatar-ring-active);
+}
+.avatar img {
+  width: 115%;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  transition: transform var(--dur-base);
+  -webkit-user-drag: none;
+}
+/* side icons: the head on a 128 canvas with room around it, so draw it
+   larger, but keep the ring's clip so shoulders don't spill past the circle */
+.avatarClip[data-side] {
+  height: 125%;
+}
+.avatarClip[data-side] img {
+  width: 130%;
+}
+.avatar[data-status="active"] img {
+  transform: scale(1.15) translateY(-3px);
+}
+
+/* legacy BackButton */
+.close {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-paper-light);
+  color: var(--color-ink);
+  text-shadow: none;
+  font-size: 18px;
+  transition: var(--dur-base);
+}
+.close:hover {
+  box-shadow: var(--color-glow) 0 0 7px 2px;
+}
+.close:active {
+  transform: scale(0.9);
+}
+
+/* Left menu: legacy ContentOptions + ListItemRhombus. */
+.menu {
+  position: absolute;
+  top: calc(var(--top) + 10px);
+  left: var(--side);
+  z-index: var(--z-hud);
+  font-size: 27px;
+  line-height: normal;
+  animation: fadeRight var(--dur-slow) ease-out;
+}
+.rhombus {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-bottom: 16px;
+  color: var(--color-menu-text);
+  white-space: nowrap;
+  user-select: none;
+  transition: color var(--dur-base);
+}
+.rhombus::before {
+  content: "";
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+  border: 1px solid var(--color-rhombus);
+  border-radius: 2px;
+  background: var(--color-rhombus);
+  transform: rotate(45deg) scale(0.6);
+  transition: var(--dur-slow);
+}
+.rhombus::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  background: linear-gradient(45deg, transparent 50%, white 50%);
+  filter: drop-shadow(0 0 5px white);
+  transform: rotate(45deg) scale(0.45);
+  opacity: 0;
+}
+/* the glyph row is the text line; keep the diamonds centred on it */
+.rhombus::after {
+  top: calc(50% - 8px - 7.5px);
+}
+.rhombus:hover,
+.rhombus[aria-current="page"],
+.rhombus[aria-current="true"] {
+  color: white;
+}
+.rhombus[aria-current="page"]::before,
+.rhombus[aria-current="true"]::before {
+  background: transparent;
+  transform: rotate(45deg) scale(0.9);
+}
+.rhombus[aria-current="page"]::after,
+.rhombus[aria-current="true"]::after {
+  opacity: 1;
+  animation: nudge 1s infinite linear;
+}
+
+/* Bottom-left buttons: legacy CharactersBottom. */
+.bottom {
+  position: absolute;
+  bottom: 12px;
+  left: var(--side);
+  z-index: var(--z-hud);
+  display: flex;
+  gap: 10px;
+  padding: 5px 15px;
+  border-radius: 5px;
+  background: var(--color-dock);
+  animation: fadeUp var(--dur-slow) ease-out;
+}
+.bottom button {
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border-radius: 5px;
+  background: white;
+  transition: transform var(--dur-base);
+}
+.bottom button:hover {
+  transform: scale(1.05);
+}
+
+/* Character selection: legacy CharacterSelection, a bare column on the left. */
+.selection {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: var(--z-selection);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 10px 10px var(--side);
+  box-sizing: content-box;
+  animation: fadeRight var(--dur-drawer) ease-out;
+}
+.selectionTitle {
+  color: var(--color-paper);
+  font-size: 26px;
+  line-height: 1.2;
+}
+/* legacy BackButton, over the right card while the selection is open */
+.back {
+  position: absolute;
+  top: 25px;
+  right: var(--side);
+  z-index: var(--z-top);
+  width: 40px;
+  height: 40px;
+  border: 3.5px solid var(--color-back-ring);
+  font-size: 22px;
+  animation: fade var(--dur-base) ease-out;
+}
+.back:hover {
+  border-color: white;
+}
+/* legacy CharacterSelectionList: 5 × 110px (4 under 1600px), rows of 140px */
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 110px);
+  grid-auto-rows: 140px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 6px;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+  scrollbar-width: none;
+}
+/* legacy CharacterCard */
+.pickCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  background: white;
+  color: var(--color-ink);
+  text-shadow: none;
+  box-shadow: 0 0 3px 2px transparent;
+  transition: var(--dur-base);
+}
+.cardTop {
+  display: flex;
+  justify-content: center;
+  height: 85%;
+  overflow: hidden;
+  border-radius: 4px 4px 25% 0;
+  background: var(--color-rarity-4);
+}
+.pickCard[data-rarity="5"] .cardTop {
+  background: var(--color-rarity-5);
+}
+.cardImg {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  transition: transform var(--dur-base);
+  -webkit-user-drag: none;
+}
+.cardElement {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 2px var(--color-scrim));
+}
+.cardLvl {
+  margin: auto 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  user-select: none;
+}
+.pickCard:hover {
+  box-shadow: 0 0 3px 2px white;
+  transform: scale(1.02);
+}
+.pickCard:active {
+  transform: translateY(2px);
+}
+.pickCard[aria-current="page"] {
+  box-shadow: 0 0 5px 2px white;
+  transform: scale(1.04);
+}
+/* legacy CharacterSelectionFilters: filter, sort, reverse */
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+  margin: 5px 0;
+  user-select: none;
+}
+.filterBtn {
+  display: grid;
+  place-items: center;
+  width: 10%;
+  min-width: 40px;
+  height: 30px;
+  border-radius: 10px;
+  background: white;
+  color: var(--color-ink);
+  text-shadow: none;
+  transition: var(--dur-fast);
+}
+.filterBtn[aria-pressed="true"],
+.filterBtn[aria-expanded="true"] {
+  background: var(--color-cream);
+  box-shadow: inset 0 0 0 2px var(--color-gold);
+}
+/* legacy TogglerWithList + ToggleList */
+.toggler {
+  position: relative;
+  width: 70%;
+  height: 30px;
+}
+.togglerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 0 10px;
+  border-radius: 20px;
+  background: white;
+  color: var(--color-ink-soft);
+  text-shadow: none;
+  font-size: 15px;
+}
+.togglerArrow {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  transition: transform var(--dur-base);
+}
+.togglerBtn[aria-expanded="true"] .togglerArrow {
+  transform: rotate(180deg);
+}
+.togglerList {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 4px;
+  border-radius: 15px;
+  background: var(--color-ink-soft);
+  text-shadow: none;
+  animation: fade var(--dur-base) ease;
+}
+.togglerList button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px;
+  border-radius: 15px;
+  color: var(--color-text-soft);
+  font-size: 15px;
+  transition: background var(--dur-fast);
+}
+.togglerList button:hover {
+  background: var(--color-hover);
+}
+.togglerList button[aria-pressed="true"] {
+  background: var(--color-selected);
+}
+.togglerCheck {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+}
+.togglerList button[aria-pressed="true"] .togglerCheck {
+  opacity: 1;
+}
+/* legacy CharacterFilterOptions: a drawer over the whole column, from the left */
+.filterDrawer {
+  position: absolute;
+  inset: 0 -10px 0 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 10px 0 0 var(--side);
+  background: var(--color-drawer);
+  text-shadow: none;
+  user-select: none;
+  animation: drawerIn var(--dur-drawer) ease both;
+}
+.filterScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 20px;
+}
+.filterTitle {
+  margin-bottom: 20px;
+  color: var(--color-khaki);
+  font-size: 30px;
+}
+.filterGroup {
+  min-width: 0;
+  margin: 0 0 30px;
+  border: 0;
+  padding: 0;
+}
+.filterGroup legend {
+  margin-bottom: 10px;
+  color: var(--color-legend);
+  font-family: sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+.filterOptions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 10px;
+}
+.filterOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 10px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 2px;
+  background: var(--color-drawer-option);
+  font-size: 17px;
+  white-space: nowrap;
+  transition: var(--dur-fast);
+}
+.radio {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 50%;
+  transition: var(--dur-fast);
+}
+.radio::after {
+  content: "";
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  transition: var(--dur-fast);
+}
+.filterOption[aria-pressed="true"] .radio::after {
+  background: var(--color-hairline);
+}
+@media (hover: hover) {
+  .filterOption:hover {
+    background: var(--color-option-hover);
+    color: var(--color-ink);
+  }
+  .filterOption:hover .radio {
+    border-color: var(--color-ink);
+  }
+  .filterOption:hover[aria-pressed="true"] .radio::after {
+    background: var(--color-ink);
+  }
+}
+/* legacy RoundedButtonWithCircle */
+.confirm {
+  /* icon pinned left, label centred across the whole pill */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  align-self: center;
+  width: 80%;
+  height: 45px;
+  margin: 10px 0;
+  padding: 0 15px;
+  border: 1px solid var(--color-outline);
+  border-radius: 50px;
+  opacity: 0.5;
+  font-size: 20px;
+  transition: var(--dur-base);
+}
+.confirmIcon {
+  justify-self: start;
+  position: relative;
+  z-index: 0;
+  color: var(--color-gold-bright);
+  font-size: 20px;
+}
+.confirmIcon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 50%;
+  background: black;
+  opacity: 0.5;
+  transform: scale(1.7);
+  transition: var(--dur-base);
+}
+.confirm:hover {
+  opacity: 1;
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+.confirm:hover .confirmIcon::after {
+  opacity: 0.7;
+}
+/* legacy CharacterSelectedFilters: a grey strip over the grid, above the bar */
+.chosen {
+  margin: 0;
+  border: 0;
+  min-width: 0;
+  position: absolute;
+  right: 10px;
+  bottom: 52px;
+  left: var(--side);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 20px;
+  background: var(--color-chips);
+  animation: fadeDown var(--dur-base) ease-out;
+}
+.chosenList {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chip {
+  flex-shrink: 0;
+  padding: 0 5px;
+  border-radius: 12px;
+  background: var(--color-chip);
+  color: black;
+  font-size: 17px;
+  white-space: nowrap;
+  transition: var(--dur-fast);
+}
+.chosenClear {
+  flex-shrink: 0;
+  margin-left: 10px;
+  padding: 1px 9px;
+  border-radius: 12px;
+  background: var(--color-chip-clear);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Right column: legacy ContentRight + AttributesContent. */
+.right {
+  position: absolute;
+  top: calc(var(--top) + 10px);
+  right: var(--side);
+  z-index: var(--z-hud);
+  width: 300px;
+  max-height: calc(100dvh - var(--top) - 40px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  animation: fadeLeft var(--dur-slow) ease-out;
+}
+.card {
+  display: block;
+  padding: 10px;
+  line-height: normal;
+  border-radius: 10px;
+  background: var(--color-glass);
+  backdrop-filter: blur(2px);
+}
+.name {
+  font-size: 28px;
+  line-height: 1.2;
+}
+.star {
+  width: 16px;
+  height: 16px;
+  filter: drop-shadow(0 0 2px var(--color-shadow));
+}
+.level {
+  font-size: 21px;
+  text-shadow: 0 0 10px var(--color-glow-white);
+}
+.bar {
+  height: 3px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+.barLevel {
+  background: var(--color-level);
+  box-shadow: 0 0 8px var(--color-level);
+}
+.barFriendship {
+  width: 90%;
+  background: var(--color-friendship);
+  box-shadow: 0 0 8px var(--color-friendship);
+}
+.stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px;
+  border-radius: 5px;
+}
+.stat:nth-child(odd) {
+  background: var(--color-stripe);
+}
+.detailsBtn {
+  padding: 8px;
+  border-radius: 20px;
+  background: var(--color-btn-glass);
+  font-size: 16px;
+  transition: var(--dur-base);
+}
+.detailsBtn:hover {
+  background: var(--color-press);
+}
+.description {
+  display: block;
+  max-height: 90px;
+  overflow-y: auto;
+  padding: 0 5px;
+  font-size: 14px;
+  word-break: break-word;
+}
+.wardrobe {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  text-shadow: none;
+}
+.wardrobe:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+.skill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background var(--dur-fast);
+}
+.skill:hover {
+  background: var(--color-hover-strong);
+}
+
+/* legacy ModalWindow */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--color-backdrop);
+  animation: fade var(--dur-fast) ease-out;
+}
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 85dvh;
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--color-modal);
+  color: white;
+  box-shadow: 0 10px 40px var(--color-scrim);
+}
+
+@keyframes nudge {
+  50% {
+    translate: 4px;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    translate: 0 -12px;
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    translate: -16px 0;
+  }
+}
+@keyframes drawerIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+}
+@keyframes fadeLeft {
+  from {
+    opacity: 0;
+    translate: 16px 0;
+  }
+}
+
+/* legacy: small landscape screens shrink the menu */
+@media (max-width: 915px) and (orientation: landscape) {
+  .menu {
+    font-size: 15px;
+  }
+}
+
+/* Legacy DetailsInfo inside ModalWindow (modalStyle 'details'). */
+.detailsBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  justify-content: center;
+  background: var(--color-backdrop-strong);
+  color: white;
+  animation: fade var(--dur-base) ease-out;
+}
+.details {
+  width: 50%;
+  height: 100%;
+  overflow-y: auto;
+  line-height: normal;
+}
+.detailsGroup {
+  margin: 10px 0;
+}
+.detailsGroup h2 {
+  font-size: 17px;
+  color: var(--color-muted);
+}
+.detailsGroup dl {
+  border-radius: 15px;
+}
+.detailsRow {
+  display: flex;
+  align-items: center;
+  padding: 7px;
+  font-size: 16px;
+}
+.detailsRow:nth-child(odd) {
+  background: var(--color-stripe-light);
+}
+.detailsRow:nth-child(even) {
+  background: var(--color-stripe-dark);
+}
+.detailsRow:first-child {
+  border-radius: 5px 5px 0 0;
+}
+.detailsRow:last-child {
+  border-radius: 0 0 5px 5px;
+}
+.detailsRow dt {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.detailsRow dt > * {
+  width: 19px;
+  flex-shrink: 0;
+}
+.detailsRow dd {
+  margin-left: auto;
+  margin-right: 70px;
+}
+@media (max-height: 820px) and (orientation: landscape) {
+  .details {
+    width: 70%;
+  }
+  .detailsGroup h2 {
+    font-size: 15px;
+  }
+  .detailsRow {
+    font-size: 13px;
+  }
+}
+@media (orientation: portrait) {
+  .details {
+    width: 82%;
+  }
+  .detailsGroup h2 {
+    font-size: 12px;
+  }
+  .detailsRow {
+    font-size: 11px;
+  }
+  .detailsRow dt > * {
+    width: 16px;
+  }
+  .detailsRow dd {
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 1600px) {
+  .grid {
+    grid-template-columns: repeat(4, 110px);
+  }
+}
+
+/* Phones: menu as a pill bar under the top bar, panel as a bottom sheet. */
+@media (max-width: 767px) {
+  .screen {
+    --top: 56px;
+    --side: 8px;
+  }
+  .topBarInner {
+    gap: 8px;
+  }
+  .info {
+    width: auto;
+    max-width: 30%;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .infoGlyph {
+    font-size: 20px;
+  }
+  .stripNav {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+  .strip {
+    gap: 8px;
+  }
+  .grid {
+    grid-template-columns: repeat(4, 70px);
+    grid-auto-rows: 80px;
+    gap: 8px;
+  }
+  .cardElement {
+    font-size: 16px;
+  }
+  .cardLvl {
+    font-size: 10px;
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-width: 2px;
+  }
+  .menu {
+    top: calc(var(--top) + 8px);
+    right: var(--side);
+    font-size: 15px;
+  }
+  .menu ul {
+    display: flex;
+    gap: 4px;
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 4px;
+    border-radius: 10px;
+    background: var(--color-scrim);
+    scrollbar-width: none;
+  }
+  .rhombus {
+    padding: 4px 8px 4px 2px;
+  }
+  .rhombus::after {
+    top: calc(50% - 7.5px);
+  }
+  .bottom {
+    top: calc(var(--top) + 56px);
+    bottom: auto;
+    padding: 4px 8px;
+  }
+  .right {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-height: 45dvh;
+    padding: 0 8px 8px;
+  }
+  .right .card {
+    background: var(--color-scrim);
+    backdrop-filter: blur(4px);
+  }
+  .name {
+    font-size: 24px;
+  }
+  .level {
+    font-size: 17px;
+  }
+  .stat {
+    font-size: 14px;
+  }
+  .selection {
+    padding-left: 16px;
+  }
+  .selectionTitle {
+    font-size: 20px;
+  }
+  .back {
+    top: 10px;
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+  .filterDrawer {
+    padding-left: 16px;
+  }
+  .filterTitle {
+    margin-bottom: 10px;
+    font-size: 22px;
+  }
+  .filterGroup legend {
+    font-size: 15px;
+  }
+  .filterOption {
+    height: 40px;
+    font-size: 14px;
+  }
+  .chosen {
+    bottom: 40px;
+  }
+  .chip,
+  .chosenClear {
+    font-size: 13px;
+  }
+  .confirm {
+    height: 35px;
+    font-size: 14px;
+  }
+  .toggler,
+  .filterBtn {
+    height: 26px;
+  }
+  .togglerBtn,
+  .togglerList button {
+    font-size: 12px;
+  }
+}

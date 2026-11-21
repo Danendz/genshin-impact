@@ -1,0 +1,93 @@
+{
+  "response": 200,
+  "data": {
+    "types": {
+      "forgingOre": "Forging Ore",
+      "cookingIngredient": "Cooking Ingredient",
+      "material": "Material",
+      "localSpecialtyMondstadt": "Local Specialty (Mondstadt)",
+      "localSpecialtyLiyue": "Local Specialty (Liyue)",
+      "localSpecialtyInazuma": "Local Specialty (Inazuma)",
+      "localSpecialtySumeru": "Local Specialty (Sumeru)",
+      "localSpecialtyFontaine": "Local Specialty (Fontaine)",
+      "localSpecialtyNatlan": "Local Specialty (Natlan)",
+      "localSpecialtyNodKrai": "Local Specialty (Nod-Krai)",
+      "localSpecialtySnezhnaya": "Local Specialty (Snezhnaya)",
+      "potion": "Potion",
+      "characterLevelUpMaterial": "Character Level-Up Material",
+      "characterAscensionMaterial": "Character Ascension Material",
+      "weaponAscensionMaterial": "Weapon Ascension Material",
+      "characterandWeaponEnhancementMaterial": "Character and Weapon Enhancement Material",
+      "questItem": "Quest Item",
+      "characterTalentMaterial": "Character Talent Material",
+      "adventureItem": "Adventure Item",
+      "consumable": "Consumable",
+      "gadget": "Gadget",
+      "systemAccess": "System Access",
+      "increasesFriendship": "Increases Friendship",
+      "specialCurrency": "Special Currency",
+      "commonCurrency": "Common Currency",
+      "superiorVoucher": "Superior Voucher",
+      "commonVoucher": "Common Voucher",
+      "limitedWishingItem": "Limited Wishing Item",
+      "wishingItem": "Wishing Item",
+      "cityStatesSigil": "City States Sigil",
+      "characterEXPMaterial": "Character EXP Material",
+      "weaponEnhancementMaterial": "Weapon Enhancement Material",
+      "challengeResultItem": "Challenge Result Item",
+      "windGlider": "Wind Glider"
+    },
+    "items": {
+      "102": {
+        "id": 102,
+        "name": "Adventure EXP",
+        "type": "systemAccess",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_102",
+        "rank": 3,
+        "route": "Adventure EXP"
+      },
+      "105": {
+        "id": 105,
+        "name": "Companionship EXP",
+        "type": "increasesFriendship",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_105",
+        "rank": 3,
+        "route": "Companionship EXP"
+      },
+      "106": {
+        "id": 106,
+        "name": "Original Resin",
+        "type": "challengeResultItem",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_106",
+        "rank": 3,
+        "route": "Original Resin"
+      },
+      "201": {
+        "id": 201,
+        "name": "Primogem",
+        "type": "specialCurrency",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_201",
+        "rank": 5,
+        "route": "Primogem"
+      },
+      "202": {
+        "id": 202,
+        "name": "Mora",
+        "type": "commonCurrency",
+        "recipe": null,
+        "mapMark": true,
+        "icon": "UI_ItemIcon_202",
+        "rank": 3,
+        "route": "Mora"
+      }
+    }
+  }
+}

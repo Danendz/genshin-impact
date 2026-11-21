@@ -1,0 +1,37 @@
+name: gi
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: gi
+      POSTGRES_PASSWORD: gi
+      POSTGRES_DB: gi
+    ports:
+      - "54329:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gi -d gi"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  s3:
+    image: chrislusf/seaweedfs:4.40
+    command: server -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json -ip.bind=0.0.0.0 -dir=/data
+    ports:
+      - "9000:8333"
+    volumes:
+      - s3data:/data
+      - ./infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://localhost:9333/cluster/status || exit 1",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+volumes:
+  pgdata:
+  s3data:

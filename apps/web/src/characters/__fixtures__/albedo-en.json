@@ -1,0 +1,1919 @@
+{
+  "id": "10000038",
+  "rarity": 5,
+  "element": "geo",
+  "weaponType": "sword",
+  "region": "MONDSTADT",
+  "birthday": [9, 13],
+  "releaseAt": "2020-12-21T22:00:00.000Z",
+  "locale": "en",
+  "name": "Albedo",
+  "title": "Kreideprinz",
+  "description": "A genius known as the Kreideprinz, he is the Chief Alchemist and Captain of the Investigation Team of the Knights of Favonius.",
+  "details": {
+    "talents": [
+      {
+        "icon": "Skill_A_01",
+        "name": "Favonius Bladework - Weiss",
+        "type": 0,
+        "promote": {
+          "1": {
+            "level": 1,
+            "params": [
+              0.367392, 0.367392, 0.474548, 0.49751, 0.620739, 0.473, 0.602, 20,
+              0.639324, 1.278377, 1.596762, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "2": {
+            "level": 2,
+            "params": [
+              0.397296, 0.397296, 0.513174, 0.538005, 0.671265, 0.5115, 0.651,
+              20, 0.691362, 1.382431, 1.726731, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0
+            ],
+            "coinCost": 12500,
+            "costItems": {
+              "104307": 3,
+              "112008": 6
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "3": {
+            "level": 3,
+            "params": [
+              0.4272, 0.4272, 0.5518, 0.5785, 0.72179, 0.55, 0.7, 20, 0.7434,
+              1.486485, 1.8567, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 17500,
+            "costItems": {
+              "104308": 2,
+              "112009": 3
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "4": {
+            "level": 4,
+            "params": [
+              0.46992, 0.46992, 0.60698, 0.63635, 0.793969, 0.605, 0.77, 20,
+              0.81774, 1.635134, 2.04237, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0
+            ],
+            "coinCost": 25000,
+            "costItems": {
+              "104308": 4,
+              "112009": 4
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "5": {
+            "level": 5,
+            "params": [
+              0.499824, 0.499824, 0.645606, 0.676845, 0.844494, 0.6435, 0.819,
+              20, 0.869778, 1.739187, 2.172339, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0
+            ],
+            "coinCost": 30000,
+            "costItems": {
+              "104308": 6,
+              "112009": 6
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "6": {
+            "level": 6,
+            "params": [
+              0.534, 0.534, 0.68975, 0.723125, 0.902238, 0.6875, 0.875, 20,
+              0.92925, 1.858106, 2.320875, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0
+            ],
+            "coinCost": 37500,
+            "costItems": {
+              "104308": 9,
+              "112009": 9
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "7": {
+            "level": 7,
+            "params": [
+              0.580992, 0.580992, 0.750448, 0.78676, 0.981634, 0.748, 0.952, 20,
+              1.011024, 2.02162, 2.525112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0
+            ],
+            "coinCost": 120000,
+            "costItems": {
+              "104309": 4,
+              "112010": 4,
+              "113013": 1
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "8": {
+            "level": 8,
+            "params": [
+              0.627984, 0.627984, 0.811146, 0.850395, 1.061031, 0.8085, 1.029,
+              20, 1.092798, 2.185133, 2.729349, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0
+            ],
+            "coinCost": 260000,
+            "costItems": {
+              "104309": 6,
+              "112010": 6,
+              "113013": 1
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "9": {
+            "level": 9,
+            "params": [
+              0.674976, 0.674976, 0.871844, 0.91403, 1.140428, 0.869, 1.106, 20,
+              1.174572, 2.348646, 2.933586, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0
+            ],
+            "coinCost": 450000,
+            "costItems": {
+              "104309": 12,
+              "112010": 9,
+              "113013": 2
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "10": {
+            "level": 10,
+            "params": [
+              0.72624, 0.72624, 0.93806, 0.98345, 1.227043, 0.935, 1.19, 20,
+              1.26378, 2.527025, 3.15639, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0
+            ],
+            "coinCost": 700000,
+            "costItems": {
+              "104309": 16,
+              "104319": 1,
+              "112010": 12,
+              "113013": 2
+            },
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "11": {
+            "level": 11,
+            "params": [
+              0.78498, 0.78498, 1.013932, 1.062994, 1.326289, 1.010625, 1.28625,
+              20, 1.352988, 2.705403, 3.379194, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "12": {
+            "level": 12,
+            "params": [
+              0.854058, 0.854058, 1.103159, 1.156537, 1.443003, 1.09956,
+              1.39944, 20, 1.442196, 2.883781, 3.601998, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "13": {
+            "level": 13,
+            "params": [
+              0.923136, 0.923136, 1.192385, 1.250081, 1.559716, 1.188495,
+              1.51263, 20, 1.531404, 3.062159, 3.824802, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "14": {
+            "level": 14,
+            "params": [
+              0.992215, 0.992215, 1.281611, 1.343624, 1.676429, 1.27743,
+              1.62582, 20, 1.620612, 3.240537, 4.047606, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "15": {
+            "level": 15,
+            "params": [
+              1.067573, 1.067573, 1.378948, 1.445671, 1.803753, 1.37445, 1.7493,
+              20, 1.70982, 3.418915, 4.27041, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "1-Hit DMG|{param1:F1P}",
+              "2-Hit DMG|{param2:F1P}",
+              "3-Hit DMG|{param3:F1P}",
+              "4-Hit DMG|{param4:F1P}",
+              "5-Hit DMG|{param5:F1P}",
+              "Charged Attack DMG|{param6:F1P}+{param7:F1P}",
+              "Charged Attack Stamina Cost|{param8:F1}",
+              "Plunge DMG|{param9:F1P}",
+              "Low/High Plunge DMG|{param10:P}/{param11:P}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          }
+        },
+        "skillId": 10386,
+        "description": "<color=#FFD780FF>Normal Attack</color>\\nPerforms up to 5 rapid strikes.\\n\\n<color=#FFD780FF>Charged Attack</color>\\nConsumes a certain amount of Stamina to unleash 2 rapid sword strikes.\\n\\n<color=#FFD780FF>Plunging Attack</color>\\nPlunges from mid-air to strike the ground below, damaging opponents along the path and dealing AoE DMG upon impact.",
+        "advancedProps": [
+          {
+            "name": "Normal Attack 1-Hit",
+            "bluntAttack": false,
+            "internalCooldown": {
+              "tag": {
+                "span": "7",
+                "text": "Normal Attack"
+              },
+              "type": {
+                "span": "7",
+                "text": "2.5s/3 Hits"
+              }
+            },
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "38.43",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Normal Attack 2-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "38.43",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Normal Attack 3-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "49.68",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Normal Attack 4-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "52.11",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Normal Attack 5-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "64.98",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Air",
+              "verticalForce": "800",
+              "horizontalForce": "655"
+            }
+          },
+          {
+            "name": "Charged Attack 1-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "60",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Light",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Charged Attack 2-Hit",
+            "bluntAttack": false,
+            "internalCooldown": "rowspan",
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "60",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Air",
+              "verticalForce": "800",
+              "horizontalForce": "655"
+            }
+          },
+          {
+            "name": "Plunging Attack Collision",
+            "bluntAttack": false,
+            "internalCooldown": null,
+            "elementalGaugeTheory": "0U",
+            "interruptionResistance": "25",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Light",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          },
+          {
+            "name": "Low Plunge",
+            "bluntAttack": true,
+            "internalCooldown": null,
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "100",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "800"
+            }
+          },
+          {
+            "name": "High Plunge",
+            "bluntAttack": true,
+            "internalCooldown": null,
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "150",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Air",
+              "verticalForce": "800",
+              "horizontalForce": "0"
+            }
+          }
+        ],
+        "descriptionBuff": null,
+        "linkedConstellations": null
+      },
+      {
+        "icon": "Skill_S_Albedo_01",
+        "name": "Abiogenesis: Solar Isotoma",
+        "type": 0,
+        "promote": {
+          "1": {
+            "level": 1,
+            "params": [
+              1.304, 1.336, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "2": {
+            "level": 2,
+            "params": [
+              1.4018, 1.4362, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 12500,
+            "costItems": {
+              "104307": 3,
+              "112008": 6
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "3": {
+            "level": 3,
+            "params": [
+              1.4996, 1.5364, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 17500,
+            "costItems": {
+              "104308": 2,
+              "112009": 3
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "4": {
+            "level": 4,
+            "params": [
+              1.63, 1.67, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0
+            ],
+            "coinCost": 25000,
+            "costItems": {
+              "104308": 4,
+              "112009": 4
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "5": {
+            "level": 5,
+            "params": [
+              1.7278, 1.7702, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 30000,
+            "costItems": {
+              "104308": 6,
+              "112009": 6
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "6": {
+            "level": 6,
+            "params": [
+              1.8256, 1.8704, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 37500,
+            "costItems": {
+              "104308": 9,
+              "112009": 9
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "7": {
+            "level": 7,
+            "params": [
+              1.956, 2.004, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 120000,
+            "costItems": {
+              "104309": 4,
+              "112010": 4,
+              "113013": 1
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "8": {
+            "level": 8,
+            "params": [
+              2.0864, 2.1376, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 260000,
+            "costItems": {
+              "104309": 6,
+              "112010": 6,
+              "113013": 1
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "9": {
+            "level": 9,
+            "params": [
+              2.2168, 2.2712, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 450000,
+            "costItems": {
+              "104309": 12,
+              "112010": 9,
+              "113013": 2
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "10": {
+            "level": 10,
+            "params": [
+              2.3472, 2.4048, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 700000,
+            "costItems": {
+              "104309": 16,
+              "104319": 1,
+              "112010": 12,
+              "113013": 2
+            },
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "11": {
+            "level": 11,
+            "params": [
+              2.4776, 2.5384, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "12": {
+            "level": 12,
+            "params": [
+              2.608, 2.672, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "13": {
+            "level": 13,
+            "params": [
+              2.771, 2.839, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "14": {
+            "level": 14,
+            "params": [
+              2.934, 3.006, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "15": {
+            "level": 15,
+            "params": [
+              3.097, 3.173, 30, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Skill DMG|{param1:P}",
+              "Transient Blossom DMG|{param2:P} DEF",
+              "Duration|{param3:F1}s",
+              "Skill CD|{param4:F1}s",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          }
+        },
+        "skillId": 10387,
+        "cooldown": 4,
+        "description": "Albedo creates a Solar Isotoma using alchemy, which deals <color=#FFE699FF>AoE Geo DMG</color> on appearance.\\n\\n<color=#FFD780FF>Solar Isotoma</color>\\nhas the following properties:\\n·When opponents within the Solar Isotoma field take DMG, the Solar Isotoma will generate Transient Blossoms which deal <color=#FFE699FF>AoE Geo DMG</color>. DMG dealt scales off Albedo's DEF. \\n·Transient Blossoms can only be generated once every 2s.\\n·When a character is located at the locus of the Solar Isotoma, the Solar Isotoma will accumulate Geo power to form a crystallized platform that lifts the character up to a certain height. Only one crystallized platform can exist at a time.\\n·Solar Isotoma is considered a <color=#FFE699FF>Geo construct</color>. Only one Solar Isotoma created by Albedo himself can exist at a time. \\n\\n<color=#FFD780FF>Hold</color> to designate the location of the skill.\\n\\n<i>This Geo bloom has an unusual property mirrored in the aim of alchemy. To rise from the earth, soar into the sky, and become the sun.</i>",
+        "advancedProps": [
+          {
+            "name": "Skill DMG",
+            "bluntAttack": true,
+            "internalCooldown": null,
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "50",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "800"
+            }
+          },
+          {
+            "name": "Transient Blossom DMG",
+            "bluntAttack": true,
+            "internalCooldown": {
+              "tag": {
+                "span": null,
+                "text": "Elemental Skill"
+              },
+              "type": {
+                "span": null,
+                "text": "2.5s/3 Hits"
+              }
+            },
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "50",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Shake",
+              "verticalForce": "0",
+              "horizontalForce": "0"
+            }
+          }
+        ],
+        "descriptionBuff": null,
+        "linkedConstellations": {
+          "prop": [
+            {
+              "id": 0,
+              "type": "normal"
+            },
+            {
+              "id": 1,
+              "type": "normal"
+            },
+            {
+              "id": 2,
+              "type": "level"
+            }
+          ],
+          "isLevelIncluded": true
+        }
+      },
+      {
+        "cost": 40,
+        "icon": "Skill_E_Albedo_01",
+        "name": "Rite of Progeniture: Tectonic Tide",
+        "type": 1,
+        "promote": {
+          "1": {
+            "level": 1,
+            "params": [
+              3.672, 0.72, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "2": {
+            "level": 2,
+            "params": [
+              3.9474, 0.774, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 12500,
+            "costItems": {
+              "104307": 3,
+              "112008": 6
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "3": {
+            "level": 3,
+            "params": [
+              4.2228, 0.828, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 17500,
+            "costItems": {
+              "104308": 2,
+              "112009": 3
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "4": {
+            "level": 4,
+            "params": [
+              4.59, 0.9, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0
+            ],
+            "coinCost": 25000,
+            "costItems": {
+              "104308": 4,
+              "112009": 4
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "5": {
+            "level": 5,
+            "params": [
+              4.8654, 0.954, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 30000,
+            "costItems": {
+              "104308": 6,
+              "112009": 6
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "6": {
+            "level": 6,
+            "params": [
+              5.1408, 1.008, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 37500,
+            "costItems": {
+              "104308": 9,
+              "112009": 9
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "7": {
+            "level": 7,
+            "params": [
+              5.508, 1.08, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 120000,
+            "costItems": {
+              "104309": 4,
+              "112010": 4,
+              "113013": 1
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "8": {
+            "level": 8,
+            "params": [
+              5.8752, 1.152, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 260000,
+            "costItems": {
+              "104309": 6,
+              "112010": 6,
+              "113013": 1
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "9": {
+            "level": 9,
+            "params": [
+              6.2424, 1.224, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 450000,
+            "costItems": {
+              "104309": 12,
+              "112010": 9,
+              "113013": 2
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "10": {
+            "level": 10,
+            "params": [
+              6.6096, 1.296, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": 700000,
+            "costItems": {
+              "104309": 16,
+              "104319": 1,
+              "112010": 12,
+              "113013": 2
+            },
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "11": {
+            "level": 11,
+            "params": [
+              6.9768, 1.368, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "12": {
+            "level": 12,
+            "params": [
+              7.344, 1.44, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "13": {
+            "level": 13,
+            "params": [
+              7.803, 1.53, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "14": {
+            "level": 14,
+            "params": [
+              8.262, 1.62, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          },
+          "15": {
+            "level": 15,
+            "params": [
+              8.721, 1.71, 12, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0
+            ],
+            "coinCost": null,
+            "costItems": null,
+            "description": [
+              "Burst DMG|{param1:P}",
+              "Fatal Blossom DMG|{param2:F1P} each",
+              "CD|{param3:F1}s",
+              "Energy Cost|{param4:I}",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              "",
+              ""
+            ]
+          }
+        },
+        "skillId": 10388,
+        "cooldown": 12,
+        "description": "Under Albedo's command, Geo crystals surge and burst forth, dealing <color=#FFE699FF>AoE Geo DMG</color> in front of him.\\nIf a Solar Isotoma created by Albedo himself is on the field, 7 Fatal Blossoms will be generated in the Solar Isotoma field, bursting violently into bloom and dealing <color=#FFE699FF>AoE Geo DMG</color>.\\n\\nTectonic Tide DMG and Fatal Blossom DMG will not generate Transient Blossoms.\\n\\n<i>Under the Kreideprinz's command, the tectonic tide of creation seethes into life.</i>",
+        "advancedProps": [
+          {
+            "name": "Activation Knockback",
+            "bluntAttack": false,
+            "internalCooldown": {
+              "tag": {
+                "span": null,
+                "text": "—"
+              },
+              "type": {
+                "span": null,
+                "text": "—"
+              }
+            },
+            "elementalGaugeTheory": "—",
+            "interruptionResistance": "400",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "800"
+            }
+          },
+          {
+            "name": "Elemental Burst DMG",
+            "bluntAttack": true,
+            "internalCooldown": null,
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "100",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Heavy",
+              "verticalForce": "0",
+              "horizontalForce": "800"
+            }
+          },
+          {
+            "name": "Fatal Blossom DMG",
+            "bluntAttack": true,
+            "internalCooldown": {
+              "tag": {
+                "span": null,
+                "text": "Elemental Burst"
+              },
+              "type": {
+                "span": null,
+                "text": "2.5s/3 Hits"
+              }
+            },
+            "elementalGaugeTheory": "1U",
+            "interruptionResistance": "30",
+            "interruptionResistanceStagger": {
+              "staggerLevel": "Light",
+              "verticalForce": "0",
+              "horizontalForce": "200"
+            }
+          }
+        ],
+        "descriptionBuff": null,
+        "linkedConstellations": {
+          "prop": [
+            {
+              "id": 1,
+              "type": "normal"
+            },
+            {
+              "id": 4,
+              "type": "level"
+            }
+          ],
+          "isLevelIncluded": true
+        }
+      },
+      {
+        "icon": "UI_Talent_S_Albedo_05",
+        "name": "Calcite Might",
+        "type": 2,
+        "skillId": 3821,
+        "description": "Transient Blossoms generated by <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> deal 25% more DMG to opponents whose HP is below 50%.",
+        "descriptionBuff": "Transient Blossoms generated by the Elemental Skill <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> deal 25% more DMG to opponents whose HP is below 50%.\\nAdditionally, if there is a Silver Isotoma on the field that was created by Albedo, the DMG dealt will also be increased by 240% of Albedo's DEF.",
+        "linkedConstellations": null
+      },
+      {
+        "icon": "UI_Talent_S_Albedo_06",
+        "name": "Homuncular Nature",
+        "type": 2,
+        "skillId": 3822,
+        "description": "Using <color=#FFD780FF>Rite of Progeniture: Tectonic Tide</color> increases the Elemental Mastery of nearby party members by 125 for 10s.",
+        "descriptionBuff": "",
+        "linkedConstellations": null
+      },
+      {
+        "icon": "UI_Talent_Combine_Weapon_Double",
+        "name": "Flash of Genius",
+        "type": 2,
+        "skillId": 3823,
+        "description": "When Albedo crafts Weapon Ascension Materials, he has a 10% chance to receive double the product.",
+        "descriptionBuff": "",
+        "linkedConstellations": null
+      },
+      {
+        "icon": "UI_Talent_S_Albedo_07",
+        "name": "Witch's Eve Rite: Book of Blinding Light",
+        "type": 2,
+        "skillId": 3851,
+        "description": "After completing <color=#FFD780FF>Witch's Homework: Beyond the Lesson</color>, Albedo will become a <color=#FFD780FF>Hexerei</color> character. When the party includes at least 2 Hexerei characters, you will gain the <color=#FFD780FF>Hexerei: Secret Rite</color> effect, which enhances Hexerei characters.\\n\\n<color=#FFD780FF>Hexerei: Secret Rite</color>\\n· When Albedo hits an opponent with his Elemental Skill within 20s of using an Elemental Skill, it will generate a <color=#FFD780FF>Silver Isotoma</color> near the opponent that lasts for 10s. When there are no Solar Isotomas created by Albedo on the field, and as long as Albedo is not downed, a single Silver Isotoma will begin generating Transient Blossoms, just as Solar Isotomas would. There can be up to two Silver Isotomas generated by Albedo on the field at any one time.\\n· After creating a Solar Isotoma, nearby party members' Normal Attack, Charged Attack, Plunging Attack, Elemental Skill, and Elemental Burst DMG are increased by 4% for every 1,000 DEF Albedo has for 20s. The maximum increase that can be achieved this way is 12%.\\n· After generating a Silver Isotoma, nearby Hexerei party members' Normal Attack, Charged Attack, Plunging Attack, Elemental Skill, and Elemental Burst DMG are increased by 10% for every 1,000 DEF Albedo has for 20s. The maximum increase that can be achieved this way is 30%.",
+        "descriptionBuff": "",
+        "linkedConstellations": null
+      }
+    ],
+    "constellations": [
+      {
+        "id": 0,
+        "icon": "UI_Talent_S_Albedo_01",
+        "name": "Flower of Eden",
+        "talentId": 381,
+        "extraData": null,
+        "description": "Transient Blossoms generated by Albedo's <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> regenerate 1.2 Energy for Albedo.",
+        "descriptionBuff": "Transient Blossoms generated by Albedo's Elemental Skill <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> regenerate 1.2 Energy for Albedo.\\nAdditionally, the use of Albedo's Elemental Skill <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> also increases his DEF by 50% for the next 20s."
+      },
+      {
+        "id": 1,
+        "icon": "UI_Talent_S_Albedo_02",
+        "name": "Opening of Phanerozoic",
+        "talentId": 382,
+        "extraData": null,
+        "description": "Transient Blossoms generated by <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> grant Albedo Fatal Reckoning for 30s:\\n·Unleashing <color=#FFD780FF>Rite of Progeniture: Tectonic Tide</color> consumes all stacks of Fatal Reckoning. Each stack of Fatal Reckoning consumed increases the DMG dealt by Fatal Blossoms and Rite of Progeniture: Tectonic Tide's burst DMG by 30% of Albedo's DEF.\\n·This effect stacks up to 4 times.",
+        "descriptionBuff": "Transient Blossoms generated by the Elemental Skill <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> grant Albedo Fatal Reckoning for 30s:\\n· Unleashing the Elemental Burst <color=#FFD780FF>Rite of Progeniture: Tectonic Tide</color> consumes all stacks of Fatal Reckoning. Each stack of Fatal Reckoning consumed increases the DMG dealt by Fatal Blossoms and Rite of Progeniture: Tectonic Tide's burst DMG by 30% of Albedo's DEF.\\n· This effect stacks up to 4 times.\\n\\nAdditionally, when Albedo is not on the field and when the stack count of Fatal Reckoning reaches 4, all stacks of Fatal Reckoning are consumed. This generates 3 Fatal Blossoms near your active character, which will violently bloom to deal <color=#FFE699FF>AoE Geo DMG</color> equal to 300% of Albedo's DEF, DMG that will be considered Elemental Burst DMG. Where the Passive Talent {LINK#P382201}<color=#FFD780FF>Homuncular Nature</color>{/LINK} has also been unlocked, the Elemental Mastery of nearby party members will also increase by 125 for 10s."
+      },
+      {
+        "id": 2,
+        "icon": "UI_Talent_U_Albedo_01",
+        "name": "Grace of Helios",
+        "talentId": 383,
+        "extraData": {
+          "addTalentExtraLevel": {
+            "extraLevel": 3,
+            "talentType": "AvatarSkill",
+            "talentIndex": 2
+          }
+        },
+        "description": "Increases the Level of <color=#FFD780FF>Abiogenesis: Solar Isotoma</color> by 3.\\nMaximum upgrade level is 15.",
+        "descriptionBuff": null
+      },
+      {
+        "id": 3,
+        "icon": "UI_Talent_S_Albedo_03",
+        "name": "Descent of Divinity",
+        "talentId": 384,
+        "extraData": null,
+        "description": "Active party members within the Solar Isotoma field have their Plunging Attack DMG increased by 30%.",
+        "descriptionBuff": "Active party members within the Solar Isotoma field have their Plunging Attack DMG increased by 30%.\\nAdditionally, when a nearby active party member jumps near a Silver Isotoma, the Silver Isotoma will be destroyed while greatly increasing the height of that jump, and for the next 3s, said character will deal 30% more Plunging Attack ground impact DMG. This effect is removed 0.1s after Plunging Attack ground impact DMG is dealt."
+      },
+      {
+        "id": 4,
+        "icon": "UI_Talent_U_Albedo_02",
+        "name": "Tide of Hadean",
+        "talentId": 385,
+        "extraData": {
+          "addTalentExtraLevel": {
+            "extraLevel": 3,
+            "talentType": "AvatarSkill",
+            "talentIndex": 9
+          }
+        },
+        "description": "Increases the Level of <color=#FFD780FF>Rite of Progeniture: Tectonic Tide</color> by 3.\\nMaximum upgrade level is 15.",
+        "descriptionBuff": null
+      },
+      {
+        "id": 5,
+        "icon": "UI_Talent_S_Albedo_04",
+        "name": "Dust of Purification",
+        "talentId": 386,
+        "extraData": null,
+        "description": "Active party members within the Solar Isotoma field who are protected by a shield created by Crystallize, or when Moondrifts are present within the Solar Isotoma field, have their DMG increased by 17%.",
+        "descriptionBuff": "Current active party members within the Solar Isotoma field who are protected by a Shield created by Crystallize, or when Moondrifts are present within the Solar Isotoma field, have their DMG increased by 17%.\\nAdditionally, use of the Elemental Burst <color=#FFD780FF>Rite of Progeniture: Tectonic Tide</color> destroys all Silver Isotomas present on the field, and whenever a Silver Isotoma is destroyed this way the current instance of Elemental Burst will also be considered as having cleared 4 Fatal Reckoning stacks from the Constellation {LINK#TE382}<color=#FFD780FF>Opening of Phanerozoic</color>{/LINK}. This increases the DMG dealt by Fatal Blossom by 250% of Albedo's DEF for the next 20s."
+      }
+    ]
+  },
+  "media": {
+    "icon": "https://gi-bucket.danendz.com/character/10000038/icon-b2621904f8a3.webp",
+    "gacha_splash": "https://gi-bucket.danendz.com/character/10000038/gacha_splash-d0c88ebb2087.webp"
+  },
+  "skillIcons": {
+    "Skill_A_01": "https://m/skill_icon/Skill_A_01/icon.webp"
+  }
+}

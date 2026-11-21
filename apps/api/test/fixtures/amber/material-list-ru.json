@@ -1,0 +1,93 @@
+{
+  "response": 200,
+  "data": {
+    "types": {
+      "forgingOre": "Руда для ковки",
+      "cookingIngredient": "Кухонный ингредиент",
+      "material": "Материал",
+      "localSpecialtyMondstadt": "Диковинка Мондштадта",
+      "localSpecialtyLiyue": "Диковинка Ли Юэ",
+      "localSpecialtyInazuma": "Диковинка Инадзумы",
+      "localSpecialtySumeru": "Диковинка Сумеру",
+      "localSpecialtyFontaine": "Диковинка Фонтейна",
+      "localSpecialtyNatlan": "Диковинка Натлана",
+      "localSpecialtyNodKrai": "Диковинка Нод-Края",
+      "localSpecialtySnezhnaya": "Диковинка Снежной",
+      "potion": "Зелье",
+      "characterLevelUpMaterial": "Развитие персонажа",
+      "characterAscensionMaterial": "Возвышение персонажей",
+      "weaponAscensionMaterial": "Возвышение оружия",
+      "characterandWeaponEnhancementMaterial": "Улучшение персонажей/оружия",
+      "questItem": "Предмет задания",
+      "characterTalentMaterial": "Таланты персонажей",
+      "adventureItem": "Предмет приключения",
+      "consumable": "Расходный предмет",
+      "gadget": "Инструмент",
+      "systemAccess": "Системный доступ",
+      "increasesFriendship": "Укрепление дружбы",
+      "specialCurrency": "Особая валюта",
+      "commonCurrency": "Обычная валюта",
+      "superiorVoucher": "Элитный билет обмена",
+      "commonVoucher": "Обычный билет обмена",
+      "limitedWishingItem": "Лимитированный предмет Молитвы",
+      "wishingItem": "Предмет молитвы",
+      "cityStatesSigil": "Символ города",
+      "characterEXPMaterial": "Опыт персонажа",
+      "weaponEnhancementMaterial": "Улучшение оружия",
+      "challengeResultItem": "Расчётный предмет испытания",
+      "windGlider": "Воздушный планер"
+    },
+    "items": {
+      "102": {
+        "id": 102,
+        "name": "Опыт приключений",
+        "type": "systemAccess",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_102",
+        "rank": 3,
+        "route": "Adventure EXP"
+      },
+      "105": {
+        "id": 105,
+        "name": "Опыт дружбы",
+        "type": "increasesFriendship",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_105",
+        "rank": 3,
+        "route": "Companionship EXP"
+      },
+      "106": {
+        "id": 106,
+        "name": "Первородная смола",
+        "type": "challengeResultItem",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_106",
+        "rank": 3,
+        "route": "Original Resin"
+      },
+      "201": {
+        "id": 201,
+        "name": "Камень Истока",
+        "type": "specialCurrency",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_201",
+        "rank": 5,
+        "route": "Primogem"
+      },
+      "202": {
+        "id": 202,
+        "name": "Мора",
+        "type": "commonCurrency",
+        "recipe": null,
+        "mapMark": true,
+        "icon": "UI_ItemIcon_202",
+        "rank": 3,
+        "route": "Mora"
+      }
+    }
+  }
+}

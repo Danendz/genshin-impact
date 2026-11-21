@@ -1,0 +1,984 @@
+/* Home screen, ported from legacy components/HomeUI and assets/Styles/HomeUI */
+
+/* ---- locked controls ---- */
+
+.locked {
+  position: relative;
+  cursor: not-allowed;
+}
+
+.locked > :not(.lock) {
+  opacity: 0.5;
+}
+
+.lock {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  color: var(--color-cream);
+  filter: drop-shadow(0 0 2px var(--color-shadow));
+  pointer-events: none;
+}
+
+/* ---- tile grid: HomeMainNavigationItems.vue ---- */
+
+.tilesWrap {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 15px;
+  user-select: none;
+}
+
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100px;
+  padding: 5px;
+  text-align: center;
+  background-color: var(--color-tile);
+  transition: transform var(--dur-base);
+}
+
+.tileArt {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center 10px;
+  background-size: 60px;
+}
+
+.caption {
+  position: relative;
+  z-index: 2;
+  color: var(--color-tile-text);
+}
+
+/* glow and bouncing marker on hover, unlocked tiles only */
+a.tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  box-shadow: 0 0 5px 4px var(--color-tile-glow);
+  transition: opacity var(--dur-base);
+}
+
+a.tile::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(45deg, transparent 50%, var(--color-chip) 50%);
+  filter: drop-shadow(0 0 2px var(--color-chip));
+  transform: rotate(135deg);
+  opacity: 0;
+}
+
+a.tile:hover {
+  transform: scale(1.05) translateZ(0);
+}
+
+a.tile:hover::before {
+  opacity: 1;
+}
+
+a.tile:hover::after {
+  opacity: 1;
+  animation: tileMarker 1s infinite linear;
+}
+
+a.tile:active {
+  background-color: var(--color-tile-active);
+}
+
+a.tile:active .caption {
+  color: var(--color-tile);
+}
+
+a.tile:focus-visible {
+  outline: 2px solid var(--color-tile-glow);
+  outline-offset: 2px;
+}
+
+@keyframes tileMarker {
+  50% {
+    translate: 0 3px;
+  }
+}
+
+@media (max-width: 915px) {
+  .tiles {
+    gap: 5px;
+    padding: 7px 5px 10px;
+  }
+
+  .tile {
+    height: 70px;
+  }
+
+  .tileArt {
+    background-size: 40px;
+  }
+
+  .caption {
+    font-size: 10px;
+  }
+}
+
+@media (orientation: portrait) {
+  .tilesWrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .tiles {
+    max-width: 500px;
+    padding: 10px;
+  }
+
+  .tile,
+  a.tile::before {
+    border-radius: 10px;
+  }
+
+  .tile {
+    background-color: var(--color-tile-soft);
+  }
+
+  .tileArt {
+    background-size: 40px;
+  }
+}
+
+/* ---- background: HomeBackground.vue ---- */
+
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--color-night);
+}
+
+.backgroundLayer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--dur-bg) ease;
+}
+
+.backgroundLayer[data-visible="true"] {
+  opacity: 1;
+}
+
+/* ---- profile card: HomeMainUserInfo/** ---- */
+
+.card {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.namecard {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-namecard-dim);
+  pointer-events: none;
+}
+
+.cardBody {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px;
+  font-weight: 100;
+}
+
+.cardLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+
+.avatar {
+  width: 120px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 4px solid var(--color-white);
+  border-radius: 50%;
+  background: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar:active:not(:disabled) {
+  opacity: 0.7;
+}
+
+.avatar:disabled {
+  cursor: default;
+}
+
+.avatarPlaceholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.uid {
+  position: relative;
+  margin-top: 15px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: var(--color-profile-pill);
+  color: var(--color-white);
+  font-size: 15px;
+  text-align: center;
+  user-select: none;
+}
+
+.copied {
+  position: absolute;
+  top: calc(100% + 15px);
+  left: 50%;
+  z-index: var(--z-top);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--color-ink);
+  color: var(--color-gold);
+  font-size: 13px;
+  white-space: nowrap;
+  translate: -50% 0;
+  animation: popIn var(--dur-fast) ease-out;
+}
+
+.copied::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  border: 6px solid transparent;
+  border-bottom-color: var(--color-ink);
+  translate: -50% 0;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    translate: -50% -4px;
+  }
+}
+
+.copy {
+  margin-top: 10px;
+  color: var(--color-white);
+  font-size: 17px;
+  opacity: 0.5;
+  transition: opacity var(--dur-fast);
+}
+
+.copy:hover {
+  opacity: 0.8;
+}
+
+.copy:active {
+  opacity: 1;
+}
+
+.cardRight {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 70%;
+  color: var(--color-profile-text);
+}
+
+.banded,
+.name {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--color-profile-band) 10%,
+    var(--color-profile-band) 90%,
+    transparent 100%
+  );
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-profile-name);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.editBtn,
+.infoBtn {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-profile-button);
+  color: var(--color-ink);
+}
+
+.editBtn {
+  width: 25px;
+  height: 25px;
+  border-radius: 3px;
+}
+
+.infoBtn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.editBtn svg {
+  width: 20px;
+}
+
+.infoBtn svg {
+  width: 14px;
+}
+
+.editBtn .lock,
+.infoBtn .lock {
+  top: -6px;
+  right: -6px;
+  width: 11px;
+  height: 11px;
+}
+
+.signature {
+  height: 40px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 17px;
+}
+
+.row:last-child {
+  font-size: 15px;
+}
+
+.value {
+  margin-left: auto;
+  margin-right: 5px;
+}
+
+.exp {
+  display: flex;
+  gap: 4px;
+}
+
+.exp > img {
+  width: 25px;
+  height: 25px;
+}
+
+.exp > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.expText {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.exp progress {
+  width: 100%;
+  height: 10px;
+  accent-color: var(--color-gold);
+}
+
+@media (max-width: 915px) {
+  .cardBody {
+    gap: 5px;
+    max-width: 500px;
+    padding: 5px 10px 5px 5px;
+  }
+
+  .avatar {
+    width: 80px;
+  }
+
+  .uid {
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  .copy {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .copied {
+    top: calc(100% + 10px);
+    font-size: 10px;
+  }
+
+  .cardRight {
+    gap: 3px;
+  }
+
+  .name {
+    font-size: 14px;
+  }
+
+  .editBtn {
+    width: 15px;
+    height: 15px;
+  }
+
+  .editBtn svg {
+    width: 13px;
+  }
+
+  .infoBtn {
+    width: 13px;
+    height: 13px;
+  }
+
+  .infoBtn svg {
+    width: 9px;
+  }
+
+  .signature {
+    height: 25px;
+  }
+
+  .signature,
+  .row,
+  .row:last-child {
+    font-size: 12px;
+  }
+
+  .expText {
+    font-size: 8px;
+  }
+
+  .exp progress {
+    height: 8px;
+  }
+
+  .exp > img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (orientation: portrait) {
+  .card {
+    width: 95%;
+    max-width: 450px;
+    margin-top: 5px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .namecard {
+    opacity: 0.95;
+  }
+}
+
+/* ---- avatar picker: HomeModals/ChangeAvatar ---- */
+
+.pickerTitle {
+  margin-bottom: 12px;
+  color: var(--color-gold);
+  font-size: 20px;
+}
+
+.picker {
+  display: flex;
+  gap: 10px;
+  height: min(60dvh, 420px);
+}
+
+.avatarList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 90px);
+  grid-auto-rows: 90px;
+  gap: 5px;
+  justify-content: space-evenly;
+  width: 60%;
+  padding: 10px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: var(--color-well);
+}
+
+.avatarOption {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  transition: var(--dur-fast);
+}
+
+.avatarOption::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--color-hairline);
+  scale: 0.92;
+}
+
+.avatarOption:hover,
+.avatarOption[data-current="true"] {
+  border-color: var(--color-cream);
+}
+
+.avatarOption[aria-pressed="true"] {
+  background: var(--color-cream);
+}
+
+.avatarImg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: scale var(--dur-fast);
+}
+
+.avatarOption:hover .avatarImg {
+  scale: 1.06;
+}
+
+.avatarPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 40%;
+}
+
+.avatarPreviewImg {
+  width: min(150px, 100%);
+  aspect-ratio: 1;
+  margin-top: 10%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-hairline);
+}
+
+.avatarName {
+  width: 100%;
+  padding: 16px 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-band-strong) 50%,
+    transparent 100%
+  );
+  color: var(--color-gold);
+  font-size: 20px;
+  text-align: center;
+  user-select: none;
+}
+
+.useBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 32px 8px 10px;
+  border-radius: 30px;
+  background: var(--color-cream);
+  color: var(--color-ink-dark);
+  font-size: 16px;
+  transition: opacity var(--dur-fast);
+}
+
+.useBtn::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 4px solid var(--color-gold);
+  border-radius: 50%;
+}
+
+.useBtn:active {
+  opacity: 0.7;
+}
+
+@media (orientation: portrait) {
+  .picker {
+    flex-direction: column;
+    height: 70dvh;
+  }
+
+  .avatarList {
+    width: 100%;
+    height: 60%;
+  }
+
+  .avatarPreview {
+    width: 100%;
+    height: 40%;
+  }
+
+  .avatarPreviewImg {
+    width: 80px;
+    margin: 0;
+  }
+
+  .avatarName {
+    padding: 10px 0;
+  }
+}
+
+/* ---- settings: HomeSettings.vue, HomeSettingsOption.vue ---- */
+
+.settings {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background: var(--color-settings);
+  animation: fadeIn var(--dur-base) ease;
+}
+
+.settingsHeader {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background: var(--color-settings-header);
+}
+
+.settingsHeader > div {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1600px;
+  padding: 10px;
+  color: var(--color-settings-title);
+}
+
+.settingsIcon {
+  width: 35px;
+  height: 35px;
+}
+
+.settingsHeader h2 {
+  margin-left: 10px;
+}
+
+.settingsClose {
+  margin-left: auto;
+  margin-right: 5px;
+}
+
+.settingsMain {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1500px;
+  height: 100%;
+  padding: 0 10px;
+}
+
+.settingsSections {
+  width: 20%;
+  padding-left: 2px;
+  font-size: 20px;
+}
+
+.settingsContent {
+  width: 100%;
+  padding-right: 10px;
+}
+
+.settingsContent h3 {
+  margin-bottom: 10px;
+  color: var(--color-white);
+  font-size: 20px;
+}
+
+.settingsOption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  background: var(--color-dock);
+  color: var(--color-white);
+  font-size: 18px;
+}
+
+.settingsChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.settingsChoices button {
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: var(--color-hover);
+  color: var(--color-menu-text);
+  transition: background var(--dur-fast);
+}
+
+.settingsChoices button:hover {
+  background: var(--color-selected);
+}
+
+.settingsChoices button[aria-pressed="true"] {
+  background: var(--color-cream);
+  color: var(--color-ink-dark);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 915px) {
+  .settings {
+    gap: 15px;
+  }
+
+  .settingsHeader > div {
+    padding: 6px;
+  }
+
+  .settingsIcon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .settingsSections,
+  .settingsContent h3 {
+    font-size: 17px;
+  }
+
+  .settingsOption {
+    font-size: 14px;
+  }
+}
+
+@media (orientation: portrait) {
+  .settingsMain {
+    flex-direction: column;
+    padding: 0 5px;
+  }
+
+  .settingsSections {
+    width: 100%;
+    padding: 5px;
+    border-radius: 10px;
+    background: var(--color-glass);
+  }
+
+  .settingsContent {
+    padding-right: 0;
+  }
+}
+
+/* ---- layout: HomeLayout.vue, HomeMenuOptions.vue, HomeMain.vue ---- */
+
+.page {
+  min-height: 100dvh;
+}
+
+.home {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100dvh;
+  animation: fadeIn var(--dur-base) ease;
+}
+
+.options {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-width: 50px;
+  padding: 0 15px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-options) 0%,
+    var(--color-options-fade) 100%
+  );
+  color: var(--color-options-icon);
+  animation: optionsInLandscape 0.45s ease both;
+}
+
+.option {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  transition: color var(--dur-fast);
+}
+
+.option svg {
+  width: 100%;
+  height: 100%;
+}
+
+button.option:not([aria-disabled]):hover {
+  color: var(--color-white);
+}
+
+.option .lock {
+  top: -4px;
+  right: -6px;
+}
+
+.main {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  max-height: 100dvh;
+  background: linear-gradient(
+    to bottom,
+    var(--color-home-panel) 0%,
+    var(--color-home-panel-fade) 100%
+  );
+  animation: mainInLandscape 0.4s ease 0.15s both;
+}
+
+@keyframes optionsInLandscape {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+}
+
+@keyframes mainInLandscape {
+  from {
+    opacity: 0;
+    transform: translateX(-80px);
+  }
+}
+
+@keyframes optionsInPortrait {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+}
+
+@keyframes mainInPortrait {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@media (max-width: 915px) and (orientation: landscape) {
+  .options {
+    gap: 10px;
+    min-width: 20px;
+    padding: 0 5px;
+  }
+
+  .option {
+    width: 30px;
+    height: 30px;
+  }
+
+  .main {
+    max-width: 45%;
+  }
+}
+
+@media (max-width: 667px) and (orientation: landscape) {
+  .main {
+    max-width: 50%;
+  }
+}
+
+@media (orientation: portrait) {
+  .home {
+    flex-direction: column-reverse;
+  }
+
+  .options {
+    flex-direction: row;
+    gap: 13px;
+    padding: 5px 0;
+    background: var(--color-options-soft);
+    animation-name: optionsInPortrait;
+  }
+
+  .option {
+    width: 30px;
+    height: 30px;
+  }
+
+  .main {
+    align-items: center;
+    max-width: 100%;
+    height: 100%;
+    background: none;
+    animation-name: mainInPortrait;
+  }
+}

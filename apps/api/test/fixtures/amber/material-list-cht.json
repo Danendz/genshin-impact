@@ -1,0 +1,93 @@
+{
+  "response": 200,
+  "data": {
+    "types": {
+      "forgingOre": "鍛造用礦石",
+      "cookingIngredient": "食材",
+      "material": "素材",
+      "localSpecialtyMondstadt": "蒙德區域特產",
+      "localSpecialtyLiyue": "璃月區域特產",
+      "localSpecialtyInazuma": "稻妻區域特產",
+      "localSpecialtySumeru": "須彌區域特產",
+      "localSpecialtyFontaine": "楓丹區域特產",
+      "localSpecialtyNatlan": "納塔區域特產",
+      "localSpecialtyNodKrai": "挪德卡萊區域特產",
+      "localSpecialtySnezhnaya": "至冬區域特產",
+      "potion": "藥劑",
+      "characterLevelUpMaterial": "角色培養素材",
+      "characterAscensionMaterial": "角色突破素材",
+      "weaponAscensionMaterial": "武器突破素材",
+      "characterandWeaponEnhancementMaterial": "角色與武器培養素材",
+      "questItem": "任務道具",
+      "characterTalentMaterial": "角色天賦素材",
+      "adventureItem": "冒險道具",
+      "consumable": "消耗品",
+      "gadget": "小道具",
+      "systemAccess": "系統開放",
+      "increasesFriendship": "好感成長",
+      "specialCurrency": "稀有貨幣",
+      "commonCurrency": "通用貨幣",
+      "superiorVoucher": "高級兌換券",
+      "commonVoucher": "普通兌換券",
+      "limitedWishingItem": "限定祈願道具",
+      "wishingItem": "祈願道具",
+      "cityStatesSigil": "七國徽印",
+      "characterEXPMaterial": "角色經驗素材",
+      "weaponEnhancementMaterial": "武器強化素材",
+      "challengeResultItem": "挑戰結算道具",
+      "windGlider": "風之翼"
+    },
+    "items": {
+      "102": {
+        "id": 102,
+        "name": "冒險閱歷",
+        "type": "systemAccess",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_102",
+        "rank": 3,
+        "route": "Adventure EXP"
+      },
+      "105": {
+        "id": 105,
+        "name": "好感經驗",
+        "type": "increasesFriendship",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_105",
+        "rank": 3,
+        "route": "Companionship EXP"
+      },
+      "106": {
+        "id": 106,
+        "name": "原粹樹脂",
+        "type": "challengeResultItem",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_106",
+        "rank": 3,
+        "route": "Original Resin"
+      },
+      "201": {
+        "id": 201,
+        "name": "原石",
+        "type": "specialCurrency",
+        "recipe": null,
+        "mapMark": false,
+        "icon": "UI_ItemIcon_201",
+        "rank": 5,
+        "route": "Primogem"
+      },
+      "202": {
+        "id": 202,
+        "name": "摩拉",
+        "type": "commonCurrency",
+        "recipe": null,
+        "mapMark": true,
+        "icon": "UI_ItemIcon_202",
+        "rank": 3,
+        "route": "Mora"
+      }
+    }
+  }
+}

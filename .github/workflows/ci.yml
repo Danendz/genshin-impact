@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [remake, master]
+  # every PR, whatever its base branch
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: gi
+          POSTGRES_PASSWORD: gi
+          POSTGRES_DB: gi
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U gi -d gi"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://gi:gi@localhost:54329/gi
+      TEST_DATABASE_URL: postgres://gi:gi@localhost:54329/gi_test
+      R2_ENDPOINT: http://localhost:9000
+      R2_ACCESS_KEY_ID: gi-local
+      R2_SECRET_ACCESS_KEY: gi-local-secret
+      R2_BUCKET: gi-media
+      MEDIA_PUBLIC_URL: http://localhost:9000/gi-media
+      ADMIN_TOKEN: dev-admin-token-change-me-0123456789abcdef
+      CORS_ORIGIN: http://localhost:5173
+      PORT: "8787"
+      S3_INTEGRATION: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      # Service containers cannot take a command or mount repo files, so
+      # SeaweedFS is started here, after checkout.
+      - name: Start SeaweedFS (S3)
+        run: |
+          docker run -d --name seaweedfs -p 9000:8333 \
+            -v "${{ github.workspace }}/infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro" \
+            chrislusf/seaweedfs:4.40 \
+            server -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json -ip.bind=0.0.0.0 -dir=/data
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      - name: Wait for SeaweedFS S3 port
+        run: |
+          for i in $(seq 1 60); do
+            if curl -s -o /dev/null http://localhost:9000; then
+              echo "S3 is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "SeaweedFS S3 did not become ready" >&2
+          docker logs seaweedfs || true
+          exit 1
+
+      - name: Migrate
+        run: pnpm --filter @gi/db db:migrate
+
+      - run: pnpm test

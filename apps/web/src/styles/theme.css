@@ -1,0 +1,151 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+@theme static {
+  /* Vision colors: legacy src/assets/Styles/_vision_colors.scss */
+  --color-anemo: #27ae60;
+  --color-pyro: #ff7979;
+  --color-geo: #f39c12;
+  --color-hydro: #54a0ff;
+  --color-cryo: #82ccdd;
+  --color-electro: #9b59b6;
+  --color-dendro: #228b4e;
+
+  /* Rarity colors: legacy _rarity_colors.scss (5 and 4 stars); 1-3 are new neutral-to-cool tones */
+  --color-rarity-1: #9ca3af;
+  --color-rarity-2: #2ecc71;
+  --color-rarity-3: #3498db;
+  --color-rarity-4: #8e44ad;
+  --color-rarity-5: #e67e22;
+
+  /* Surfaces and text, from the legacy SCSS */
+  --color-night: #0d1018;
+  --color-night-soft: #1d2333;
+  --color-ink: #3b4255;
+  --color-ink-soft: #4a5267;
+  --color-modal: rgb(59 66 85 / 0.95);
+  --color-paper: #dfdcd1;
+  --color-paper-light: #e0ddd4;
+  --color-cream: #ece5d8;
+  --color-gold: #d3bc8e;
+  --color-gold-bright: #f0c879;
+  --color-khaki: #c9c2a6;
+  --color-muted: #b9b9b9;
+  --color-menu-text: #d4d4d4;
+  --color-rhombus: #a3a3a3;
+  --color-outline: #b1b1b1;
+  --color-text-soft: #e2e2e2;
+  --color-legend: rgb(255 255 255 / 0.6);
+  --color-element-fallback: #5b6170;
+
+  /* Accents */
+  --color-level: #3ed2ff;
+  --color-friendship: #fc8ef3;
+  --color-avatar-ring: #6c9992;
+  --color-avatar-ring-active: #7ec8b9;
+  --color-avatar-fill: #5bb8d9;
+  --color-back-ring: #abbcc6;
+  --color-glow: rgb(160 175 190 / 0.6);
+
+  /* Filter drawer and chips */
+  --color-drawer: rgb(38 50 64 / 0.994);
+  --color-drawer-option: #25313f;
+  --color-chips: rgb(202 202 202 / 0.82);
+  --color-chip: rgb(255 255 255 / 0.97);
+  --color-chip-clear: #4b4a48;
+
+  /* Translucent layers over art */
+  --color-dim: rgb(0 0 0 / 0.12);
+  --color-bar: rgb(0 0 0 / 0.21);
+  --color-dock: rgb(0 0 0 / 0.36);
+  --color-glass: rgb(0 0 0 / 0.16);
+  --color-scrim: rgb(0 0 0 / 0.5);
+  --color-shadow: rgb(0 0 0 / 0.4);
+  --color-press: rgb(0 0 0 / 0.19);
+  --color-backdrop: rgb(0 0 0 / 0.55);
+  --color-backdrop-strong: rgb(0 0 0 / 0.767);
+  --color-stripe: rgb(0 0 0 / 0.1);
+  --color-stripe-dark: rgb(0 0 0 / 0.075);
+  --color-stripe-light: rgb(255 255 255 / 0.055);
+  --color-hairline: rgb(255 255 255 / 0.25);
+  --color-hover: rgb(255 255 255 / 0.1);
+  --color-hover-strong: rgb(255 255 255 / 0.12);
+  --color-selected: rgb(255 255 255 / 0.18);
+  --color-btn-glass: rgb(255 255 255 / 0.19);
+  --color-glow-white: rgb(255 255 255 / 0.38);
+  --color-option-hover: rgb(255 255 255 / 0.94);
+
+  /* Home screen: legacy HomeUI SCSS */
+  --color-tile: #51586b;
+  --color-tile-soft: rgb(81 88 107 / 0.78);
+  --color-tile-glow: #f7e4ba;
+  --color-tile-active: #faedd3;
+  --color-tile-text: #bdc1ca;
+  --color-home-panel: #e6e5d6;
+  --color-home-panel-fade: rgb(255 255 255 / 0.116);
+  --color-options: #4b5269;
+  --color-options-fade: rgb(75 82 105 / 0.38);
+  --color-options-soft: rgb(75 82 105 / 0.62);
+  --color-options-icon: #cfbc8f;
+  --color-profile-text: rgb(255 255 255 / 0.78);
+  --color-profile-name: #e9e6e6;
+  --color-profile-band: rgb(0 0 0 / 0.082);
+  --color-profile-pill: rgb(0 0 0 / 0.41);
+  --color-profile-button: #ebe6d6;
+  --color-namecard-dim: rgb(0 0 0 / 0.05);
+  --color-white: #fff;
+  --color-well: rgb(0 0 0 / 0.16);
+  --color-band-strong: rgb(0 0 0 / 0.27);
+  --color-ink-dark: #323646;
+  --color-settings: rgb(0 0 0 / 0.28);
+  --color-settings-header: rgb(0 0 0 / 0.39);
+  --color-settings-title: #c7b18c;
+
+  --font-genshin: "Genshin", system-ui, sans-serif;
+  --font-genshin-icon: "GenshinIcon";
+}
+
+:root {
+  /* legacy text shadow over art */
+  --text-shadow-hud:
+    0 0 1px rgb(0 0 0 / 0.32), 0 1px 2px rgb(0 0 0 / 0.22),
+    0 0 8px rgb(0 0 0 / 0.16);
+
+  /* motion */
+  --dur-fast: 0.2s;
+  --dur-base: 0.3s;
+  --dur-bounce: 0.35s;
+  --dur-drawer: 0.4s;
+  --dur-slow: 0.5s;
+  --dur-bg: 0.6s;
+  --ease-bounce: cubic-bezier(0.2, 1.4, 0.4, 1);
+
+  /* stacking */
+  --z-hud: 10;
+  --z-selection: 15;
+  --z-top: 20;
+  --z-modal: 50;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-genshin);
+    background-color: var(--color-paper);
+  }
+}
+
+/* one switch for every CSS animation and transition; JS motion checks the same query */
+@media (prefers-reduced-motion: reduce) {
+  /* biome-ignore-start lint/complexity/noImportantStyles: must beat component rules of any specificity */
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  /* biome-ignore-end lint/complexity/noImportantStyles: see above */
+}

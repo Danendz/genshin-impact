@@ -1,0 +1,39 @@
+{
+  "name": "@gi/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=../../.env src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "sync": "tsx --env-file-if-exists=../../.env src/sync/cli.ts",
+    "seed:site": "tsx --env-file-if-exists=../../.env src/site/seed-cli.ts",
+    "typecheck": "tsc --noEmit",
+    "models:sync": "tsx --env-file-if-exists=../../.env src/models-sync/cli.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1172.0",
+    "@gi/db": "workspace:*",
+    "@gi/models": "workspace:*",
+    "@gi/shared": "workspace:*",
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@hono/node-server": "^2.1.9",
+    "@hono/zod-validator": "^0.9.1",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.19",
+    "meshoptimizer": "1.3.0",
+    "postgres": "^4.1.1",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15"
+  },
+  "exports": {
+    "./app": "./src/app.ts"
+  }
+}
