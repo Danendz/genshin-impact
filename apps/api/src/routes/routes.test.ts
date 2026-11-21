@@ -263,6 +263,7 @@ describe('characters: models assets', () => {
       {
         modelSlug: 'diluc',
         variant: 'default',
+        kind: 'avatar',
         glbKey: 'model/diluc/default/model-1.glb',
         weaponKey: 'model/diluc/default/weapon-1.glb',
         toonPrefix: 'model/diluc/default/toon-1/',
@@ -302,6 +303,7 @@ describe('characters: models assets', () => {
     expect(body.models).toEqual([
       {
         variant: 'default',
+        kind: 'avatar',
         glb: 'http://media.test/gi-media/model/diluc/default/model-1.glb',
         weapon: 'http://media.test/gi-media/model/diluc/default/weapon-1.glb',
         props: null,

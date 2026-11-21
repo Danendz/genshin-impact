@@ -136,6 +136,7 @@ function fakeClient(
 
 const fakeBuild: typeof buildVariantFrom = async ({ variant, containers }) => ({
   variant,
+  kind: variant === 'default' ? 'avatar' : 'monster',
   glb: Uint8Array.of(
     variant.length,
     ...containers.map((c) => c.id.charCodeAt(0)),
@@ -202,6 +203,11 @@ describe('runModelsSync', () => {
     const main = models.find(
       (m) => m.modelSlug === 'citlali' && m.variant === 'default',
     )
+    expect(main?.kind).toBe('avatar')
+    expect(
+      models.find((m) => m.modelSlug === 'citlali' && m.variant === 'Outfit')
+        ?.kind,
+    ).toBe('monster')
     expect(main?.sourceHashes).toEqual([h('a'), h('b'), h('f')])
     expect(main?.glbKey).toMatch(
       /^model\/citlali\/default\/model-[0-9a-f]{12}\.glb$/,
@@ -318,6 +324,7 @@ describe('runModelsSync', () => {
       .from(characterModels)
       .where(eq(characterModels.variant, 'Outfit'))
     expect(extra?.glbKey).toBeNull()
+    expect(extra?.kind).toBeNull()
   })
 
   it('dry runs write nothing', async () => {

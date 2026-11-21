@@ -357,7 +357,7 @@ async function execute(
       built.glb.length +
       (built.weapons[0]?.length ?? 0) +
       (built.props?.length ?? 0)
-    return { ...keys, toonPrefix, clips: built.clips, bytes }
+    return { ...keys, kind: built.kind, toonPrefix, clips: built.clips, bytes }
   }
 
   async function saveModel(
@@ -370,6 +370,7 @@ async function execute(
       modelSlug: slug,
       variant,
       glbKey: out?.glbKey ?? null,
+      kind: out?.kind ?? null,
       weaponKey: out?.weaponKey ?? null,
       propsKey: out?.propsKey ?? null,
       toonPrefix: out?.toonPrefix ?? null,

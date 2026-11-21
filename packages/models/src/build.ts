@@ -6,6 +6,7 @@ import {
   type Container,
   decodeContainers,
   isCompressed,
+  type ModelKind,
 } from './assemble'
 import { parseGlb } from './glb'
 import { decompressMeshopt, mergeAnimations } from './merge-anim'
@@ -14,6 +15,7 @@ import { buildSidecar, type ToonSidecar } from './toon'
 export interface BuiltVariant {
   /** `default`, or the outfit/boss label from the source (`Outfit`, `Childe Boss`) */
   variant: string
+  kind: ModelKind
   /** `<Name>.glb`: the character with its animation library merged in */
   glb: Uint8Array
   /** default weapon first; meshopt-compressed, as the viewer loads them */
@@ -65,6 +67,7 @@ async function buildVariant(
   })
   return {
     variant,
+    kind: character.kind,
     glb,
     weapons: character.weapons.map((w) => w.glb),
     props: character.props?.glb,

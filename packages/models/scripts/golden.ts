@@ -74,7 +74,11 @@ async function check(
   const outDir = join(VIEWER, 'models', viewerName)
   if (!built)
     return existsSync(outDir) ? ['TS skipped a variant Python built'] : []
-  if (!existsSync(outDir)) return ['Python has no build for this variant']
+  if (!existsSync(outDir))
+    // Python only builds `Avatar_` rigs; NPC and boss forms are TS-only.
+    return built.kind === 'avatar'
+      ? ['Python has no build for this variant']
+      : []
 
   const ref = parseGlb(read(join(outDir, `${viewerName}.glb`)))
   const ours = parseGlb(built.glb)

@@ -16,7 +16,24 @@ export interface Part extends Glb {
   glb: Uint8Array
 }
 
+/** What the rig is, from its root node prefix. */
+export type ModelKind = 'avatar' | 'npc' | 'monster'
+
+const KIND_PREFIXES: [string, ModelKind][] = [
+  ['Avatar_', 'avatar'],
+  ['NPC_Avatar_', 'npc'],
+  ['Monster_', 'monster'],
+]
+
+export function modelKind(part: Glb): ModelKind | undefined {
+  for (const name of rootNames(part))
+    for (const [prefix, kind] of KIND_PREFIXES)
+      if (name.startsWith(prefix)) return kind
+  return undefined
+}
+
 export interface Assembled {
+  kind: ModelKind
   model: Part
   anim?: Part
   toon?: Part
@@ -36,8 +53,9 @@ export function rootNames(part: Glb): string[] {
 export const isCompressed = (part: Glb) =>
   (part.doc.extensionsUsed ?? []).includes(MESHOPT)
 
+/** A rigged character: playable (`Avatar_`), its NPC form or a boss (`Monster_`). */
 export const isCharacterModel = (part: Part) =>
-  part.role === 'model' && rootNames(part).some((n) => n.startsWith('Avatar_'))
+  part.role === 'model' && modelKind(part) !== undefined
 
 /** `Avatar_Girl_Catalyst_Citlali` -> `Citlali` */
 export function characterName(part: Glb): string | undefined {
@@ -78,7 +96,12 @@ export function assemble(parts: Part[]): Assembled | undefined {
     throw new BuildError(`several characters (${names})`)
   }
   const model = models[0] as Part
-  const out: Assembled = { model, weapons: [], notes: [] }
+  const out: Assembled = {
+    kind: modelKind(model) as ModelKind,
+    model,
+    weapons: [],
+    notes: [],
+  }
   for (const part of parts) {
     if (part === model) continue
     if (part.role === 'model') out.weapons.push(part)

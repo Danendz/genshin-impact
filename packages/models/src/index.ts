@@ -1,4 +1,4 @@
-export { BuildError, type Container } from './assemble'
+export { BuildError, type Container, type ModelKind } from './assemble'
 export {
   type BuildInput,
   type BuildOutput,

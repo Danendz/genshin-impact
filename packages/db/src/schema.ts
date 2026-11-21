@@ -46,6 +46,7 @@ export const syncStatusEnum = pgEnum('sync_status', [
   'partial',
   'failed',
 ])
+export const modelKindEnum = pgEnum('model_kind', ['avatar', 'npc', 'monster'])
 export const syncSourceEnum = pgEnum('sync_source', ['amber', 'models'])
 
 const updatedAt = () => timestamp({ withTimezone: true }).notNull().defaultNow()
@@ -160,6 +161,8 @@ export const characterModels = pgTable(
     variant: text().notNull(),
     /** null: the variant isn't a rigged character (skill props); kept so it isn't refetched */
     glbKey: text(),
+    /** playable character, its NPC form or a boss; null when not built */
+    kind: modelKindEnum(),
     weaponKey: text(),
     propsKey: text(),
     /** R2 prefix holding toon.json and its textures */

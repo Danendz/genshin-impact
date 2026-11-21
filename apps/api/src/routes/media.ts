@@ -1,4 +1,9 @@
-import { characterModels, type Db, mediaAssets } from '@gi/db'
+import {
+  characterModels,
+  type Db,
+  mediaAssets,
+  type modelKindEnum,
+} from '@gi/db'
 import { and, asc, eq, inArray } from 'drizzle-orm'
 import type { MediaStore } from '../media/store'
 
@@ -100,8 +105,11 @@ export async function loadModelAssets(
   }))
 }
 
+type ModelKind = (typeof modelKindEnum.enumValues)[number]
+
 export type CharacterModel = {
   variant: string
+  kind: ModelKind
   glb: string
   weapon: string | null
   props: string | null
@@ -130,6 +138,7 @@ export async function loadModels(
     )
     .map((r) => ({
       variant: r.variant,
+      kind: r.kind ?? 'avatar',
       glb: store.publicUrl(r.glbKey as string),
       weapon: url(r.weaponKey),
       props: url(r.propsKey),
