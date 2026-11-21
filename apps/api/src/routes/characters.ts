@@ -8,8 +8,8 @@ import { localeParam } from './locale'
 import {
   loadCharacterMedia,
   loadMedia,
+  loadModelAssets,
   loadModels,
-  loadSkowtAssets,
 } from './media'
 import { validate } from './validate'
 
@@ -104,11 +104,11 @@ export function charactersRoute(deps: { db: Db; store: MediaStore }) {
         .limit(1)
       if (!r || r.name == null) return c.json({ error: 'not_found' }, 404)
       const media = await loadCharacterMedia(db, store, [r.c])
-      const slug = r.c.skowtSlug
+      const slug = r.c.modelSlug
       const [models, assets] = slug
         ? await Promise.all([
             loadModels(db, store, slug),
-            loadSkowtAssets(db, store, slug),
+            loadModelAssets(db, store, slug),
           ])
         : [[], []]
       const icons = await loadMedia(

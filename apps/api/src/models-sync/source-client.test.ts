@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   cleanLabel,
   collectHashes,
-  createSkowtClient,
+  createSourceClient,
   extraLabel,
-} from './skowt-client'
+} from './source-client'
 
 const h = (c: string) => c.repeat(32)
 
@@ -73,7 +73,7 @@ describe('collectHashes', () => {
   })
 })
 
-describe('createSkowtClient', () => {
+describe('createSourceClient', () => {
   it('keeps cookies the API sets (signed links are bound to them)', async () => {
     const seen: (string | null)[] = []
     const fetchFn = (async (_url: string, init: RequestInit) => {
@@ -81,16 +81,17 @@ describe('createSkowtClient', () => {
       const res = new Response(
         JSON.stringify({ result: { data: { characters: [] } } }),
       )
-      res.headers.append('Set-Cookie', 'skowt_visit=abc; Path=/; HttpOnly')
+      res.headers.append('Set-Cookie', 'visit=abc; Path=/; HttpOnly')
       return res
     }) as unknown as typeof fetch
-    const client = createSkowtClient({
+    const client = createSourceClient({
+      baseUrl: 'https://source.test',
       fetch: fetchFn,
       cookie: 'session=s1',
       throttleMs: 0,
     })
     await client.characters()
     await client.characters()
-    expect(seen).toEqual(['session=s1', 'session=s1; skowt_visit=abc'])
+    expect(seen).toEqual(['session=s1', 'session=s1; visit=abc'])
   })
 })

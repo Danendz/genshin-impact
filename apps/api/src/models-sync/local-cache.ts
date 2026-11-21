@@ -4,7 +4,7 @@
 //   <Folder>/media/<Group>/<Stem>.png (original) or .webp (preview)
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { cleanLabel, type SkowtAsset } from './skowt-client'
+import { cleanLabel, type SourceAsset } from './source-client'
 
 const HASH_RE = /^[0-9a-f]{32}$/
 
@@ -25,7 +25,7 @@ export function mediaGroup(role: string): string {
 /** fetch_characters.py `collect_media`: asset id -> `<Group>/<Stem>` */
 export function mediaStems(
   characterName: string,
-  files: SkowtAsset[],
+  files: SourceAsset[],
 ): Map<string, string> {
   const out = new Map<string, string>()
   const used = new Set<string>()
@@ -50,8 +50,8 @@ export interface LocalCache {
   container(hash: string): Uint8Array | undefined
   image(
     characterName: string,
-    files: SkowtAsset[],
-    asset: SkowtAsset,
+    files: SourceAsset[],
+    asset: SourceAsset,
   ): { bytes: Uint8Array; original: boolean } | undefined
 }
 

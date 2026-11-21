@@ -5,7 +5,7 @@ import { decodeSkv, type SkvRole } from './skv'
 const MESHOPT = 'EXT_meshopt_compression'
 
 export interface Container {
-  /** skowt hash (the file name); containers are processed in id order */
+  /** container hash (the file name); containers are processed in id order */
   id: string
   bytes: Uint8Array
 }

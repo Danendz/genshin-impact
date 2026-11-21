@@ -19,27 +19,28 @@ pnpm --filter @gi/web dev   # web on :5173
 
 ## Deploy
 
-| Service  | Where                                              | Config                                                                                                   |
-| -------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| web      | Vercel, project root `apps/web`                    | [`apps/web/vercel.json`](apps/web/vercel.json)                                                           |
-| api      | Railway                                            | [`apps/api/railway.json`](apps/api/railway.json) (runs migrations as pre-deploy, health check `/health`) |
-| sync     | Railway cron, daily 04:00 UTC                      | [`apps/api/railway.sync.json`](apps/api/railway.sync.json)                                               |
-| models-sync | Railway cron, daily 05:00 UTC | [`apps/api/railway.models.json`](apps/api/railway.models.json) (skowt.cc 3D models + art) |
-| Postgres | Railway plugin                                     |                                                                                                          |
-| media    | Cloudflare R2 bucket `gi-media` with public access |                                                                                                          |
+| Service     | Where                                              | Config                                                                                                   |
+| ----------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| web         | Vercel, project root `apps/web`                    | [`apps/web/vercel.json`](apps/web/vercel.json)                                                           |
+| api         | Railway                                            | [`apps/api/railway.json`](apps/api/railway.json) (runs migrations as pre-deploy, health check `/health`) |
+| sync        | Railway cron, daily 04:00 UTC                      | [`apps/api/railway.sync.json`](apps/api/railway.sync.json)                                               |
+| models-sync | Railway cron, daily 05:00 UTC                      | [`apps/api/railway.models.json`](apps/api/railway.models.json) (3D models + art)                         |
+| Postgres    | Railway plugin                                     |                                                                                                          |
+| media       | Cloudflare R2 bucket `gi-media` with public access |                                                                                                          |
 
 Environment variables:
 
-| Variable                                                               | Used by   | Notes                                                         |
-| ---------------------------------------------------------------------- | --------- | ------------------------------------------------------------- |
-| `DATABASE_URL`                                                         | api, sync | Railway Postgres reference variable                           |
-| `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | api, sync | R2 S3 credentials, bucket `gi-media`                          |
-| `MEDIA_PUBLIC_URL`                                                     | api, sync | public base URL of the bucket                                 |
-| `ADMIN_TOKEN`                                                          | api       | bearer token for `/admin/*`, at least 32 characters           |
-| `SKOWT_COOKIE` | models-sync | optional signed-in skowt.cc `Cookie` header for full-size images; without it (or once it expires) previews are saved and upgraded later |
-| `CORS_ORIGIN`                                                          | api       | allowed web origin(s), comma-separated (Vercel URL, previews) |
-| `PORT`                                                                 | api       | injected by Railway                                           |
-| `VITE_API_URL`                                                         | web       | the API's public URL, set in Vercel                           |
+| Variable                                                               | Used by     | Notes                                                                                                                                                 |
+| ---------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                         | api, sync   | Railway Postgres reference variable                                                                                                                   |
+| `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | api, sync   | R2 S3 credentials, bucket `gi-media`                                                                                                                  |
+| `MEDIA_PUBLIC_URL`                                                     | api, sync   | public base URL of the bucket                                                                                                                         |
+| `ADMIN_TOKEN`                                                          | api         | bearer token for `/admin/*`, at least 32 characters                                                                                                   |
+| `MODELS_SOURCE_URL`                                                    | models-sync | origin of the models source site (API and packs on its `den.`/`pack.` subdomains)                                                                     |
+| `MODELS_COOKIE`                                                        | models-sync | optional signed-in `Cookie` header from the models source for full-size images; without it (or once it expires) previews are saved and upgraded later |
+| `CORS_ORIGIN`                                                          | api         | allowed web origin(s), comma-separated (Vercel URL, previews)                                                                                         |
+| `PORT`                                                                 | api         | injected by Railway                                                                                                                                   |
+| `VITE_API_URL`                                                         | web         | the API's public URL, set in Vercel                                                                                                                   |
 
 ### Railway setup
 
@@ -86,9 +87,9 @@ railway run --service api sh -c 'DATABASE_URL="$DATABASE_PUBLIC_URL" pnpm --filt
 
 Arguments are `<group> <dir>`: group `home-background`, and the directory holding the images (extensionless webp is fine; hidden and non-image files are skipped).
 
-### skowt models and art
+### 3D models and art
 
-`models:sync` (cron service `models-sync`) mirrors skowt.cc: it builds each character's 3D variants with `@gi/models` (a TypeScript port of the `models/` Python toolchain), uploads the GLBs, toon sidecars and the kept images (side/round/wish icons, outfits, sheets, art, kit icons) to R2, and records them in `character_models` and `media_assets`. Characters link to Amber through `characters.skowt_slug`. Only changed variants and images are rebuilt; objects are content-addressed and never deleted by the sync.
+`models:sync` (cron service `models-sync`) mirrors the models source (`MODELS_SOURCE_URL`): it builds each character's 3D variants with `@gi/models` (a TypeScript port of the `models/` Python toolchain), uploads the GLBs, toon sidecars and the kept images (side/round/wish icons, outfits, sheets, art, kit icons) to R2, and records them in `character_models` and `media_assets`. Characters link to Amber through `characters.model_slug`. Only changed variants and images are rebuilt; objects are content-addressed and never deleted by the sync.
 
 ```sh
 pnpm --filter @gi/api models:sync --only citlali,hu-tao          # some characters

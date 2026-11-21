@@ -1,4 +1,4 @@
-// skowt.cc 3D models + images -> R2 + Postgres.
+// Models source 3D models + images -> R2 + Postgres.
 //
 //   models:sync                          every character, only what changed
 //   models:sync --only citlali,hu-tao    some characters
@@ -11,13 +11,19 @@ import { createS3Store } from '../media/s3-store'
 import { findOrphans } from './gc'
 import { createLocalCache } from './local-cache'
 import { runModelsSync } from './run-models-sync'
-import { createSkowtClient } from './skowt-client'
+import { createSourceClient } from './source-client'
 
 function flag(name: string): string | undefined {
   const i = process.argv.indexOf(name)
   return i >= 0 ? process.argv[i + 1] : undefined
 }
 const has = (name: string) => process.argv.includes(name)
+
+function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) throw new Error(`${name} is not set`)
+  return value
+}
 
 async function main(): Promise<number> {
   const env = parseCliEnv(process.env)
@@ -42,8 +48,9 @@ async function main(): Promise<number> {
         db,
         sql,
         store,
-        client: createSkowtClient({
-          cookie: process.env.SKOWT_COOKIE || undefined,
+        client: createSourceClient({
+          baseUrl: requireEnv('MODELS_SOURCE_URL'),
+          cookie: process.env.MODELS_COOKIE || undefined,
         }),
         cache: cacheDir ? createLocalCache(cacheDir) : undefined,
         log,
@@ -72,7 +79,7 @@ async function main(): Promise<number> {
       console.log(`  failed ${f.id}: ${f.reason}`)
     if (result.authFailed)
       console.log(
-        '  SKOWT_COOKIE was rejected: previews were saved; refresh the cookie',
+        '  MODELS_COOKIE was rejected: previews were saved; refresh the cookie',
       )
     return result.status === 'failed' ? 1 : 0
   } finally {

@@ -1,32 +1,32 @@
-# Skowt Asset Pipeline: Implementation Plan
+# Models Asset Pipeline: Implementation Plan
 
 ## Context
 
-The remake (`~/Projects/genshin-impact/genshin-impact-vue`, branch `remake`) currently gets character data and images from Amber only. The Python toolchain in `~/Projects/genshin-impact/models` can pull 3D models and extra art from skowt.cc and build viewer-ready GLBs and toon sidecars. All 124 characters are already fetched locally (4.3 GB).
+The remake (`~/Projects/genshin-impact/genshin-impact-vue`, branch `remake`) currently gets character data and images from Amber only. The Python toolchain in `~/Projects/genshin-impact/models` can pull 3D models and extra art from the models source and build viewer-ready GLBs and toon sidecars. All 124 characters are already fetched locally (4.3 GB).
 
 Goal:
 1. Port the Python build pipeline to TypeScript, checked against Python output with golden tests.
 2. Do a one-time bulk upload to R2 from the local folders.
-3. Run a daily Railway cron that discovers new or changed skowt characters, fetches, builds and uploads only what changed, and records every asset in Postgres so the UI can connect them.
+3. Run a daily Railway cron that discovers new or changed source characters, fetches, builds and uploads only what changed, and records every asset in Postgres so the UI can connect them.
 
 Decisions already made in the grilling session:
-- Amber stays the source for splash, namecard and the existing icon/splash/namecard kinds; it is equal or better there (gacha splash 2048 vs skowt 1430).
-- From skowt we take:
+- Amber stays the source for splash, namecard and the existing icon/splash/namecard kinds; it is equal or better there (gacha splash 2048 vs source 1430).
+- From source we take:
   - icons: `icon`, `side_icon`, `round_icon`, `wish_icon`, `outfit_icon`
   - character sheets and art
   - outfit splash
   - kit icons
-- TCG art and skowt namecards are skipped.
+- TCG art and source namecards are skipped.
 - 3D upload: per variant (default plus each rigged outfit), the merged `<Name>.glb`, `-weapon.glb`, `-props.glb` and the toon sidecar. Raw `decoded/` files and `*-uncompressed.glb` are not uploaded.
 - Backdrops (3 files) are uploaded once as site assets, byte-for-byte, because `palette.webp` is a data texture.
-- Assets are linked to characters through `characters.skowt_slug`. It is nullable and not unique: all 7 Traveler element rows share `traveler-aether` or `traveler-lumine`.
-- Skowt rows are keyed by slug, not by an FK, so characters that skowt has before Amber are still stored.
+- Assets are linked to characters through `characters.model_slug`. It is nullable and not unique: all 7 Traveler element rows share `traveler-aether` or `traveler-lumine`.
+- Models source rows are keyed by slug, not by an FK, so characters that source has before Amber are still stored.
 - Encoding:
   - art and icons: WebP q90
   - toon textures: lossless WebP (lightmap alpha holds the material id)
   - GLBs: uploaded as built
 - R2 keys are content-addressed and immutable. The cron never deletes; a manual `--gc` removes unreferenced objects.
-- Auth: `SKOWT_COOKIE` env. On 401, fall back to previews stored with `quality='preview'`; a later run with a working cookie upgrades them automatically. The run warns in logs and in `sync_runs`.
+- Auth: `MODELS_COOKIE` env. On 401, fall back to previews stored with `quality='preview'`; a later run with a working cookie upgrades them automatically. The run warns in logs and in `sync_runs`.
 - Runtime: a separate Railway cron service `models-sync` at `0 5 * * *`, one hour after the Amber `sync` at `0 4`.
 
 **Language: TypeScript, not Rust.** Measured: Python decodes Citlali's 8.2 MB of SKV in 1.6 s. Almost all of that is the pure-Python u32 xor/PRNG loop, which JS JIT-compiles to near-native speed with typed arrays and `Math.imul`. The other heavy steps are already native in Node: zlib (`node:zlib`), meshopt (WASM) and images (sharp/libvips). Rust would add a cargo/napi toolchain to the Railway build for maybe a 2× gain on the remaining ~tens of milliseconds. The cron also only rebuilds characters that changed. Fallback: if profiling ever shows `skv.ts` is hot, compile only the decoder to a Rust→WASM module behind the same `decodeSkv` signature.
@@ -60,23 +60,23 @@ Decisions already made in the grilling session:
 | `packages/models/src/build.ts` | `buildCharacter({main: Uint8Array[], extras: Record<label, Uint8Array[]>, name?, element?}) → BuildOutput` |
 | `packages/models/scripts/golden.ts` | Compares TS output with the Python outputs for every character in `../models/characters` |
 | `packages/db/src/schema.ts` | Schema changes (below), plus a new migration |
-| `apps/api/src/models-sync/skowt-client.ts` | Port of the skowt API parts of `fetch_characters.py`: roster, character, weapons, `viewer/links`, `pack` download, `downloads.generate`, 429 retry/backoff and throttle |
-| `apps/api/src/models-sync/source.ts` | `ModelsSource` interface with `SkowtSource` and `LocalDirSource` (reads the `../models/characters/<Name>/{source,extras,media}` layout) |
-| `apps/api/src/models-sync/media-roles.ts` | Allowlist mapping skowt `role` → `{kind, variant}` |
-| `apps/api/src/models-sync/match.ts` | Fills `characters.skowt_slug` by normalized English name plus Traveler overrides |
+| `apps/api/src/models-sync/source-client.ts` | Port of the source API parts of `fetch_characters.py`: roster, character, weapons, `viewer/links`, `pack` download, `downloads.generate`, 429 retry/backoff and throttle |
+| `apps/api/src/models-sync/source.ts` | `ModelsSource` interface with `SourceSource` and `LocalDirSource` (reads the `../models/characters/<Name>/{source,extras,media}` layout) |
+| `apps/api/src/models-sync/media-roles.ts` | Allowlist mapping source `role` → `{kind, variant}` |
+| `apps/api/src/models-sync/match.ts` | Fills `characters.model_slug` by normalized English name plus Traveler overrides |
 | `apps/api/src/models-sync/run-models-sync.ts` | Lock, diff, build, upload, upsert, `sync_runs` |
-| `apps/api/src/models-sync/gc.ts` | Lists `skowt_character/` and `model/` prefixes and deletes keys no row references |
+| `apps/api/src/models-sync/gc.ts` | Lists `model_character/` and `model/` prefixes and deletes keys no row references |
 | `apps/api/src/models-sync/cli.ts` | CLI entry point |
-| `apps/api/src/routes/characters.ts`, `routes/media.ts` | Expose models and skowt media |
+| `apps/api/src/routes/characters.ts`, `routes/media.ts` | Expose models and source media |
 | `apps/web/src/characters/TopBar.tsx`, `characters.module.css` | Side-icon avatar that breaks out of its circle |
 
 ## Schema changes (`packages/db/src/schema.ts`)
 
-- `characters.skowtSlug`: `text()`, nullable, indexed.
-- `mediaOwnerTypeEnum`: add `skowt_character`.
+- `characters.modelSlug`: `text()`, nullable, indexed.
+- `mediaOwnerTypeEnum`: add `model_character`.
 - `mediaKindEnum`: add `side_icon`, `round_icon`, `wish_icon`, `outfit_icon`, `sheet`, `art`, `outfit_splash`, `kit`.
 - New enums:
-  - `mediaSourceEnum`: `amber | skowt`
+  - `mediaSourceEnum`: `amber | source`
   - `mediaQualityEnum`: `original | preview`
 - `media_assets` new columns:
   - `variant text not null default ''` (the outfit label or kit role; `''` for single-instance kinds)
@@ -84,7 +84,7 @@ Decisions already made in the grilling session:
   - `quality` (default `original`)
 - `media_assets` unique key changes to `(ownerType, ownerId, kind, variant)`. Update the `onConflictDoUpdate` target in `media/sync-media.ts` to match; Amber behaviour stays the same with `variant=''`.
 - New table `character_models`:
-  - `skowtSlug text`
+  - `modelSlug text`
   - `variant text` (`default` or the outfit label)
   - `label text`
   - `glbKey text not null`, `weaponKey text`, `propsKey text`
@@ -94,12 +94,12 @@ Decisions already made in the grilling session:
   - `sourceHashes text[] not null` (sorted container hashes)
   - `contentHash text not null`
   - `updatedAt`
-  - primary key `(skowtSlug, variant)`
-- `sync_runs.source`: enum `amber | skowt`, default `amber`.
+  - primary key `(modelSlug, variant)`
+- `sync_runs.source`: enum `amber | source`, default `amber`.
 - `site_assets.name`: nullable `text`, so backdrops can be looked up by file name.
 
 R2 keys:
-- Images: `skowt_character/<slug>/<kind>[-<variant>]-<hash12>.webp`. Extend `mediaKey` with an optional variant, slugified.
+- Images: `model_character/<slug>/<kind>[-<variant>]-<hash12>.webp`. Extend `mediaKey` with an optional variant, slugified.
 - Models: `model/<slug>/<variant>/<role>-<hash12>.glb`.
 - Toon: `model/<slug>/<variant>/toon-<hash12>/{toon.json, *.webp}`, where the hash is taken over the sorted sidecar file hashes, so the whole prefix is immutable.
 
@@ -112,7 +112,7 @@ Write a feedback memory, `workflow-no-specs.md`, and add it to `MEMORY.md`:
 
 Reason: the user asked to stop doing spec + plan. There is no existing memory to remove; the old two-step flow came from the superpowers brainstorming skill.
 
-Copy this plan into the repo at `docs/superpowers/plans/2026-11-20-skowt-asset-pipeline.md`.
+Copy this plan into the repo at `docs/superpowers/plans/2026-11-20-models-asset-pipeline.md`.
 
 ---
 
@@ -188,9 +188,9 @@ BuildOutput = {
 
 Apply the schema changes above and generate the migration. Update `sync-media.ts` (conflict target, `variant: ''`, `source: 'amber'`) and its tests. Existing API tests must stay green.
 
-### Task 7: Skowt client and media roles
+### Task 7: Source client and media roles
 
-- `skowt-client.ts`: port the tRPC calls, `viewer_hashes` (`format === 1`, 32-hex), `collect_hashes`, `extra_label`, default weapon, `viewer/links` with a single retry on 403, the `pack` download with a MAGIC check, `downloads.generate` with the cookie (401 → `AuthError`), and the 429 backoff and throttle. Inject `fetch` so it can be tested.
+- `source-client.ts`: port the tRPC calls, `viewer_hashes` (`format === 1`, 32-hex), `collect_hashes`, `extra_label`, default weapon, `viewer/links` with a single retry on 403, the `pack` download with a MAGIC check, `downloads.generate` with the cookie (401 → `AuthError`), and the 429 backoff and throttle. Inject `fetch` so it can be tested.
 - Before writing `media-roles.ts`, dump the real `role` strings for 2–3 characters with a one-off read-only script. Then write the allowlist:
   - `icon.*` → `icon`, `side_icon`, `round_icon`, `wish_icon`, `outfit_icon`
   - `sheet.*` → `sheet`
@@ -207,33 +207,33 @@ Apply the schema changes above and generate the migration. Update `sync-media.ts
   - `getCharacter(slug) → {containers: {main: hash[], extras: Record<label, hash[]>}, media: {assetId, role, ext}[]}`
   - `fetchContainers(hashes)`
   - `fetchImage(asset, preferOriginal) → {bytes, quality}`
-- `SkowtSource` wraps the client. `LocalDirSource(dir)` reads the existing folders:
+- `SourceSource` wraps the client. `LocalDirSource(dir)` reads the existing folders:
   - slug comes from the folder name (`folder_name` inverse via the roster file or lowercase-kebab)
   - containers come from `source/` and `extras/*/`
   - media comes from `media/<Group>/` with the file name mapped to a role
   - quality is `original` for `.png` and `preview` for `.webp`
 - `match.ts`:
-  - Normalize the English `character_i18n.name` and the skowt name (lowercase, alphanumerics only).
+  - Normalize the English `character_i18n.name` and the source name (lowercase, alphanumerics only).
   - Override `10000005-*` → `traveler-aether` and `10000007-*` → `traveler-lumine`.
-  - Write `skowt_slug` and return the slugs it could not match.
+  - Write `model_slug` and return the slugs it could not match.
 - DB tests for matching.
 
 ### Task 9: `runModelsSync`
 
 - `runModelsSync(deps, opts: {only?: string[], force?, dryRun?})`:
   - Take its own advisory lock key; return `'busy'` if it is held.
-  - Write a `sync_runs` row with `source='skowt'`.
+  - Write a `sync_runs` row with `source='models'`.
   - Run matching first.
 - Per character, 2 at a time (memory bound):
   1. **Models:**
      - Compare the sorted container hashes per variant with `character_models.sourceHashes`.
      - If they changed: fetch, `buildCharacter`, put every file under its content-addressed key (`store.exists` first), then upsert `character_models`.
   2. **Media:**
-     - The source URL is `skowt:asset/<id>`. Skip if the row's source URL is unchanged and either the row is `quality='original'` or no cookie is configured.
+     - The source URL is `models:asset/<id>`. Skip if the row's source URL is unchanged and either the row is `quality='original'` or no cookie is configured.
      - Otherwise run `processImage` with q90 (add a `quality` param to `processImage`, default 85 so Amber is unchanged).
-     - Upsert with `source='skowt'`, `owner skowt_character/<slug>`.
+     - Upsert with `source='models'`, `owner model_character/<slug>`.
 - Counts: `{models: {built, skipped, failed}, media: {uploaded, skipped, failed, previews}}`.
-- If any `AuthError` occurs, set `error: 'skowt cookie expired; saved previews'` and status `partial`.
+- If any `AuthError` occurs, set `error: 'source cookie expired; saved previews'` and status `partial`.
 - Tests: memory store, fake source, and the real test DB. Cover:
   - first run builds;
   - second run skips everything;
@@ -246,7 +246,7 @@ Apply the schema changes above and generate the migration. Update `sync-media.ts
 
 - `models-sync/cli.ts` flags: `--source-dir <path>` (`LocalDirSource`), `--only slug,...`, `--force`, `--dry-run`, `--gc [--yes]`. GC prints the orphans and deletes only with `--yes`.
 - Add `deleteObject` and `list(prefix)` to `MediaStore`, `s3-store.ts` and `memory-store.ts`.
-- Env: an optional `SKOWT_COOKIE` in `parseCliEnv`.
+- Env: an optional `MODELS_COOKIE` in `parseCliEnv`.
 - Add a `models-cli` entry in `apps/api/tsup.config.ts` and a `models:sync` script in `apps/api/package.json` (`tsx --env-file-if-exists=../../.env src/models-sync/cli.ts`).
 
 ### Task 11: Backdrops
@@ -257,10 +257,10 @@ Apply the schema changes above and generate the migration. Update `sync-media.ts
 
 ### Task 12: API
 
-- `routes/media.ts`: add `loadSkowtMedia(db, store, slugs) → Map<slug, Array<{kind, variant, url, width, height, quality}>>`.
+- `routes/media.ts`: add `loadModelMedia(db, store, slugs) → Map<slug, Array<{kind, variant, url, width, height, quality}>>`.
 - `routes/characters.ts`:
-  - List: join `skowt_slug` and merge single-instance skowt kinds into `media` (`side_icon`, `round_icon`, `wish_icon`; Amber's `icon` stays).
-  - Detail: add `models: [{variant, label, glb, weapon, props, toon, clips}]` (URLs built with `store.publicUrl`; `toon` = the prefix URL) and `assets` (the full skowt list).
+  - List: join `model_slug` and merge single-instance source kinds into `media` (`side_icon`, `round_icon`, `wish_icon`; Amber's `icon` stays).
+  - Detail: add `models: [{variant, label, glb, weapon, props, toon, clips}]` (URLs built with `store.publicUrl`; `toon` = the prefix URL) and `assets` (the full source list).
 - Extend the route tests.
 
 ### Task 13: Web top bar
@@ -284,7 +284,7 @@ In `TopBar.tsx` `AvatarStrip`, render `media.side_icon ?? media.icon`. Change th
 
 - Create the `models-sync` service in the `genshin-impact` Railway project with the same repo and build as `sync`.
 - Start command: `node apps/api/dist/models-cli.js`. Cron: `0 5 * * *`. Restart policy: never. Pre-deploy: `db:migrate`.
-- Variables: `DATABASE_URL`, `R2_*`, `MEDIA_PUBLIC_URL`, `SKOWT_COOKIE`.
+- Variables: `DATABASE_URL`, `R2_*`, `MEDIA_PUBLIC_URL`, `MODELS_COOKIE`.
 - Service settings are set directly on Railway (new services can't opt in to railway.json). Commit `apps/api/railway.models.json` as documentation only.
 - Trigger one run manually and check the `sync_runs` row.
 
@@ -301,4 +301,4 @@ In `TopBar.tsx` `AvatarStrip`, render `media.side_icon ?? media.icon`. Change th
 - `--gc` with no `--yes` lists 0 orphans.
 - Load a built GLB plus its toon prefix in the existing Python viewer (`serve.py`) to compare rendering visually.
 - Web: `pnpm --filter web dev`; the top bar shows side icons breaking out of their rings.
-- Prod: after the bulk upload and the first cron run, the `sync_runs` row with `source='skowt'` is `succeeded`, or `partial` with the cookie warning.
+- Prod: after the bulk upload and the first cron run, the `sync_runs` row with `source='models'` is `succeeded`, or `partial` with the cookie warning.

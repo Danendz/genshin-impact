@@ -230,18 +230,18 @@ describe('characters', () => {
   })
 })
 
-describe('characters: skowt assets', () => {
-  const skowtRow = (kind: 'side_icon' | 'kit' | 'outfit_icon', variant = '') =>
+describe('characters: models assets', () => {
+  const modelRow = (kind: 'side_icon' | 'kit' | 'outfit_icon', variant = '') =>
     ({
-      ownerType: 'skowt_character',
+      ownerType: 'model_character',
       ownerId: 'diluc',
       kind,
       variant,
       label: variant || null,
-      source: 'skowt',
+      source: 'models',
       quality: 'original',
-      sourceUrl: `skowt:asset/${kind}${variant}`,
-      r2Key: `skowt_character/diluc/${kind}${variant}.webp`,
+      sourceUrl: `models:asset/${kind}${variant}`,
+      r2Key: `model_character/diluc/${kind}${variant}.webp`,
       width: 2,
       height: 2,
       contentHash: 'c',
@@ -250,18 +250,18 @@ describe('characters: skowt assets', () => {
   beforeEach(async () => {
     await db
       .update(characters)
-      .set({ skowtSlug: 'diluc' })
+      .set({ modelSlug: 'diluc' })
       .where(eq(characters.id, '10000005-pyro'))
     await db
       .insert(mediaAssets)
       .values([
-        skowtRow('side_icon'),
-        skowtRow('kit', 'constellation.1'),
-        skowtRow('outfit_icon', 'Outfit'),
+        modelRow('side_icon'),
+        modelRow('kit', 'constellation.1'),
+        modelRow('outfit_icon', 'Outfit'),
       ])
     await db.insert(characterModels).values([
       {
-        skowtSlug: 'diluc',
+        modelSlug: 'diluc',
         variant: 'default',
         glbKey: 'model/diluc/default/model-1.glb',
         weaponKey: 'model/diluc/default/weapon-1.glb',
@@ -271,7 +271,7 @@ describe('characters: skowt assets', () => {
         sourceHashes: ['a'],
       },
       {
-        skowtSlug: 'diluc',
+        modelSlug: 'diluc',
         variant: 'Skill',
         clips: [],
         bytes: 0,
@@ -288,11 +288,11 @@ describe('characters: skowt assets', () => {
     expect(d?.media).toEqual({
       icon: 'http://media.test/gi-media/character/10000005-pyro/icon.webp',
       side_icon:
-        'http://media.test/gi-media/skowt_character/diluc/side_icon.webp',
+        'http://media.test/gi-media/model_character/diluc/side_icon.webp',
     })
   })
 
-  it('lists built models and every skowt image on detail', async () => {
+  it('lists built models and every source image on detail', async () => {
     const body = (await (
       await app.request('/v1/characters/10000005-pyro')
     ).json()) as {

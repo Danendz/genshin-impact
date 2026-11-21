@@ -1,8 +1,8 @@
 import { characterI18n, characters, type Db } from '@gi/db'
 import { and, eq } from 'drizzle-orm'
-import type { SkowtCharacter } from './skowt-client'
+import type { SourceCharacter } from './source-client'
 
-/** Amber splits the Travelers by element; skowt has one entry per twin. */
+/** Amber splits the Travelers by element; the models source has one entry per twin. */
 const OVERRIDES: [RegExp, string][] = [
   [/^10000005(-|$)/, 'traveler-aether'],
   [/^10000007(-|$)/, 'traveler-lumine'],
@@ -12,20 +12,20 @@ export const normalizeName = (name: string) =>
   name.toLowerCase().replace(/[^a-z0-9]/g, '')
 
 /**
- * Fill `characters.skowt_slug` from the English name. Returns the skowt slugs
+ * Fill `characters.model_slug` from the English name. Returns the source slugs
  * no Amber character matched (assets are still stored; they link up once
  * Amber has the character).
  */
 export async function matchCharacters(
   db: Db,
-  roster: SkowtCharacter[],
+  roster: SourceCharacter[],
 ): Promise<{ updated: number; unmatched: string[] }> {
   const bySlug = new Set(roster.map((c) => c.slug))
   const byName = new Map(roster.map((c) => [normalizeName(c.name), c.slug]))
   const rows = await db
     .select({
       id: characters.id,
-      slug: characters.skowtSlug,
+      slug: characters.modelSlug,
       name: characterI18n.name,
     })
     .from(characters)
@@ -48,7 +48,7 @@ export async function matchCharacters(
     if (slug !== row.slug) {
       await db
         .update(characters)
-        .set({ skowtSlug: slug })
+        .set({ modelSlug: slug })
         .where(eq(characters.id, row.id))
       updated++
     }

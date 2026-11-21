@@ -36,14 +36,14 @@ export async function loadMedia(
   return out
 }
 
-/** skowt images that exist once per character, merged into `media` */
-const SKOWT_SINGLE: MediaKind[] = ['side_icon', 'round_icon', 'wish_icon']
+/** source images that exist once per character, merged into `media` */
+const MODEL_SINGLE: MediaKind[] = ['side_icon', 'round_icon', 'wish_icon']
 
-/** `media` for characters: Amber's kinds plus skowt's single icons. */
+/** `media` for characters: Amber's kinds plus the source's single icons. */
 export async function loadCharacterMedia(
   db: Db,
   store: MediaStore,
-  rows: { id: string; skowtSlug: string | null }[],
+  rows: { id: string; modelSlug: string | null }[],
 ): Promise<Map<string, MediaMap>> {
   const amber = await loadMedia(
     db,
@@ -51,19 +51,19 @@ export async function loadCharacterMedia(
     'character',
     rows.map((r) => r.id),
   )
-  const slugs = [...new Set(rows.flatMap((r) => r.skowtSlug ?? []))]
-  const skowt = await loadMedia(db, store, 'skowt_character', slugs)
+  const slugs = [...new Set(rows.flatMap((r) => r.modelSlug ?? []))]
+  const extras = await loadMedia(db, store, 'model_character', slugs)
   const out = new Map<string, MediaMap>()
   for (const r of rows) {
     const m: MediaMap = { ...amber.get(r.id) }
-    const extra = r.skowtSlug ? skowt.get(r.skowtSlug) : undefined
-    for (const kind of SKOWT_SINGLE) if (extra?.[kind]) m[kind] = extra[kind]
+    const extra = r.modelSlug ? extras.get(r.modelSlug) : undefined
+    for (const kind of MODEL_SINGLE) if (extra?.[kind]) m[kind] = extra[kind]
     out.set(r.id, m)
   }
   return out
 }
 
-export type SkowtAssetItem = {
+export type ModelAssetItem = {
   kind: MediaKind
   variant: string
   label: string | null
@@ -73,18 +73,18 @@ export type SkowtAssetItem = {
   quality: 'original' | 'preview'
 }
 
-/** Every skowt image of a character (icons, outfits, sheets, art, kit). */
-export async function loadSkowtAssets(
+/** Every source image of a character (icons, outfits, sheets, art, kit). */
+export async function loadModelAssets(
   db: Db,
   store: MediaStore,
   slug: string,
-): Promise<SkowtAssetItem[]> {
+): Promise<ModelAssetItem[]> {
   const rows = await db
     .select()
     .from(mediaAssets)
     .where(
       and(
-        eq(mediaAssets.ownerType, 'skowt_character'),
+        eq(mediaAssets.ownerType, 'model_character'),
         eq(mediaAssets.ownerId, slug),
       ),
     )
@@ -119,7 +119,7 @@ export async function loadModels(
   const rows = await db
     .select()
     .from(characterModels)
-    .where(eq(characterModels.skowtSlug, slug))
+    .where(eq(characterModels.modelSlug, slug))
     .orderBy(asc(characterModels.variant))
   const url = (k: string | null) => (k ? store.publicUrl(k) : null)
   return rows

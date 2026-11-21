@@ -24,10 +24,10 @@ import { findOrphans } from './gc'
 import { runModelsSync } from './run-models-sync'
 import {
   AuthError,
-  type SkowtAsset,
-  type SkowtCharacter,
-  type SkowtClient,
-} from './skowt-client'
+  type SourceAsset,
+  type SourceCharacter,
+  type SourceClient,
+} from './source-client'
 
 const { db, sql, close } = createDb(inject('dbUrl'))
 const h = (c: string) => c.repeat(32)
@@ -45,7 +45,7 @@ beforeAll(async () => {
 beforeEach(() => resetDb(db))
 afterAll(() => close())
 
-const roster: SkowtCharacter[] = [
+const roster: SourceCharacter[] = [
   { id: 'c1', slug: 'citlali', name: 'Citlali', hasModel: true },
   {
     id: 'c2',
@@ -60,7 +60,7 @@ const viewer = (...hashes: string[]) => ({
   model: { viewer: { format: 1, model: hashes[0], anim: hashes[1] } },
 })
 
-function files(slug: string, mainHashes: string[]): SkowtAsset[] {
+function files(slug: string, mainHashes: string[]): SourceAsset[] {
   const name = roster.find((c) => c.slug === slug)?.name as string
   return [
     {
@@ -121,7 +121,7 @@ function fakeClient(
       calls.containers.push(...hashes)
       return new Map(hashes.map((x) => [x, Uint8Array.of(1)]))
     },
-    originalUrls: async (_: string, assets: SkowtAsset[]) => {
+    originalUrls: async (_: string, assets: SourceAsset[]) => {
       if (opts.authFails) throw new AuthError('rejected')
       return new Map(assets.map((a) => [a.id, `https://orig.test/${a.id}`]))
     },
@@ -130,7 +130,7 @@ function fakeClient(
       calls.downloads.push(url)
       return png
     },
-  } as unknown as SkowtClient
+  } as unknown as SourceClient
   return { client, calls }
 }
 
@@ -184,7 +184,7 @@ describe('runModelsSync', () => {
     expect(res.status).toBe('succeeded')
     expect(res.unmatched).toEqual(['new-one'])
     const linked = await db
-      .select({ id: characters.id, slug: characters.skowtSlug })
+      .select({ id: characters.id, slug: characters.modelSlug })
       .from(characters)
     expect(Object.fromEntries(linked.map((r) => [r.id, r.slug]))).toEqual({
       '10000107': 'citlali',
@@ -193,14 +193,14 @@ describe('runModelsSync', () => {
     })
 
     const models = await db.select().from(characterModels)
-    expect(models.map((m) => `${m.skowtSlug}/${m.variant}`).sort()).toEqual([
+    expect(models.map((m) => `${m.modelSlug}/${m.variant}`).sort()).toEqual([
       'citlali/Outfit',
       'citlali/default',
       'traveler-aether/Outfit',
       'traveler-aether/default',
     ])
     const main = models.find(
-      (m) => m.skowtSlug === 'citlali' && m.variant === 'default',
+      (m) => m.modelSlug === 'citlali' && m.variant === 'default',
     )
     expect(main?.sourceHashes).toEqual([h('a'), h('b'), h('f')])
     expect(main?.glbKey).toMatch(
@@ -221,7 +221,7 @@ describe('runModelsSync', () => {
       'side_icon:',
     ])
     expect(
-      media.every((m) => m.quality === 'preview' && m.source === 'skowt'),
+      media.every((m) => m.quality === 'preview' && m.source === 'models'),
     ).toBe(true)
     // the model-less character still gets its images
     expect(
@@ -232,7 +232,7 @@ describe('runModelsSync', () => {
     ).toHaveLength(3)
 
     const [run] = await db.select().from(syncRuns)
-    expect(run).toMatchObject({ source: 'skowt', status: 'succeeded' })
+    expect(run).toMatchObject({ source: 'models', status: 'succeeded' })
   })
 
   it('skips everything on a second run and rebuilds only changed variants', async () => {

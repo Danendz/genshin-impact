@@ -21,7 +21,7 @@ export const mediaOwnerTypeEnum = pgEnum('media_owner_type', [
   'weapon',
   'material',
   'skill_icon',
-  'skowt_character',
+  'model_character',
 ])
 export const mediaKindEnum = pgEnum('media_kind', [
   'icon',
@@ -38,7 +38,7 @@ export const mediaKindEnum = pgEnum('media_kind', [
   'art',
   'kit',
 ])
-export const mediaSourceEnum = pgEnum('media_source', ['amber', 'skowt'])
+export const mediaSourceEnum = pgEnum('media_source', ['amber', 'models'])
 export const mediaQualityEnum = pgEnum('media_quality', ['original', 'preview'])
 export const syncStatusEnum = pgEnum('sync_status', [
   'running',
@@ -46,7 +46,7 @@ export const syncStatusEnum = pgEnum('sync_status', [
   'partial',
   'failed',
 ])
-export const syncSourceEnum = pgEnum('sync_source', ['amber', 'skowt'])
+export const syncSourceEnum = pgEnum('sync_source', ['amber', 'models'])
 
 const updatedAt = () => timestamp({ withTimezone: true }).notNull().defaultNow()
 
@@ -64,11 +64,11 @@ export const characters = pgTable(
     sourceHash: text().notNull(),
     /** sha256 of the normalized detail record; null until a sync computed it */
     detailHash: text(),
-    /** skowt.cc character slug; shared by the Traveler's element rows */
-    skowtSlug: text(),
+    /** models source character slug; shared by the Traveler's element rows */
+    modelSlug: text(),
     updatedAt: updatedAt(),
   },
-  (t) => [index().on(t.skowtSlug)],
+  (t) => [index().on(t.modelSlug)],
 )
 
 export const characterI18n = pgTable(
@@ -152,11 +152,11 @@ export const mediaAssets = pgTable(
   (t) => [unique().on(t.ownerType, t.ownerId, t.kind, t.variant)],
 )
 
-/** One built 3D model per skowt character variant (`default`, `Outfit 1`, ...). */
+/** One built 3D model per models source character variant (`default`, `Outfit 1`, ...). */
 export const characterModels = pgTable(
   'character_models',
   {
-    skowtSlug: text().notNull(),
+    modelSlug: text().notNull(),
     variant: text().notNull(),
     /** null: the variant isn't a rigged character (skill props); kept so it isn't refetched */
     glbKey: text(),
@@ -170,7 +170,7 @@ export const characterModels = pgTable(
     sourceHashes: text().array().notNull(),
     updatedAt: updatedAt(),
   },
-  (t) => [primaryKey({ columns: [t.skowtSlug, t.variant] })],
+  (t) => [primaryKey({ columns: [t.modelSlug, t.variant] })],
 )
 
 export const syncRuns = pgTable('sync_runs', {

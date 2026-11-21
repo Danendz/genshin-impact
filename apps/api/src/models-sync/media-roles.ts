@@ -1,8 +1,8 @@
-// Which skowt images we keep, and how they're stored. Amber stays the source for
+// Which source images we keep, and how they're stored. Amber stays the source for
 // the wish splash, namecards and the small icon (it's equal or sharper there).
-import type { SkowtAsset } from './skowt-client'
+import type { SourceAsset } from './source-client'
 
-export type SkowtMediaKind =
+export type ModelMediaKind =
   | 'icon'
   | 'side_icon'
   | 'round_icon'
@@ -14,7 +14,7 @@ export type SkowtMediaKind =
   | 'kit'
 
 export interface MediaSlot {
-  kind: SkowtMediaKind
+  kind: ModelMediaKind
   /**
    * '' for one-per-character kinds; the outfit label (`Outfit 1`, matching the
    * model variant) for outfit art; the role (`constellation.2`) for kit icons;
@@ -24,7 +24,7 @@ export interface MediaSlot {
   label: string | null
 }
 
-const SINGLE: Record<string, SkowtMediaKind> = {
+const SINGLE: Record<string, ModelMediaKind> = {
   'icon.avatar': 'icon',
   'icon.side': 'side_icon',
   'icon.round': 'round_icon',
@@ -33,7 +33,7 @@ const SINGLE: Record<string, SkowtMediaKind> = {
 
 export function mediaSlot(
   characterName: string,
-  asset: SkowtAsset,
+  asset: SourceAsset,
 ): MediaSlot | undefined {
   if (asset.extension === 'glb' || asset.hidden || !asset.id) return undefined
   const role = asset.role ?? ''

@@ -1,6 +1,4 @@
-// skowt.cc API client (port of models/fetch_characters.py's API layer).
-const API = 'https://den.skowt.cc'
-const PACK = 'https://pack.skowt.cc'
+// Models source API client (port of models/fetch_characters.py's API layer).
 const GAME = 'genshin-impact'
 const HASH_RE = /^[0-9a-f]{32}$/
 const VIEWER_KEYS = ['model', 'anim', 'props', 'toon'] as const
@@ -9,7 +7,7 @@ const SKV_MAGIC = [154, 126, 49, 197]
 export class FetchError extends Error {}
 export class AuthError extends FetchError {}
 
-export interface SkowtCharacter {
+export interface SourceCharacter {
   id: string
   slug: string
   name: string
@@ -17,7 +15,7 @@ export interface SkowtCharacter {
   facets?: { facet: string; name: string }[]
 }
 
-export interface SkowtAsset {
+export interface SourceAsset {
   id: string
   publicId?: string
   name?: string
@@ -29,15 +27,17 @@ export interface SkowtAsset {
   category?: { name?: string }
 }
 
-export interface SkowtWeapons {
+export interface SourceWeapons {
   defaultSetId?: string
   weapons?: { setId?: string; name?: string; model?: { viewer?: unknown } }[]
 }
 
-export interface SkowtClientOptions {
+export interface SourceClientOptions {
+  /** site origin (`MODELS_SOURCE_URL`); the API and packs live on its subdomains */
+  baseUrl: string
   fetch?: typeof fetch
   cookie?: string
-  /** pause after each API call, ms (skowt rate-limits) */
+  /** pause after each API call, ms (the source rate-limits) */
   throttleMs?: number
   sleep?: (ms: number) => Promise<void>
 }
@@ -46,11 +46,9 @@ const HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
   Accept: 'application/json, text/plain, */*',
-  Origin: 'https://skowt.cc',
-  Referer: 'https://skowt.cc/',
 }
 
-/** Python's str.title(), enough for skowt's ASCII labels. */
+/** Python's str.title(), enough for the source's ASCII labels. */
 export const titleCase = (s: string) =>
   s
     .toLowerCase()
@@ -69,7 +67,7 @@ export function cleanLabel(value: string): string {
 /** `Citlali · Outfit 3D model` -> `Outfit`; boss/skill names stay descriptive. */
 export function extraLabel(
   characterName: string,
-  asset: SkowtAsset,
+  asset: SourceAsset,
   used: Set<string>,
 ): string {
   let raw = (asset.name ?? '').trim()
@@ -109,8 +107,8 @@ export interface ContainerSets {
 /** Split one character's containers into the main set (+ default weapon) and extras. */
 export function collectHashes(
   characterName: string,
-  files: SkowtAsset[],
-  weapons: SkowtWeapons | undefined,
+  files: SourceAsset[],
+  weapons: SourceWeapons | undefined,
 ): ContainerSets {
   const main: string[] = []
   const extras: Record<string, string[]> = {}
@@ -148,15 +146,18 @@ export function collectHashes(
   return { main, extras, problems }
 }
 
-export const elementOf = (c: SkowtCharacter) =>
+export const elementOf = (c: SourceCharacter) =>
   c.facets?.find((f) => f.facet === 'element')?.name ?? null
 
-export function createSkowtClient(opts: SkowtClientOptions = {}) {
+export function createSourceClient(opts: SourceClientOptions) {
+  const site = new URL(opts.baseUrl)
+  const API = `${site.protocol}//den.${site.host}`
+  const PACK = `${site.protocol}//pack.${site.host}`
   const fetchFn = opts.fetch ?? fetch
   const throttle = opts.throttleMs ?? 400
   const sleep =
     opts.sleep ?? ((ms: number) => new Promise((r) => setTimeout(r, ms)))
-  // Signed container links are bound to the `skowt_visit` cookie the API
+  // Signed container links are bound to the visit cookie the API
   // sets, so keep cookies like a browser session (requests.Session did).
   const jar = new Map<string, string>()
   for (const part of opts.cookie?.split(';') ?? []) {
@@ -164,7 +165,11 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
     if (name) jar.set(name, value.join('='))
   }
   const headers = () => {
-    const h: Record<string, string> = { ...HEADERS }
+    const h: Record<string, string> = {
+      ...HEADERS,
+      Origin: site.origin,
+      Referer: `${site.origin}/`,
+    }
     if (jar.size) h.Cookie = [...jar].map(([k, v]) => `${k}=${v}`).join('; ')
     return h
   }
@@ -176,7 +181,7 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
     }
   }
 
-  /** GET (or POST `body`) with retry/backoff for skowt's rate limiter (429). */
+  /** GET (or POST `body`) with retry/backoff for the source's rate limiter (429). */
   async function request(
     url: string,
     init: { body?: unknown; attempts?: number } = {},
@@ -236,18 +241,18 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
     hasCookie: Boolean(opts.cookie),
 
     characters: () =>
-      trpc<{ characters: SkowtCharacter[] }>('asset.gameCharacters', {
+      trpc<{ characters: SourceCharacter[] }>('asset.gameCharacters', {
         slug: GAME,
       }).then((d) => d.characters),
 
     character: (slug: string) =>
-      trpc<{ files: SkowtAsset[] }>('asset.getCharacter', {
+      trpc<{ files: SourceAsset[] }>('asset.getCharacter', {
         gameSlug: GAME,
         character: slug,
       }),
 
     weapons: (characterId: string) =>
-      trpc<SkowtWeapons>('asset.characterWeapons', { setId: characterId }),
+      trpc<SourceWeapons>('asset.characterWeapons', { setId: characterId }),
 
     /** Download SKV containers, refreshing expired signatures once. */
     async containers(hashes: string[]): Promise<Map<string, Uint8Array>> {
@@ -288,7 +293,7 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
     /** Signed full-size URLs; needs a signed-in session cookie. */
     async originalUrls(
       characterName: string,
-      assets: SkowtAsset[],
+      assets: SourceAsset[],
     ): Promise<Map<string, string>> {
       const res = await request(`${API}/trpc/downloads.generate`, {
         body: {
@@ -305,7 +310,7 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
       await sleep(throttle)
       if (res.status === 401) {
         throw new AuthError(
-          'SKOWT_COOKIE was rejected; sign in on skowt.cc and copy it again',
+          'MODELS_COOKIE was rejected; sign in on the source site and copy it again',
         )
       }
       if (!res.ok)
@@ -338,4 +343,4 @@ export function createSkowtClient(opts: SkowtClientOptions = {}) {
   }
 }
 
-export type SkowtClient = ReturnType<typeof createSkowtClient>
+export type SourceClient = ReturnType<typeof createSourceClient>

@@ -1,5 +1,5 @@
-// Decodes SKV (SKOWT Viewer) containers into standard GLB files.
-// Port of models/tools/skv_decode.py, itself a port of skowt's viewer.js `$e`.
+// Decodes SKV containers into standard GLB files.
+// Port of models/tools/skv_decode.py, itself a port of the source viewer.js `$e`.
 import { inflateSync } from 'node:zlib'
 
 export const SKV_MAGIC = Uint8Array.of(154, 126, 49, 197)

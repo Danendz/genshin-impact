@@ -73,8 +73,8 @@
       "name": "character_models",
       "schema": "",
       "columns": {
-        "skowt_slug": {
-          "name": "skowt_slug",
+        "model_slug": {
+          "name": "model_slug",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -138,9 +138,9 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "character_models_skowt_slug_variant_pk": {
-          "name": "character_models_skowt_slug_variant_pk",
-          "columns": ["skowt_slug", "variant"]
+        "character_models_model_slug_variant_pk": {
+          "name": "character_models_model_slug_variant_pk",
+          "columns": ["model_slug", "variant"]
         }
       },
       "uniqueConstraints": {},
@@ -214,8 +214,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "skowt_slug": {
-          "name": "skowt_slug",
+        "model_slug": {
+          "name": "model_slug",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -229,11 +229,11 @@
         }
       },
       "indexes": {
-        "characters_skowt_slug_index": {
-          "name": "characters_skowt_slug_index",
+        "characters_model_slug_index": {
+          "name": "characters_model_slug_index",
           "columns": [
             {
-              "expression": "skowt_slug",
+              "expression": "model_slug",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -765,7 +765,7 @@
         "weapon",
         "material",
         "skill_icon",
-        "skowt_character"
+        "model_character"
       ]
     },
     "public.media_quality": {
@@ -776,12 +776,12 @@
     "public.media_source": {
       "name": "media_source",
       "schema": "public",
-      "values": ["amber", "skowt"]
+      "values": ["amber", "models"]
     },
     "public.sync_source": {
       "name": "sync_source",
       "schema": "public",
-      "values": ["amber", "skowt"]
+      "values": ["amber", "models"]
     },
     "public.sync_status": {
       "name": "sync_status",

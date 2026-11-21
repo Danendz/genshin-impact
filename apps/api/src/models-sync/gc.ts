@@ -2,10 +2,10 @@ import { characterModels, type Db, mediaAssets } from '@gi/db'
 import { eq } from 'drizzle-orm'
 import type { MediaStore } from '../media/store'
 
-const PREFIXES = ['skowt_character/', 'model/']
+const PREFIXES = ['model_character/', 'model/']
 
 /**
- * Objects under the skowt prefixes that no row references any more (old
+ * Objects under the models prefixes that no row references any more (old
  * builds, replaced images). Keys are content-addressed, so the sync never
  * deletes; this is the manual clean-up.
  */
@@ -18,7 +18,7 @@ export async function findOrphans(
   for (const r of await db
     .select({ key: mediaAssets.r2Key })
     .from(mediaAssets)
-    .where(eq(mediaAssets.ownerType, 'skowt_character'))) {
+    .where(eq(mediaAssets.ownerType, 'model_character'))) {
     referenced.add(r.key)
   }
   for (const m of await db.select().from(characterModels)) {

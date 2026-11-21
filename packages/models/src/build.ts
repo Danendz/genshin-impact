@@ -12,7 +12,7 @@ import { decompressMeshopt, mergeAnimations } from './merge-anim'
 import { buildSidecar, type ToonSidecar } from './toon'
 
 export interface BuiltVariant {
-  /** `default`, or the outfit/boss label from skowt (`Outfit`, `Childe Boss`) */
+  /** `default`, or the outfit/boss label from the source (`Outfit`, `Childe Boss`) */
   variant: string
   /** `<Name>.glb`: the character with its animation library merged in */
   glb: Uint8Array

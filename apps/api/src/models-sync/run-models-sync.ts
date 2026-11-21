@@ -1,4 +1,4 @@
-// Daily skowt sync: discover characters, rebuild 3D variants whose containers
+// Daily models sync: discover characters, rebuild 3D variants whose containers
 // changed, upload the images we keep, and record everything for the API.
 import { createHash } from 'node:crypto'
 import {
@@ -24,14 +24,14 @@ import {
   AuthError,
   collectHashes,
   elementOf,
-  type SkowtAsset,
-  type SkowtCharacter,
-  type SkowtClient,
-} from './skowt-client'
+  type SourceAsset,
+  type SourceCharacter,
+  type SourceClient,
+} from './source-client'
 
 /** pg_try_advisory_lock key; the Amber sync uses 8_420_731. */
 export const MODELS_SYNC_LOCK_KEY = 8_420_732
-const OWNER = 'skowt_character'
+const OWNER = 'model_character'
 const CHARACTER_CONCURRENCY = 2
 const IMAGE_CONCURRENCY = 6
 const IMAGE_QUALITY = 90
@@ -39,7 +39,7 @@ const IMAGE_QUALITY = 90
 export type ModelsSyncDeps = {
   db: Db
   sql: ReturnType<typeof createDb>['sql']
-  client: SkowtClient
+  client: SourceClient
   store: MediaStore
   /** already-downloaded containers/images (the bulk upload) */
   cache?: LocalCache
@@ -49,7 +49,7 @@ export type ModelsSyncDeps = {
 }
 
 export type ModelsSyncOptions = {
-  /** skowt slugs or names; default every character */
+  /** source slugs or names; default every character */
   only?: string[]
   /** rebuild and re-upload even if nothing changed */
   force?: boolean
@@ -131,10 +131,10 @@ async function execute(
     await db
       .update(syncRuns)
       .set({ status: 'failed', error: 'abandoned', finishedAt: new Date() })
-      .where(and(eq(syncRuns.status, 'running'), eq(syncRuns.source, 'skowt')))
+      .where(and(eq(syncRuns.status, 'running'), eq(syncRuns.source, 'models')))
     const [run] = await db
       .insert(syncRuns)
-      .values({ source: 'skowt', status: 'running', counts: {} })
+      .values({ source: 'models', status: 'running', counts: {} })
       .returning({ id: syncRuns.id })
     runId = run?.id ?? null
   }
@@ -165,7 +165,7 @@ async function execute(
       const matched = await matchCharacters(db, roster)
       result.unmatched = matched.unmatched
       if (matched.updated)
-        log(`linked ${matched.updated} Amber characters to skowt`)
+        log(`linked ${matched.updated} Amber characters to the models source`)
       if (matched.unmatched.length) {
         log(`not in Amber (stored anyway): ${matched.unmatched.join(', ')}`)
       }
@@ -203,7 +203,7 @@ async function execute(
   if (runId !== null) {
     const error =
       fatal ??
-      (result.authFailed ? 'skowt cookie rejected; saved previews' : null) ??
+      (result.authFailed ? 'models cookie rejected; saved previews' : null) ??
       result.failures[0]?.reason ??
       null
     await db
@@ -218,7 +218,7 @@ async function execute(
   }
   return result
 
-  async function syncCharacter(character: SkowtCharacter) {
+  async function syncCharacter(character: SourceCharacter) {
     const detail = await client.character(character.slug)
     const files = detail.files ?? []
     if (!opts.skipModels && character.hasModel) {
@@ -229,9 +229,9 @@ async function execute(
   }
 
   async function syncModels(
-    character: SkowtCharacter,
-    files: SkowtAsset[],
-    weapons: Awaited<ReturnType<SkowtClient['weapons']>>,
+    character: SourceCharacter,
+    files: SourceAsset[],
+    weapons: Awaited<ReturnType<SourceClient['weapons']>>,
   ) {
     const sets = collectHashes(character.name, files, weapons)
     for (const p of sets.problems) log(`${character.slug}: note: ${p}`)
@@ -243,7 +243,7 @@ async function execute(
             hashes: characterModels.sourceHashes,
           })
           .from(characterModels)
-          .where(eq(characterModels.skowtSlug, character.slug))
+          .where(eq(characterModels.modelSlug, character.slug))
       ).map((r) => [r.variant, [...r.hashes].sort().join(',')]),
     )
     const variants: [string, string[]][] = [
@@ -367,7 +367,7 @@ async function execute(
     out: Awaited<ReturnType<typeof uploadVariant>> | null,
   ) {
     const values = {
-      skowtSlug: slug,
+      modelSlug: slug,
       variant,
       glbKey: out?.glbKey ?? null,
       weaponKey: out?.weaponKey ?? null,
@@ -382,14 +382,17 @@ async function execute(
       .insert(characterModels)
       .values(values)
       .onConflictDoUpdate({
-        target: [characterModels.skowtSlug, characterModels.variant],
+        target: [characterModels.modelSlug, characterModels.variant],
         set: values,
       })
   }
 
-  async function syncMediaFor(character: SkowtCharacter, files: SkowtAsset[]) {
+  async function syncMediaFor(
+    character: SourceCharacter,
+    files: SourceAsset[],
+  ) {
     const c = result.counts.media
-    const slots = new Map<string, { asset: SkowtAsset; slot: MediaSlot }>()
+    const slots = new Map<string, { asset: SourceAsset; slot: MediaSlot }>()
     for (const asset of files) {
       const slot = mediaSlot(character.name, asset)
       const key = slot && `${slot.kind}|${slot.variant}`
@@ -474,7 +477,7 @@ async function execute(
           kind: slot.kind,
           variant: slot.variant,
           label: slot.label,
-          source: 'skowt',
+          source: 'models',
           quality: original ? 'original' : 'preview',
           sourceUrl: sourceUrl(asset),
           r2Key,
@@ -504,4 +507,4 @@ async function execute(
   }
 }
 
-const sourceUrl = (asset: SkowtAsset) => `skowt:asset/${asset.id}`
+const sourceUrl = (asset: SourceAsset) => `models:asset/${asset.id}`
