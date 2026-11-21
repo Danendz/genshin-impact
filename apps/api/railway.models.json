@@ -6,7 +6,7 @@
   "deploy": {
     "preDeployCommand": ["pnpm --filter @gi/db db:migrate"],
     "startCommand": "node apps/api/dist/models-cli.js",
-    "cronSchedule": "0 5 * * *",
+    "cronSchedule": "0 5 1,16 * *",
     "restartPolicyType": "NEVER"
   }
 }

@@ -1,4 +1,4 @@
-// Daily models sync: discover characters, rebuild 3D variants whose containers
+// Models sync (twice a month): discover characters, rebuild 3D variants whose containers
 // changed, upload the images we keep, and record everything for the API.
 import { createHash } from 'node:crypto'
 import {

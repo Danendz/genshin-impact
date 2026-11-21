@@ -24,7 +24,7 @@ pnpm --filter @gi/web dev   # web on :5173
 | web         | Vercel, project root `apps/web`                    | [`apps/web/vercel.json`](apps/web/vercel.json)                                                           |
 | api         | Railway                                            | [`apps/api/railway.json`](apps/api/railway.json) (runs migrations as pre-deploy, health check `/health`) |
 | sync        | Railway cron, daily 04:00 UTC                      | [`apps/api/railway.sync.json`](apps/api/railway.sync.json)                                               |
-| models-sync | Railway cron, daily 05:00 UTC                      | [`apps/api/railway.models.json`](apps/api/railway.models.json) (3D models + art)                         |
+| models-sync | Railway cron, 05:00 UTC on the 1st and 16th       | [`apps/api/railway.models.json`](apps/api/railway.models.json) (3D models + art)                         |
 | Postgres    | Railway plugin                                     |                                                                                                          |
 | media       | Cloudflare R2 bucket `gi-media` with public access |                                                                                                          |
 
