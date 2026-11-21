@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [remake, master]
+    branches: [master]
   # every PR, whatever its base branch
   pull_request:
 
