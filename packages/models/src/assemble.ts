@@ -1,5 +1,5 @@
 // Sorts one folder's decoded containers into a character (from models/build.py).
-import { type Glb, parseGlb } from './glb'
+import { type Glb, parseGlb, rebrandGlb } from './glb'
 import { decodeSkv, type SkvRole } from './skv'
 
 const MESHOPT = 'EXT_meshopt_compression'
@@ -78,12 +78,8 @@ export function decodeContainers(containers: Container[]): Part[] {
     } catch (err) {
       throw new BuildError(`${id}: ${(err as Error).message}`)
     }
-    return {
-      id,
-      role: result.role,
-      glb: result.glb,
-      ...parseGlb(result.glb, id),
-    }
+    const glb = rebrandGlb(result.glb)
+    return { id, role: result.role, glb, ...parseGlb(glb, id) }
   })
 }
 

@@ -96,6 +96,10 @@ async function check(
       problems.push('props differ')
   }
 
+  // Python has no toon builder for NPC and boss forms; the viewer copies of
+  // those came from this TS build, so there is nothing to compare against.
+  if (built.kind !== 'avatar') return problems
+
   const toonDir = join(VIEWER, 'toon', viewerName)
   const refJson = readFileSync(join(toonDir, 'toon.json'), 'utf8').replaceAll(
     '.png"',

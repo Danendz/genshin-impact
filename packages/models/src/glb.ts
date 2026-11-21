@@ -70,3 +70,39 @@ export function imageBytes(glb: Glb, image: GltfDoc): Uint8Array {
   const start = bv.byteOffset ?? 0
   return glb.bin.subarray(start, start + bv.byteLength)
 }
+
+/** Our name for the custom data the source files tag `extras.skowt`. */
+export const BRAND = 'danendz'
+const KEY = /"skowt"([ \t\n\r]*):/g
+const GENERATOR = /("generator"[ \t\n\r]*:[ \t\n\r]*)"skowt"/g
+
+/**
+ * Rename the `skowt` extras key and `asset.generator` to BRAND. Works on the
+ * JSON text, so every other byte stays put (same output as models/tools/glb.py
+ * `rebrand_glb`).
+ */
+export function rebrandGlb(data: Uint8Array): Uint8Array {
+  if (data.length < 20) return data
+  const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
+  const jsonLen = view.getUint32(12, true)
+  if (view.getUint32(16, true) !== JSON_CHUNK_TYPE) return data
+  const text = new TextDecoder().decode(data.subarray(20, 20 + jsonLen))
+  const renamed = text
+    .replace(KEY, `"${BRAND}"$1:`)
+    .replace(GENERATOR, `$1"${BRAND}"`)
+  if (renamed === text) return data
+  const body = new TextEncoder().encode(renamed.replace(/ +$/, ''))
+  const padded = body.length + pad4(body.length)
+  const rest = data.subarray(20 + jsonLen)
+  const out = new Uint8Array(20 + padded + rest.length)
+  const outView = new DataView(out.buffer)
+  outView.setUint32(0, GLB_MAGIC, true)
+  outView.setUint32(4, 2, true)
+  outView.setUint32(8, out.length, true)
+  outView.setUint32(12, padded, true)
+  outView.setUint32(16, JSON_CHUNK_TYPE, true)
+  out.set(body, 20)
+  out.fill(0x20, 20 + body.length, 20 + padded)
+  out.set(rest, 20 + padded)
+  return out
+}

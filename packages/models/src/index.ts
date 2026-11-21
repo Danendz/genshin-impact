@@ -7,6 +7,6 @@ export {
   buildVariantFrom,
   DEFAULT_VARIANT,
 } from './build'
-export { parseGlb, writeGlb } from './glb'
+export { BRAND, parseGlb, rebrandGlb, writeGlb } from './glb'
 export { decodeSkv, isSkv, SKV_MAGIC, SkvError } from './skv'
 export type { ToonSidecar } from './toon'
